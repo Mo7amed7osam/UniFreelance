@@ -9,12 +9,15 @@ import JobList from '@/components/student/JobList';
 import SkillVerification from '@/components/student/SkillVerification';
 import VideoInterview from '@/components/student/VideoInterview';
 import StudentContracts from '@/components/student/StudentContracts';
+import StudentWallet from '@/components/student/StudentWallet';
 import ClientDashboard from '@/components/client/ClientDashboard';
 import PostJob from '@/components/client/PostJob';
 import ViewProposals from '@/components/client/ViewProposals';
 import ClientContracts from '@/components/client/ClientContracts';
+import ClientWallet from '@/components/client/ClientWallet';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import ReviewInterview from '@/components/admin/ReviewInterview';
+import AdminPayments from '@/components/admin/AdminPayments';
 import ProtectedRoute from '@/auth/ProtectedRoute';
 import { AppShell } from '@/components/layout/AppShell';
 import ContractDetails from '@/components/contracts/ContractDetails';
@@ -87,6 +90,16 @@ export const AppRouter = () => (
         }
       />
       <Route
+        path="/student/wallet"
+        element={
+          <ProtectedRoute roles={['Student']}>
+            <AppShell>
+              <StudentWallet />
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/student/video-interview/:interviewId"
         element={
           <ProtectedRoute roles={['Student']}>
@@ -123,6 +136,16 @@ export const AppRouter = () => (
           <ProtectedRoute roles={['Client']}>
             <AppShell>
               <ViewProposals />
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/client/wallet"
+        element={
+          <ProtectedRoute roles={['Client']}>
+            <AppShell>
+              <ClientWallet />
             </AppShell>
           </ProtectedRoute>
         }
@@ -165,6 +188,16 @@ export const AppRouter = () => (
           <ProtectedRoute roles={['Admin']}>
             <AppShell>
               <ReviewInterview />
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/payments"
+        element={
+          <ProtectedRoute roles={['Admin']}>
+            <AppShell>
+              <AdminPayments />
             </AppShell>
           </ProtectedRoute>
         }

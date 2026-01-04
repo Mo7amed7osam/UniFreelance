@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Briefcase, ClipboardList, FileBadge, Home, LayoutDashboard, Users } from 'lucide-react';
+import { Briefcase, ClipboardList, FileBadge, Home, LayoutDashboard, Users, Wallet } from 'lucide-react';
 import useAuth from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
@@ -8,6 +8,7 @@ const navByRole = {
     { label: 'Dashboard', to: '/student/dashboard', icon: LayoutDashboard },
     { label: 'Job Board', to: '/student/jobs', icon: Briefcase },
     { label: 'Contracts', to: '/student/contracts', icon: ClipboardList },
+    { label: 'Wallet', to: '/student/wallet', icon: Wallet },
     { label: 'Skill Verification', to: '/student/skill-verification', icon: FileBadge },
     { label: 'Profile', to: '/student/profile', icon: Home },
   ],
@@ -16,9 +17,11 @@ const navByRole = {
     { label: 'Post Job', to: '/client/post-job', icon: ClipboardList },
     { label: 'Proposals', to: '/client/view-proposals', icon: Users },
     { label: 'Contracts', to: '/client/contracts', icon: Briefcase },
+    { label: 'Wallet', to: '/client/wallet', icon: Wallet },
   ],
   Admin: [
     { label: 'Dashboard', to: '/admin/dashboard', icon: LayoutDashboard },
+    { label: 'Payments', to: '/admin/payments', icon: ClipboardList },
   ],
 };
 

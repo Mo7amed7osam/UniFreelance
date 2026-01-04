@@ -4,6 +4,12 @@ export const API = {
     login: '/auth/login',
     me: '/auth/me',
   },
+  wallet: {
+    balance: '/wallet/balance',
+    topups: '/wallet/topups',
+    topupScreenshot: (id: string) => `/wallet/topups/${id}/screenshot`,
+    withdrawals: '/wallet/withdrawals',
+  },
   jobs: {
     list: '/jobs',
     create: '/jobs',
@@ -45,5 +51,11 @@ export const API = {
     deleteUser: (id: string) => `/admin/users/${id}`,
     deleteJob: (id: string) => `/admin/jobs/${id}`,
     skills: '/admin/skills',
+    topups: '/admin/payments/topups',
+    topupApprove: (id: string) => `/admin/payments/topups/${id}/approve`,
+    topupDecline: (id: string) => `/admin/payments/topups/${id}/decline`,
+    withdrawals: '/admin/payments/withdrawals',
+    withdrawalApprove: (id: string) => `/admin/payments/withdrawals/${id}/approve`,
+    withdrawalDecline: (id: string) => `/admin/payments/withdrawals/${id}/decline`,
   },
 };
