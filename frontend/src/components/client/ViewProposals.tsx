@@ -1,20 +1,29 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { getClientJobs, getClientProposals, getJobProposals, getSkills, selectStudentForJob } from '@/services/api';
+import {
+    getClientJobs,
+    getClientProposals,
+    getJobProposals,
+    getSkills,
+    acceptProposal,
+} from '@/services/api';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
 
 const ViewProposals: React.FC = () => {
     const queryClient = useQueryClient();
+    const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [selectedJob, setSelectedJob] = useState<string>(searchParams.get('jobId') || '');
     const [selectedSkill, setSelectedSkill] = useState<string>('');
+    const [budgetDrafts, setBudgetDrafts] = useState<Record<string, string>>({});
 
     const { data: jobs, isLoading: jobsLoading } = useQuery({
         queryKey: ['client', 'jobs'],
@@ -48,16 +57,19 @@ const ViewProposals: React.FC = () => {
         });
     }, [proposals, selectedSkill]);
 
-    const selectMutation = useMutation({
-        mutationFn: ({ jobId, studentId }: { jobId: string; studentId: string }) =>
-            selectStudentForJob(jobId, studentId),
-        onSuccess: () => {
-            toast.success('Student selected successfully.');
+    const acceptMutation = useMutation({
+        mutationFn: ({ proposalId, agreedBudget }: { proposalId: string; agreedBudget?: number }) =>
+            acceptProposal(proposalId, { agreedBudget }),
+        onSuccess: (data: any) => {
+            toast.success('Proposal accepted. Escrow funded.');
             queryClient.invalidateQueries({ queryKey: ['client', 'proposals'] });
             queryClient.invalidateQueries({ queryKey: ['client', 'jobs'] });
+            if (data?.contract?._id) {
+                navigate(`/contracts/${data.contract._id}`);
+            }
         },
         onError: (error: any) => {
-            toast.error(error?.response?.data?.message || 'Failed to select student.');
+            toast.error(error?.response?.data?.message || 'Failed to accept proposal.');
         },
     });
 
@@ -126,11 +138,17 @@ const ViewProposals: React.FC = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredProposals.map((proposal: any) => (
+                        {filteredProposals.map((proposal: any) => {
+                            const statusValue = proposal.status || 'submitted';
+                            const displayStatus = statusValue === 'pending' ? 'submitted' : statusValue;
+                            return (
                             <TableRow key={proposal._id}>
                                 <TableCell>
                                     <div className="font-semibold text-ink-900">{proposal.studentId?.name || 'Student'}</div>
                                     <p className="text-xs text-ink-500">{proposal.studentId?.email || '—'}</p>
+                                    {proposal.proposedBudget ? (
+                                        <p className="mt-2 text-xs text-ink-500">Proposed budget: ${proposal.proposedBudget}</p>
+                                    ) : null}
                                     {proposal.details ? (
                                         <p className="mt-2 whitespace-pre-line text-xs text-ink-500">{proposal.details}</p>
                                     ) : null}
@@ -152,40 +170,90 @@ const ViewProposals: React.FC = () => {
                                 <TableCell>
                                     <Badge
                                         variant={
-                                            proposal.status === 'accepted'
+                                            statusValue === 'accepted'
                                                 ? 'success'
-                                                : proposal.status === 'rejected'
+                                                : statusValue === 'rejected'
                                                 ? 'danger'
+                                                : statusValue === 'shortlisted'
+                                                ? 'brand'
                                                 : 'warning'
                                         }
                                     >
-                                        {proposal.status || 'pending'}
+                                        {displayStatus}
                                     </Badge>
                                 </TableCell>
                                 <TableCell>
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        disabled={
-                                            proposal.status !== 'pending' ||
-                                            proposal.jobId?.status === 'filled' ||
-                                            selectMutation.isPending
-                                        }
-                                        onClick={() =>
-                                            proposal.jobId?._id && proposal.studentId?._id
-                                                ? selectMutation.mutate({
-                                                      jobId: proposal.jobId?._id,
-                                                      studentId: proposal.studentId?._id,
-                                                  })
-                                                : null
-                                        }
-                                    >
-                                        Select student
-                                    </Button>
+                                    <div className="flex flex-col gap-2">
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() =>
+                                                proposal.studentId?._id
+                                                    ? navigate(`/students/${proposal.studentId?._id}?jobId=${proposal.jobId?._id}`)
+                                                    : null
+                                            }
+                                        >
+                                            View profile
+                                        </Button>
+                                        {statusValue === 'accepted' ? (
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() =>
+                                                    proposal.jobId?.activeContract
+                                                        ? navigate(`/contracts/${proposal.jobId.activeContract}`)
+                                                        : null
+                                                }
+                                            >
+                                                View contract
+                                            </Button>
+                                        ) : (
+                                            <div className="space-y-2">
+                                                <Input
+                                                    placeholder="Agreed budget"
+                                                    type="number"
+                                                    min={0}
+                                                    value={budgetDrafts[proposal._id] ?? proposal.proposedBudget ?? ''}
+                                                    onChange={(e) =>
+                                                        setBudgetDrafts((prev) => ({
+                                                            ...prev,
+                                                            [proposal._id]: e.target.value,
+                                                        }))
+                                                    }
+                                                    disabled={acceptMutation.isPending}
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    disabled={
+                                                        !['submitted', 'pending'].includes(statusValue) ||
+                                                        proposal.jobId?.status !== 'open' ||
+                                                        acceptMutation.isPending
+                                                    }
+                                                    onClick={() => {
+                                                        const draft = budgetDrafts[proposal._id];
+                                                        const budgetValue = draft ? Number(draft) : proposal.proposedBudget;
+                                                        if (!Number.isFinite(budgetValue) || budgetValue <= 0) {
+                                                            toast.error('Enter a valid agreed budget.');
+                                                            return;
+                                                        }
+                                                        acceptMutation.mutate({
+                                                            proposalId: proposal._id,
+                                                            agreedBudget: budgetValue,
+                                                        });
+                                                    }}
+                                                >
+                                                    {acceptMutation.isPending ? 'Funding escrow...' : 'Accept & fund escrow'}
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        )})}
                     </TableBody>
                 </Table>
             )}

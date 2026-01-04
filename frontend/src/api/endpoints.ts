@@ -14,6 +14,18 @@ export const API = {
     clientProposals: '/jobs/proposals/client',
     matches: (jobId: string) => `/jobs/${jobId}/matches`,
     select: (jobId: string) => `/jobs/${jobId}/select`,
+    reviews: (jobId: string) => `/jobs/${jobId}/reviews`,
+  },
+  proposals: {
+    accept: (proposalId: string) => `/proposals/${proposalId}/accept`,
+  },
+  contracts: {
+    list: '/contracts',
+    details: (id: string) => `/contracts/${id}`,
+    submit: (id: string) => `/contracts/${id}/submissions`,
+    accept: (id: string) => `/contracts/${id}/accept`,
+    requestChanges: (id: string) => `/contracts/${id}/request-changes`,
+    review: (id: string) => `/contracts/${id}/review`,
   },
   skills: {
     list: '/skills',

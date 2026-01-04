@@ -31,7 +31,7 @@ const StudentDashboard: React.FC = () => {
                 <h1 className="text-2xl font-semibold text-ink-900">Welcome, {user?.name}</h1>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-4">
                 <Card>
                     <CardHeader>
                         <CardTitle>Verified Skills</CardTitle>
@@ -54,10 +54,25 @@ const StudentDashboard: React.FC = () => {
                             <Skeleton className="h-6 w-20" />
                         ) : (
                             <p className="text-3xl font-semibold">
-                                {(proposals || []).filter((proposal: any) => proposal.status === 'pending').length}
+                                {(proposals || []).filter((proposal: any) =>
+                                    ['submitted', 'shortlisted'].includes(proposal.status)
+                                ).length}
                             </p>
                         )}
                         <p className="text-sm text-ink-500">Keep tabs on client responses.</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Balance</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {profileLoading ? (
+                            <Skeleton className="h-6 w-20" />
+                        ) : (
+                            <p className="text-3xl font-semibold">${profile?.balance?.toFixed?.(2) || '0.00'}</p>
+                        )}
+                        <p className="text-sm text-ink-500">Earnings released after acceptance.</p>
                     </CardContent>
                 </Card>
                 <Card>
@@ -108,10 +123,12 @@ const StudentDashboard: React.FC = () => {
                                                     ? 'success'
                                                     : proposal.status === 'rejected'
                                                     ? 'danger'
+                                                    : proposal.status === 'shortlisted'
+                                                    ? 'brand'
                                                     : 'warning'
                                             }
                                         >
-                                            {proposal.status}
+                                            {proposal.status || 'submitted'}
                                         </Badge>
                                     </TableCell>
                                     <TableCell>

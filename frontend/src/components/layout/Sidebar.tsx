@@ -7,6 +7,7 @@ const navByRole = {
   Student: [
     { label: 'Dashboard', to: '/student/dashboard', icon: LayoutDashboard },
     { label: 'Job Board', to: '/student/jobs', icon: Briefcase },
+    { label: 'Contracts', to: '/student/contracts', icon: ClipboardList },
     { label: 'Skill Verification', to: '/student/skill-verification', icon: FileBadge },
     { label: 'Profile', to: '/student/profile', icon: Home },
   ],
@@ -14,6 +15,7 @@ const navByRole = {
     { label: 'Dashboard', to: '/client/dashboard', icon: LayoutDashboard },
     { label: 'Post Job', to: '/client/post-job', icon: ClipboardList },
     { label: 'Proposals', to: '/client/view-proposals', icon: Users },
+    { label: 'Contracts', to: '/client/contracts', icon: Briefcase },
   ],
   Admin: [
     { label: 'Dashboard', to: '/admin/dashboard', icon: LayoutDashboard },

@@ -4,16 +4,20 @@ import Login from '@/components/auth/Login';
 import Register from '@/components/auth/Register';
 import StudentDashboard from '@/components/student/StudentDashboard';
 import StudentProfile from '@/components/student/StudentProfile';
+import StudentPublicProfile from '@/components/student/StudentPublicProfile';
 import JobList from '@/components/student/JobList';
 import SkillVerification from '@/components/student/SkillVerification';
 import VideoInterview from '@/components/student/VideoInterview';
+import StudentContracts from '@/components/student/StudentContracts';
 import ClientDashboard from '@/components/client/ClientDashboard';
 import PostJob from '@/components/client/PostJob';
 import ViewProposals from '@/components/client/ViewProposals';
+import ClientContracts from '@/components/client/ClientContracts';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import ReviewInterview from '@/components/admin/ReviewInterview';
 import ProtectedRoute from '@/auth/ProtectedRoute';
 import { AppShell } from '@/components/layout/AppShell';
+import ContractDetails from '@/components/contracts/ContractDetails';
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -43,11 +47,31 @@ export const AppRouter = () => (
         }
       />
       <Route
+        path="/students/:id"
+        element={
+          <ProtectedRoute roles={['Student', 'Client', 'Admin']}>
+            <AppShell>
+              <StudentPublicProfile />
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/student/jobs"
         element={
           <ProtectedRoute roles={['Student']}>
             <AppShell>
               <JobList />
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/student/contracts"
+        element={
+          <ProtectedRoute roles={['Student']}>
+            <AppShell>
+              <StudentContracts />
             </AppShell>
           </ProtectedRoute>
         }
@@ -99,6 +123,27 @@ export const AppRouter = () => (
           <ProtectedRoute roles={['Client']}>
             <AppShell>
               <ViewProposals />
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/client/contracts"
+        element={
+          <ProtectedRoute roles={['Client']}>
+            <AppShell>
+              <ClientContracts />
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/contracts/:id"
+        element={
+          <ProtectedRoute roles={['Student', 'Client', 'Admin']}>
+            <AppShell>
+              <ContractDetails />
             </AppShell>
           </ProtectedRoute>
         }

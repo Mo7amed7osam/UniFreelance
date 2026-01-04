@@ -9,6 +9,7 @@ const {
     getMatchedCandidates,
     selectStudentForJob,
     getClientProposals,
+    submitJobReview,
 } = require('../controllers/jobController');
 const { authenticate } = require('../middleware/auth');
 const { checkRole } = require('../middleware/roleCheck');
@@ -36,6 +37,9 @@ router.post('/:id/select', authenticate, checkRole('Client'), selectStudentForJo
 
 // Route to get proposals across client jobs
 router.get('/proposals/client', authenticate, checkRole('Client'), getClientProposals);
+
+// Route to submit a review for a job's selected student
+router.post('/:id/reviews', authenticate, checkRole('Client'), submitJobReview);
 
 // Route to get a single job
 router.get('/:id', getJobById);

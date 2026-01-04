@@ -70,8 +70,14 @@ export const postJob = async (jobData: any) => {
   return response.data;
 };
 
-export const getJobs = async () => {
-  const response = await http.get(API.jobs.list);
+export const getJobs = async (params?: {
+  search?: string;
+  skills?: string[];
+  minBudget?: number | string;
+  maxBudget?: number | string;
+  duration?: string;
+}) => {
+  const response = await http.get(API.jobs.list, { params });
   return response.data;
 };
 
@@ -110,8 +116,57 @@ export const selectStudentForJob = async (jobId: string, studentId: string) => {
   return response.data;
 };
 
-export const getStudentProfile = async (studentId: string) => {
-  const response = await http.get(`/students/${studentId}/profile`);
+export const acceptProposal = async (proposalId: string, payload: { agreedBudget?: number }) => {
+  const response = await http.post(API.proposals.accept(proposalId), payload);
+  return response.data;
+};
+
+export const getContracts = async (params?: { status?: string }) => {
+  const response = await http.get(API.contracts.list, { params });
+  return response.data;
+};
+
+export const getContractDetails = async (contractId: string) => {
+  const response = await http.get(API.contracts.details(contractId));
+  return response.data;
+};
+
+export const submitContractWork = async (
+  contractId: string,
+  payload: { message: string; links?: string[]; attachments?: string[] }
+) => {
+  const response = await http.post(API.contracts.submit(contractId), payload);
+  return response.data;
+};
+
+export const acceptContractWork = async (contractId: string) => {
+  const response = await http.post(API.contracts.accept(contractId));
+  return response.data;
+};
+
+export const requestContractChanges = async (contractId: string) => {
+  const response = await http.post(API.contracts.requestChanges(contractId));
+  return response.data;
+};
+
+export const submitContractReview = async (
+  contractId: string,
+  payload: { rating: number; comment?: string }
+) => {
+  const response = await http.post(API.contracts.review(contractId), payload);
+  return response.data;
+};
+
+export const submitJobReview = async (
+  jobId: string,
+  payload: { studentId: string; rating: number; comment?: string }
+) => {
+  const response = await http.post(API.jobs.reviews(jobId), payload);
+  return response.data;
+};
+
+export const getStudentProfile = async (studentId: string, params?: { jobId?: string }) => {
+  const response = await http.get(`/students/${studentId}/profile`, { params });
   return response.data;
 };
 
@@ -124,6 +179,15 @@ export const uploadStudentCV = async (studentId: string, file: File) => {
   const formData = new FormData();
   formData.append('cv', file);
   const response = await http.post(`/students/${studentId}/upload-cv`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+};
+
+export const uploadStudentPhoto = async (studentId: string, file: File) => {
+  const formData = new FormData();
+  formData.append('photo', file);
+  const response = await http.post(`/students/${studentId}/upload-photo`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
   return response.data;

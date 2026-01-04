@@ -16,6 +16,18 @@ const JobSchema = new Schema({
         ref: 'Skill',
         required: true,
     },
+    budgetMin: {
+        type: Number,
+        min: 0,
+    },
+    budgetMax: {
+        type: Number,
+        min: 0,
+    },
+    duration: {
+        type: String,
+        trim: true,
+    },
     applicants: {
         type: [Schema.Types.ObjectId],
         ref: 'User',
@@ -31,14 +43,21 @@ const JobSchema = new Schema({
         ref: 'User',
         default: null,
     },
+    activeContract: {
+        type: Schema.Types.ObjectId,
+        ref: 'Contract',
+        default: null,
+    },
     status: {
         type: String,
-        enum: ['open', 'filled'],
+        enum: ['open', 'in_progress', 'completed', 'closed'],
         default: 'open',
     },
 }, {
     timestamps: true, // Automatically manage createdAt and updatedAt fields
 });
+
+JobSchema.index({ title: 'text', description: 'text' });
 
 // Export the Job model
 const Job = mongoose.model('Job', JobSchema);

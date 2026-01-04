@@ -17,10 +17,14 @@ const ProposalSchema = new Schema({
         type: String,
         required: true,
     },
+    proposedBudget: {
+        type: Number,
+        min: 0,
+    },
     status: {
         type: String,
-        enum: ['pending', 'accepted', 'rejected'],
-        default: 'pending',
+        enum: ['submitted', 'shortlisted', 'rejected', 'accepted'],
+        default: 'submitted',
     },
     createdAt: {
         type: Date,
@@ -29,6 +33,8 @@ const ProposalSchema = new Schema({
 }, {
     timestamps: true,
 });
+
+ProposalSchema.index({ jobId: 1, studentId: 1 }, { unique: true });
 
 // Exporting the Proposal model
 const Proposal = mongoose.model('Proposal', ProposalSchema);

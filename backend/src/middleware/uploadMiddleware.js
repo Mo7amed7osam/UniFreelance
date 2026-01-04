@@ -20,7 +20,12 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // Set destination based on file type
     const fileType = file.mimetype.split('/')[0];
-    const uploadPath = fileType === 'video' ? 'uploads/videos' : 'uploads/cvs';
+    let uploadPath = 'uploads/cvs';
+    if (fileType === 'video') {
+      uploadPath = 'uploads/videos';
+    } else if (fileType === 'image') {
+      uploadPath = 'uploads/photos';
+    }
     const fullPath = path.join(__dirname, '../../', uploadPath);
     const uploadsRoot = path.join(__dirname, '../../', 'uploads');
     ensureDirectory(uploadsRoot);

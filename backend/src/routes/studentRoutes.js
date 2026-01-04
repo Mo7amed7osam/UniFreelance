@@ -5,6 +5,7 @@ const {
     browseJobs,
     submitProposal,
     uploadStudentCV,
+    uploadStudentPhoto,
     getStudentProposals,
 } = require('../controllers/studentController');
 const { authenticate } = require('../middleware/auth');
@@ -12,13 +13,16 @@ const { checkRole } = require('../middleware/roleCheck');
 const { upload } = require('../middleware/uploadMiddleware');
 
 // Route to get student profile
-router.get('/:id/profile', authenticate, checkRole(['Student', 'Admin']), getStudentProfile);
+router.get('/:id/profile', authenticate, checkRole(['Student', 'Client', 'Admin']), getStudentProfile);
 
 // Route to update student profile
 router.put('/:id/profile', authenticate, checkRole(['Student', 'Admin']), updateStudentProfile);
 
 // Route to upload CV
 router.post('/:id/upload-cv', authenticate, checkRole(['Student', 'Admin']), upload.single('cv'), uploadStudentCV);
+
+// Route to upload profile photo
+router.post('/:id/upload-photo', authenticate, checkRole(['Student', 'Admin']), upload.single('photo'), uploadStudentPhoto);
 
 // Route to browse available jobs
 router.get('/jobs', authenticate, checkRole('Student'), browseJobs);

@@ -21,7 +21,8 @@ const ClientDashboard: React.FC = () => {
     });
 
     const openJobs = (jobs || []).filter((job: any) => job.status === 'open');
-    const filledJobs = (jobs || []).filter((job: any) => job.status === 'filled');
+    const activeJobs = (jobs || []).filter((job: any) => job.status === 'in_progress');
+    const completedJobs = (jobs || []).filter((job: any) => job.status === 'completed');
 
     return (
         <div className="space-y-8">
@@ -35,7 +36,7 @@ const ClientDashboard: React.FC = () => {
                 </Button>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-4">
                 <Card>
                     <CardHeader>
                         <CardTitle>Open Jobs</CardTitle>
@@ -47,11 +48,20 @@ const ClientDashboard: React.FC = () => {
                 </Card>
                 <Card>
                     <CardHeader>
-                        <CardTitle>Filled Jobs</CardTitle>
+                        <CardTitle>Active Jobs</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {jobsLoading ? <Skeleton className="h-6 w-16" /> : <p className="text-3xl font-semibold">{filledJobs.length}</p>}
-                        <p className="text-sm text-ink-500">Hires already finalized.</p>
+                        {jobsLoading ? <Skeleton className="h-6 w-16" /> : <p className="text-3xl font-semibold">{activeJobs.length}</p>}
+                        <p className="text-sm text-ink-500">Contracts in progress.</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Completed Jobs</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {jobsLoading ? <Skeleton className="h-6 w-16" /> : <p className="text-3xl font-semibold">{completedJobs.length}</p>}
+                        <p className="text-sm text-ink-500">Projects delivered and paid.</p>
                     </CardContent>
                 </Card>
                 <Card>
@@ -101,7 +111,17 @@ const ClientDashboard: React.FC = () => {
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant={job.status === 'filled' ? 'success' : 'warning'}>{job.status}</Badge>
+                                        <Badge
+                                            variant={
+                                                job.status === 'completed'
+                                                    ? 'success'
+                                                    : job.status === 'in_progress'
+                                                    ? 'brand'
+                                                    : 'warning'
+                                            }
+                                        >
+                                            {job.status}
+                                        </Badge>
                                     </TableCell>
                                     <TableCell>
                                         <Button
@@ -151,10 +171,12 @@ const ClientDashboard: React.FC = () => {
                                                     ? 'success'
                                                     : proposal.status === 'rejected'
                                                     ? 'danger'
+                                                    : proposal.status === 'shortlisted'
+                                                    ? 'brand'
                                                     : 'warning'
                                             }
                                         >
-                                            {proposal.status || 'pending'}
+                                            {proposal.status || 'submitted'}
                                         </Badge>
                                     </TableCell>
                                 </TableRow>

@@ -282,7 +282,15 @@ const AdminDashboard: React.FC = () => {
                                 <TableRow key={job._id}>
                                     <TableCell>{job.title}</TableCell>
                                     <TableCell>
-                                        <Badge variant={job.status === 'filled' ? 'success' : 'warning'}>
+                                        <Badge
+                                            variant={
+                                                job.status === 'completed'
+                                                    ? 'success'
+                                                    : job.status === 'in_progress'
+                                                    ? 'brand'
+                                                    : 'warning'
+                                            }
+                                        >
                                             {job.status}
                                         </Badge>
                                     </TableCell>

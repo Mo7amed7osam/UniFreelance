@@ -35,7 +35,7 @@ const reviewInterview = async (req, res) => {
                     verified => verified.skill.toString() === interview.skillId.toString()
                 );
                 if (!alreadyVerified) {
-                    student.verifiedSkills.push({ skill: interview.skillId, score });
+                    student.verifiedSkills.push({ skill: interview.skillId, score, verifiedAt: new Date() });
                 }
                 await student.save();
             }

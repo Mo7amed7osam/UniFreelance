@@ -8,6 +8,8 @@ const skillRoutes = require('./routes/skillRoutes');
 const interviewRoutes = require('./routes/interviewRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const studentRoutes = require('./routes/studentRoutes');
+const proposalRoutes = require('./routes/proposalRoutes');
+const contractRoutes = require('./routes/contractRoutes');
 const connectDB = require('./config/database');
 
 // Load environment variables from .env file
@@ -42,6 +44,8 @@ app.use('/api/skills', skillRoutes);
 app.use('/api/interviews', interviewRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/students', studentRoutes);
+app.use('/api/proposals', proposalRoutes);
+app.use('/api/contracts', contractRoutes);
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 // Start the server

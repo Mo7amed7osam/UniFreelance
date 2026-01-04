@@ -17,7 +17,8 @@ const formSchema = z.object({
     title: z.string().min(3, 'Title must be at least 3 characters.'),
     description: z.string().min(20, 'Description should be at least 20 characters.'),
     requiredSkills: z.array(z.string()).min(1, 'Select at least one skill.'),
-    budget: z.string().optional(),
+    minBudget: z.string().optional(),
+    maxBudget: z.string().optional(),
     duration: z.string().optional(),
 });
 
@@ -42,7 +43,8 @@ const PostJob: React.FC = () => {
             title: '',
             description: '',
             requiredSkills: [],
-            budget: '',
+            minBudget: '',
+            maxBudget: '',
             duration: '',
         },
     });
@@ -54,7 +56,14 @@ const PostJob: React.FC = () => {
     }, [register]);
 
     const { mutateAsync: createJob } = useMutation({
-        mutationFn: (payload: { title: string; description: string; requiredSkills: string[] }) => postJob(payload),
+        mutationFn: (payload: {
+            title: string;
+            description: string;
+            requiredSkills: string[];
+            budgetMin?: number;
+            budgetMax?: number;
+            duration?: string;
+        }) => postJob(payload),
         onSuccess: () => {
             toast.success('Job posted successfully.');
             navigate('/client/dashboard');
@@ -72,14 +81,27 @@ const PostJob: React.FC = () => {
     };
 
     const onSubmit = async (values: FormValues) => {
-        const metaLines = [];
-        if (values.budget) metaLines.push(`Budget: ${values.budget}`);
-        if (values.duration) metaLines.push(`Duration: ${values.duration}`);
-        const description = metaLines.length ? `${values.description}\n\n${metaLines.join('\n')}` : values.description;
+        const parsedMin = values.minBudget ? Number(values.minBudget) : undefined;
+        const parsedMax = values.maxBudget ? Number(values.maxBudget) : undefined;
+        if (values.minBudget && (!Number.isFinite(parsedMin) || parsedMin < 0)) {
+            toast.error('Minimum budget must be a non-negative number.');
+            return;
+        }
+        if (values.maxBudget && (!Number.isFinite(parsedMax) || parsedMax < 0)) {
+            toast.error('Maximum budget must be a non-negative number.');
+            return;
+        }
+        if (parsedMin !== undefined && parsedMax !== undefined && parsedMin > parsedMax) {
+            toast.error('Minimum budget cannot exceed maximum budget.');
+            return;
+        }
         await createJob({
             title: values.title,
-            description,
+            description: values.description,
             requiredSkills: values.requiredSkills,
+            budgetMin: parsedMin,
+            budgetMax: parsedMax,
+            duration: values.duration || undefined,
         });
     };
 
@@ -110,10 +132,14 @@ const PostJob: React.FC = () => {
                             ) : null}
                         </div>
 
-                        <div className="grid gap-4 md:grid-cols-2">
+                        <div className="grid gap-4 md:grid-cols-3">
                             <div className="space-y-2">
-                                <label className="text-sm font-semibold text-ink-700">Budget (optional)</label>
-                                <Input placeholder="e.g. $300 - $600" {...register('budget')} />
+                                <label className="text-sm font-semibold text-ink-700">Min budget</label>
+                                <Input type="number" min={0} placeholder="e.g. 300" {...register('minBudget')} />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-ink-700">Max budget</label>
+                                <Input type="number" min={0} placeholder="e.g. 600" {...register('maxBudget')} />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-semibold text-ink-700">Duration (optional)</label>
