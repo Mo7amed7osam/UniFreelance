@@ -86,3 +86,31 @@ export interface Contract {
   acceptedAt?: string;
   completedAt?: string;
 }
+
+export interface TopUpRequest {
+  _id: string;
+  clientId: any;
+  amount: number;
+  screenshotPath?: string;
+  status: 'PENDING' | 'APPROVED' | 'DECLINED';
+  note?: string;
+  adminId?: any;
+  decisionReason?: string;
+  createdAt?: string;
+  processedAt?: string;
+}
+
+export interface WithdrawalRequest {
+  _id: string;
+  studentId: any;
+  amount: number;
+  payoutMethod: 'BANK' | 'INSTAPAY';
+  bankAccount?: string;
+  instapayHandle?: string;
+  status: 'PENDING' | 'APPROVED' | 'DECLINED';
+  adminId?: any;
+  decisionReason?: string;
+  note?: string;
+  createdAt?: string;
+  processedAt?: string;
+}

@@ -111,6 +111,79 @@ export const getMatchedCandidates = async (jobId: string) => {
   return response.data;
 };
 
+export const getWalletBalance = async () => {
+  const response = await http.get(API.wallet.balance);
+  return response.data;
+};
+
+export const createTopUpRequest = async (payload: { amount: number; screenshot: File; note?: string }) => {
+  const formData = new FormData();
+  formData.append('amount', String(payload.amount));
+  formData.append('screenshot', payload.screenshot);
+  if (payload.note) {
+    formData.append('note', payload.note);
+  }
+  const response = await http.post(API.wallet.topups, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+};
+
+export const getTopUpRequests = async () => {
+  const response = await http.get(API.wallet.topups);
+  return response.data;
+};
+
+export const downloadTopUpScreenshot = async (id: string) => {
+  const response = await http.get(API.wallet.topupScreenshot(id), { responseType: 'blob' });
+  return response.data;
+};
+
+export const createWithdrawalRequest = async (payload: {
+  amount: number;
+  bankAccount?: string;
+  instapayHandle?: string;
+  note?: string;
+}) => {
+  const response = await http.post(API.wallet.withdrawals, payload);
+  return response.data;
+};
+
+export const getWithdrawalRequests = async () => {
+  const response = await http.get(API.wallet.withdrawals);
+  return response.data;
+};
+
+export const getAdminTopUps = async (status?: string) => {
+  const response = await http.get(API.admin.topups, { params: status ? { status } : undefined });
+  return response.data;
+};
+
+export const approveAdminTopUp = async (id: string) => {
+  const response = await http.post(API.admin.topupApprove(id));
+  return response.data;
+};
+
+export const declineAdminTopUp = async (id: string, payload: { reason?: string }) => {
+  const response = await http.post(API.admin.topupDecline(id), payload);
+  return response.data;
+};
+
+export const getAdminWithdrawals = async (status?: string) => {
+  const response = await http.get(API.admin.withdrawals, { params: status ? { status } : undefined });
+  return response.data;
+};
+
+export const approveAdminWithdrawal = async (id: string) => {
+  const response = await http.post(API.admin.withdrawalApprove(id));
+  return response.data;
+};
+
+export const declineAdminWithdrawal = async (id: string, payload: { reason?: string }) => {
+  const response = await http.post(API.admin.withdrawalDecline(id), payload);
+  return response.data;
+};
+
 export const selectStudentForJob = async (jobId: string, studentId: string) => {
   const response = await http.post(API.jobs.select(jobId), { studentId });
   return response.data;
