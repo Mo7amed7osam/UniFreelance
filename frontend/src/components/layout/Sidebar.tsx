@@ -3,7 +3,7 @@ import { Briefcase, ClipboardList, FileBadge, Home, LayoutDashboard, Users, Wall
 import useAuth from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
-const navByRole = {
+export const navByRole = {
   Student: [
     { label: 'Dashboard', to: '/student/dashboard', icon: LayoutDashboard },
     { label: 'Job Board', to: '/student/jobs', icon: Briefcase },

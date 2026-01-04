@@ -18,6 +18,8 @@ const VideoInterview: React.FC = () => {
     const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
     const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
     const [uploadProgress, setUploadProgress] = useState(0);
+    const [recordingSeconds, setRecordingSeconds] = useState(0);
+    const autoStopRef = useRef(false);
 
     const { stream, error: recorderError, isRecording, startRecording, stopRecording } = useVideoRecorder();
 
@@ -47,6 +49,29 @@ const VideoInterview: React.FC = () => {
             }
         };
     }, [recordedUrl]);
+
+    useEffect(() => {
+        if (!isRecording) {
+            return;
+        }
+        const intervalId = window.setInterval(() => {
+            setRecordingSeconds((prev) => prev + 1);
+        }, 1000);
+        return () => {
+            window.clearInterval(intervalId);
+        };
+    }, [isRecording]);
+
+    useEffect(() => {
+        if (!isRecording) {
+            return;
+        }
+        if (recordingSeconds >= 60 && !autoStopRef.current) {
+            autoStopRef.current = true;
+            void handleStopRecording();
+            toast('Recording stopped at 1 minute limit.');
+        }
+    }, [isRecording, recordingSeconds]);
 
     const uploadMutation = useMutation({
         mutationFn: async (payload: { blob: Blob; index: number }) => {
@@ -102,6 +127,8 @@ const VideoInterview: React.FC = () => {
             toast.error('Camera stream is not ready yet.');
             return;
         }
+        autoStopRef.current = false;
+        setRecordingSeconds(0);
         if (recordedUrl) {
             URL.revokeObjectURL(recordedUrl);
         }
@@ -135,6 +162,12 @@ const VideoInterview: React.FC = () => {
         const apiBase = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
         const origin = apiBase.endsWith('/api') ? apiBase.slice(0, -4) : apiBase;
         return `${origin}${path}`;
+    };
+
+    const formatDuration = (totalSeconds: number) => {
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     };
 
     if (isLoading) {
@@ -213,6 +246,16 @@ const VideoInterview: React.FC = () => {
                                 autoPlay
                                 muted
                             />
+                            {isRecording ? (
+                                <div className="flex items-center gap-2 text-sm font-medium text-rose-600">
+                                    <span className="h-2 w-2 animate-pulse rounded-full bg-rose-600" aria-hidden />
+                                    <span>
+                                        Recording {formatDuration(recordingSeconds)} / 01:00
+                                    </span>
+                                </div>
+                            ) : (
+                                <p className="text-xs text-ink-500">Max recording time: 01:00</p>
+                            )}
                             <div className="flex flex-wrap gap-2">
                                 <Button
                                     type="button"
