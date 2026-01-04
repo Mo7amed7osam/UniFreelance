@@ -25,13 +25,14 @@ services:
     container_name: unifreelance-backend
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "${BACKEND_PORT:-5000}:5000"
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: 5000
-      MONGODB_URI: ${MONGODB_URI:-mongodb://admin:password@mongodb:27017/unifreelance?authSource=admin}
+      MONGO_URI: ${MONGO_URI:-mongodb://admin:password@mongodb:27017/unifreelance?authSource=admin}
       JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-this}
       JWT_EXPIRE: ${JWT_EXPIRE:-7d}
+      INSTAPAY_RECEIVER_NUMBER: ${INSTAPAY_RECEIVER_NUMBER:-01146370900}
     depends_on:
       mongodb:
         condition: service_healthy
