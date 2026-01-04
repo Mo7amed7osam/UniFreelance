@@ -1,0 +1,14 @@
+uploads/
+uploads/videos/
+uploads/cvs/
+
+.env
+.env.local
+.env.production
+
+node_modules/
+
+dist/
+
+*.log
+logs/
