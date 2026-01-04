@@ -6,6 +6,8 @@
 
 UniFreelance is a student-focused freelancing marketplace that connects students with clients looking for freelance work. The platform features skill-based video interviews to verify student skills, ensuring that clients can find qualified candidates for their job postings.
 
+**🚀 [Quick Start Guide](QUICKSTART.md)** | **📦 [Deployment Guide](DEPLOYMENT.md)** | **🔄 [CI/CD Overview](CICD.md)** | **🤝 [Contributing](CONTRIBUTING.md)**
+
 ## Table of Contents
 
 - [Features](#features)
@@ -225,6 +227,10 @@ For manual deployment to a server:
 3. Run `docker-compose up -d`
 4. Set up a reverse proxy (nginx/traefik) for HTTPS
 
+For detailed deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
+
+For a complete CI/CD pipeline overview, see [CICD.md](CICD.md).
+
 ## Usage
 
 - Access the application in your browser at `http://localhost:3000`.
@@ -252,7 +258,19 @@ For manual deployment to a server:
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct, development process, and how to submit pull requests.
+
+### Quick Start for Contributors
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run tests and ensure CI passes
+5. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+6. Push to your branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+For detailed guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
