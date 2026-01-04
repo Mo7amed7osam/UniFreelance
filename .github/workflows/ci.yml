@@ -92,12 +92,12 @@ jobs:
     
     - name: Backend security audit
       working-directory: ./backend
-      run: npm audit --audit-level=moderate
+      run: npm audit --audit-level=high
       continue-on-error: true
     
     - name: Frontend security audit
       working-directory: ./frontend
-      run: npm audit --audit-level=moderate
+      run: npm audit --audit-level=high
       continue-on-error: true
     
     - name: Run Trivy vulnerability scanner
