@@ -10,9 +10,12 @@ import { Select } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/components/ui/table';
+import useAuth from '@/hooks/useAuth';
 
 const StudentWallet: React.FC = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const userId = user?._id;
   const [amount, setAmount] = useState('');
   const [payoutMethod, setPayoutMethod] = useState<'BANK' | 'INSTAPAY'>('BANK');
   const [bankAccount, setBankAccount] = useState('');
@@ -20,13 +23,15 @@ const StudentWallet: React.FC = () => {
   const [note, setNote] = useState('');
 
   const { data: balanceData, isLoading: balanceLoading } = useQuery({
-    queryKey: ['wallet', 'balance'],
+    queryKey: ['wallet', 'balance', userId],
     queryFn: getWalletBalance,
+    enabled: !!userId,
   });
 
   const { data: withdrawals, isLoading: withdrawalsLoading } = useQuery({
-    queryKey: ['wallet', 'withdrawals'],
+    queryKey: ['wallet', 'withdrawals', userId],
     queryFn: getWithdrawalRequests,
+    enabled: !!userId,
   });
 
   const withdrawMutation = useMutation({

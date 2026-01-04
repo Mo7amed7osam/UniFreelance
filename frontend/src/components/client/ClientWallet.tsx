@@ -14,21 +14,26 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/components/ui/table';
+import useAuth from '@/hooks/useAuth';
 
 const ClientWallet: React.FC = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const userId = user?._id;
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
   const [screenshot, setScreenshot] = useState<File | null>(null);
 
   const { data: balanceData, isLoading: balanceLoading } = useQuery({
-    queryKey: ['wallet', 'balance'],
+    queryKey: ['wallet', 'balance', userId],
     queryFn: getWalletBalance,
+    enabled: !!userId,
   });
 
   const { data: topups, isLoading: topupsLoading } = useQuery({
-    queryKey: ['wallet', 'topups'],
+    queryKey: ['wallet', 'topups', userId],
     queryFn: getTopUpRequests,
+    enabled: !!userId,
   });
 
   const topupMutation = useMutation({
