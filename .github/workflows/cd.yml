@@ -112,3 +112,4 @@ jobs:
         echo "🚀 Deployment successful!"
         echo "Backend image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest"
         echo "Frontend image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest"
+# draft for testing
