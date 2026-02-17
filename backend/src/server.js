@@ -54,9 +54,13 @@ app.use('/api/proposals', proposalRoutes);
 app.use('/api/contracts', contractRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+app.get('/', (req, res) => {
+    console.log("server is working");
+    res.status(200).send('ok');
+});
 
 // Start the server
-const PORT = process.env.PORT || 5000;
+const PORT = 5001;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
