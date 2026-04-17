@@ -5,11 +5,13 @@ import { MobileNav } from './MobileNav';
 
 export const AppShell = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="page-shell flex">
+<div className="page-shell flex md:pl-64">
       <Sidebar />
       <div className="flex min-h-screen flex-1 flex-col">
         <Topbar />
-        <main className="flex-1 px-6 py-8 pb-24 md:pb-8">{children}</main>
+        <main className="flex-1 px-6 py-8 pb-24 md:pb-8">
+          {children}
+        </main>
       </div>
       <MobileNav />
     </div>

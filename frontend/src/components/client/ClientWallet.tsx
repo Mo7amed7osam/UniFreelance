@@ -13,13 +13,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
-import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from '@/components/ui/table';
 import useAuth from '@/hooks/useAuth';
 
 const ClientWallet: React.FC = () => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const userId = user?._id;
+
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
   const [screenshot, setScreenshot] = useState<File | null>(null);
@@ -37,7 +45,8 @@ const ClientWallet: React.FC = () => {
   });
 
   const topupMutation = useMutation({
-    mutationFn: (payload: { amount: number; screenshot: File; note?: string }) => createTopUpRequest(payload),
+    mutationFn: (payload: { amount: number; screenshot: File; note?: string }) =>
+      createTopUpRequest(payload),
     onSuccess: () => {
       toast.success('Top-up request submitted.');
       setAmount('');
@@ -60,7 +69,11 @@ const ClientWallet: React.FC = () => {
       toast.error('Screenshot is required.');
       return;
     }
-    topupMutation.mutate({ amount: amountValue, screenshot, note: note.trim() || undefined });
+    topupMutation.mutate({
+      amount: amountValue,
+      screenshot,
+      note: note.trim() || undefined,
+    });
   };
 
   const openScreenshot = async (id: string) => {
@@ -77,47 +90,103 @@ const ClientWallet: React.FC = () => {
   const instapayReceiver = balanceData?.instapayReceiver || '01146370900';
 
   return (
-    <div className="space-y-6">
-      <div>
-        <p className="text-sm uppercase tracking-wide text-ink-400">Client wallet</p>
-        <h1 className="text-2xl font-semibold text-ink-900">Wallet & top-ups</h1>
+    <div
+      className="
+        space-y-10 rounded-2xl p-6
+        bg-gradient-to-br from-ink-50 via-white to-brand-100/30
+        dark:bg-gradient-to-br dark:from-ink-900 dark:via-ink-900 dark:to-ink-800
+      "
+    >
+      {/* Header */}
+      <div className="space-y-1">
+        <p className="text-xs font-semibold uppercase tracking-widest text-ink-400 dark:text-ink-400">
+          Client Wallet
+        </p>
+        <h1 className="text-3xl font-semibold text-ink-900 dark:text-white">
+          Wallet &{' '}
+          <span className="text-brand-600 dark:text-brand-400">
+            top-ups
+          </span>
+        </h1>
+        <p className="text-sm text-ink-500 dark:text-ink-400">
+          Manage your balance and funding requests.
+        </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle>Current balance</CardTitle>
+      {/* Balance & Instructions */}
+      <div className="grid gap-5 md:grid-cols-3">
+        {/* Balance */}
+        <Card
+          className="
+            bg-gradient-to-br from-brand-500 to-brand-700 text-white
+            transition-all hover:-translate-y-1 hover:shadow-xl
+          "
+        >
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-white/80">
+              Current balance
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-2">
             {balanceLoading ? (
-              <Skeleton className="h-6 w-24" />
+              <Skeleton className="h-8 w-24 bg-white/30" />
             ) : (
-              <p className="text-3xl font-semibold">${Number(balanceData?.balance || 0).toFixed(2)}</p>
+              <p className="text-4xl font-semibold text-white">
+                ${Number(balanceData?.balance || 0).toFixed(2)}
+              </p>
             )}
-            <p className="text-sm text-ink-500">Funds held in escrow for active contracts.</p>
+            <p className="text-sm text-white/80">
+              Funds held in escrow for contracts.
+            </p>
           </CardContent>
         </Card>
-        <Card className="md:col-span-2">
+
+        {/* Instapay */}
+        <Card
+          className="
+            md:col-span-2
+            bg-white/80 backdrop-blur-sm transition-all
+            hover:shadow-xl
+            dark:bg-ink-800 dark:border-ink-700
+          "
+        >
           <CardHeader>
-            <CardTitle>Instapay instructions</CardTitle>
+            <CardTitle className="text-lg font-semibold text-ink-900 dark:text-white">
+              Instapay instructions
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-ink-600">
-              Transfer the exact amount to Instapay receiver <span className="font-semibold">{instapayReceiver}</span>,
-              then upload the payment screenshot.
+            <p className="text-sm text-ink-600 dark:text-ink-400">
+              Transfer the exact amount to Instapay receiver{' '}
+              <span className="font-semibold text-ink-900 dark:text-white">
+                {instapayReceiver}
+              </span>
+              , then upload the payment screenshot.
             </p>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
+      {/* Top-up Form */}
+      <Card
+        className="
+          bg-white/80 backdrop-blur-sm transition-all
+          hover:shadow-xl
+          dark:bg-ink-800 dark:border-ink-700
+        "
+      >
         <CardHeader>
-          <CardTitle>Submit top-up request</CardTitle>
+          <CardTitle className="text-lg font-semibold text-ink-900 dark:text-white">
+            Submit top-up request
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+
+        <CardContent className="space-y-6">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-ink-700">Amount</label>
+              <label className="text-sm font-semibold text-ink-700 dark:text-ink-300">
+                Amount
+              </label>
               <Input
                 type="number"
                 min={0}
@@ -127,19 +196,29 @@ const ClientWallet: React.FC = () => {
                 disabled={topupMutation.isPending}
               />
             </div>
+
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-ink-700">Screenshot</label>
+              <label className="text-sm font-semibold text-ink-700 dark:text-ink-300">
+                Screenshot
+              </label>
               <Input
                 type="file"
                 accept="image/png,image/jpeg,image/jpg,image/webp"
                 onChange={(e) => setScreenshot(e.target.files?.[0] || null)}
                 disabled={topupMutation.isPending}
               />
-              {screenshot ? <p className="text-xs text-ink-500">{screenshot.name}</p> : null}
+              {screenshot && (
+                <p className="text-xs text-ink-500 dark:text-ink-400">
+                  {screenshot.name}
+                </p>
+              )}
             </div>
           </div>
+
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-ink-700">Note (optional)</label>
+            <label className="text-sm font-semibold text-ink-700 dark:text-ink-300">
+              Note (optional)
+            </label>
             <Textarea
               rows={3}
               placeholder="Add any reference details."
@@ -148,21 +227,38 @@ const ClientWallet: React.FC = () => {
               disabled={topupMutation.isPending}
             />
           </div>
-          <Button type="button" disabled={topupMutation.isPending} onClick={handleSubmit}>
-            {topupMutation.isPending ? 'Submitting...' : 'Submit top-up'}
+
+          <Button
+            type="button"
+            disabled={topupMutation.isPending}
+            onClick={handleSubmit}
+          >
+            {topupMutation.isPending ? 'Submitting…' : 'Submit top-up'}
           </Button>
         </CardContent>
       </Card>
 
-      <Card>
+      {/* History */}
+      <Card
+        className="
+          bg-white/80 backdrop-blur-sm transition-all
+          hover:shadow-xl
+          dark:bg-ink-800 dark:border-ink-700
+        "
+      >
         <CardHeader>
-          <CardTitle>Top-up history</CardTitle>
+          <CardTitle className="text-lg font-semibold text-ink-900 dark:text-white">
+            Top-up history
+          </CardTitle>
         </CardHeader>
+
         <CardContent>
           {topupsLoading ? (
             <Skeleton className="h-32 w-full" />
           ) : (topups || []).length === 0 ? (
-            <p className="text-sm text-ink-500">No top-ups submitted yet.</p>
+            <p className="text-sm text-ink-500 dark:text-ink-400">
+              No top-ups submitted yet.
+            </p>
           ) : (
             <Table>
               <TableHead>
@@ -173,10 +269,17 @@ const ClientWallet: React.FC = () => {
                   <TableHeaderCell>Action</TableHeaderCell>
                 </TableRow>
               </TableHead>
+
               <TableBody>
                 {(topups || []).map((topup: any) => (
-                  <TableRow key={topup._id}>
-                    <TableCell>${topup.amount}</TableCell>
+                  <TableRow
+                    key={topup._id}
+                    className="transition-colors hover:bg-brand-50/40 dark:hover:bg-ink-800"
+                  >
+                    <TableCell className="font-medium">
+                      ${topup.amount}
+                    </TableCell>
+
                     <TableCell>
                       <Badge
                         variant={
@@ -189,16 +292,22 @@ const ClientWallet: React.FC = () => {
                       >
                         {topup.status}
                       </Badge>
-                      {topup.status === 'DECLINED' && topup.decisionReason ? (
-                        <p className="mt-1 text-xs text-rose-500">{topup.decisionReason}</p>
-                      ) : null}
+
+                      {topup.status === 'DECLINED' && topup.decisionReason && (
+                        <p className="mt-1 text-xs text-rose-500 dark:text-rose-400">
+                          {topup.decisionReason}
+                        </p>
+                      )}
                     </TableCell>
+
                     <TableCell>
-                      {topup.createdAt ? new Date(topup.createdAt).toLocaleDateString() : '—'}
+                      {topup.createdAt
+                        ? new Date(topup.createdAt).toLocaleDateString()
+                        : '—'}
                     </TableCell>
+
                     <TableCell>
                       <Button
-                        type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() => openScreenshot(topup._id)}
