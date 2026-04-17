@@ -26,26 +26,42 @@ const StudentContracts: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <p className="text-sm uppercase tracking-wide text-ink-400">Student workspace</p>
-          <h1 className="text-2xl font-semibold text-ink-900">My contracts</h1>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold uppercase tracking-widest text-ink-400">
+            Student workspace
+          </p>
+          <h1 className="text-3xl font-semibold dark:text-white">
+            My contracts
+          </h1>
         </div>
+
+        {/* Balance Card */}
         <Card className="w-full md:w-auto">
-          <CardContent className="py-3">
-            <p className="text-xs text-ink-500">Balance</p>
-            <p className="text-lg font-semibold text-ink-900">${profile?.balance?.toFixed?.(2) || '0.00'}</p>
+          <CardContent className="flex items-center gap-4 py-4">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-ink-400">
+                Balance
+              </p>
+              <p className="text-xl font-semibold text-ink-900">
+                ${profile?.balance?.toFixed?.(2) || '0.00'}
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
 
+      {/* Content */}
       {isLoading ? (
-        <Skeleton className="h-40 w-full" />
+        <Skeleton className="h-48 w-full" />
       ) : (contracts || []).length === 0 ? (
         <Card>
-          <CardContent>
-            <p className="text-sm text-ink-500">No contracts yet.</p>
+          <CardContent className="py-12 text-center">
+            <p className="text-sm text-ink-500">
+              No contracts yet.
+            </p>
           </CardContent>
         </Card>
       ) : (
@@ -61,28 +77,40 @@ const StudentContracts: React.FC = () => {
                   <TableHeaderCell>Client</TableHeaderCell>
                   <TableHeaderCell>Status</TableHeaderCell>
                   <TableHeaderCell>Budget</TableHeaderCell>
-                  <TableHeaderCell>Action</TableHeaderCell>
+                  <TableHeaderCell className="text-right">Action</TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {(contracts || []).map((contract: any) => (
                   <TableRow key={contract._id}>
-                    <TableCell>{contract.jobId?.title || 'Job'}</TableCell>
-                    <TableCell>{contract.clientId?.name || 'Client'}</TableCell>
+                    <TableCell className="font-medium">
+                      {contract.jobId?.title || 'Job'}
+                    </TableCell>
                     <TableCell>
-                      <Badge variant={contract.status === 'completed' ? 'success' : 'brand'}>
+                      {contract.clientId?.name || 'Client'}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          contract.status === 'completed'
+                            ? 'success'
+                            : 'brand'
+                        }
+                      >
                         {contract.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>${contract.agreedBudget}</TableCell>
                     <TableCell>
+                      ${contract.agreedBudget}
+                    </TableCell>
+                    <TableCell className="text-right">
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() => navigate(`/contracts/${contract._id}`)}
                       >
-                        View contract
+                        View
                       </Button>
                     </TableCell>
                   </TableRow>

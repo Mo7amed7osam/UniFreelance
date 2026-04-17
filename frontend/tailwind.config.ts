@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 export default {
+  darkMode: 'class', // 👈 مهم جدًا
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
@@ -28,11 +29,20 @@ export default {
           700: '#434c5a',
           800: '#2f353f',
           900: '#1e232b',
+
+          // 👇 Dark mode (GitHub inspired)
+          dark: {
+            bg: '#0d1117',
+            surface: '#161b22',
+            border: '#30363d',
+            text: '#c9d1d9',
+            muted: '#8b949e',
+          },
         },
       },
       boxShadow: {
-        'soft': '0 10px 30px -15px rgba(16, 24, 40, 0.35)',
-        'card': '0 18px 45px -30px rgba(15, 23, 42, 0.35)',
+        soft: '0 10px 30px -15px rgba(16, 24, 40, 0.35)',
+        card: '0 18px 45px -30px rgba(15, 23, 42, 0.35)',
       },
     },
   },
