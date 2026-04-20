@@ -16,3 +16,4 @@ coverage/
 # Misc
 .DS_Store
 .eslintcache
+.vercel
