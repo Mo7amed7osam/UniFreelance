@@ -6,37 +6,63 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  backend-ci:
-    name: Backend CI
+  changes:
+    name: Detect Changes
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
-    
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      workflows: ${{ steps.filter.outputs.workflows }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
-    - name: Setup Node.js ${{ matrix.node-version }}
+
+    - name: Detect changed paths
+      id: filter
+      uses: dorny/paths-filter@v3
+      with:
+        filters: |
+          backend:
+            - 'backend/**'
+          frontend:
+            - 'frontend/**'
+          workflows:
+            - '.github/workflows/**'
+
+  backend-ci:
+    name: Backend CI
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.workflows == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js 20.x
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: '20.x'
         cache: 'npm'
         cache-dependency-path: backend/package-lock.json
-    
+
     - name: Install dependencies
       working-directory: ./backend
       run: npm ci
-    
+
     - name: Run tests
       working-directory: ./backend
-      run: npm test
-      continue-on-error: true
-    
+      run: npm test -- --passWithNoTests
+
     - name: Build backend
       working-directory: ./backend
       run: |
@@ -46,35 +72,32 @@ jobs:
 
   frontend-ci:
     name: Frontend CI
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.workflows == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
-    - name: Setup Node.js ${{ matrix.node-version }}
+
+    - name: Setup Node.js 20.x
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: '20.x'
         cache: 'npm'
         cache-dependency-path: frontend/package-lock.json
-    
+
     - name: Install dependencies
       working-directory: ./frontend
       run: npm ci
-    
+
     - name: Build frontend
       working-directory: ./frontend
       run: npm run build
-    
+
     - name: Upload build artifacts
-      if: matrix.node-version == '20.x'
       uses: actions/upload-artifact@v4
       with:
         name: frontend-build
@@ -83,6 +106,8 @@ jobs:
 
   security-scan:
     name: Security Scan
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.workflows == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -125,6 +150,8 @@ jobs:
 
   code-quality:
     name: Code Quality
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.workflows == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read

@@ -1,24 +1,23 @@
-# Backend Dockerfile
-FROM node:18-alpine AS base
+FROM node:20-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+ENV NODE_ENV=production
+ENV PORT=5000
 
-# Install dependencies
-RUN npm ci --only=production
+COPY --chown=node:node package*.json ./
+RUN npm ci --omit=dev
 
-# Copy application code
-COPY . .
+COPY --chown=node:node . .
 
-# Expose port
+RUN mkdir -p /app/uploads /app/private/topups \
+  && chown -R node:node /app
+
+USER node
+
 EXPOSE 5000
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:5000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); })"
+  CMD node -e "const http=require('http');const port=process.env.PORT||5000;const req=http.get({host:'127.0.0.1',port,path:'/health'},res=>process.exit(res.statusCode===200?0:1));req.on('error',()=>process.exit(1));"
 
-# Start the application
-CMD ["npm", "start"]
+CMD ["node", "src/server.js"]
