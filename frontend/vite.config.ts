@@ -4,8 +4,9 @@ import path from 'path';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
-  const apiUrl = env.VITE_API_URL || 'http://localhost:6000/api';
-  const resolvedApiUrl = apiUrl.startsWith('http') ? apiUrl : 'http://localhost:6000/api';
+  const apiUrl = env.VITE_API_URL || '/api';
+  const fallbackApiUrl = 'http://localhost:5000/api';
+  const resolvedApiUrl = apiUrl.startsWith('http') ? apiUrl : fallbackApiUrl;
   const proxyTarget = resolvedApiUrl.replace(/\/api\/?$/, '');
 
   return {
