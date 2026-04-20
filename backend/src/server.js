@@ -12,6 +12,7 @@ const proposalRoutes = require('./routes/proposalRoutes');
 const contractRoutes = require('./routes/contractRoutes');
 const walletRoutes = require('./routes/walletRoutes');
 const connectDB = require('./config/database');
+const { metricsMiddleware, metricsHandler } = require('./monitoring/metrics');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -24,11 +25,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cors());
+app.use(metricsMiddleware);
 
 // Health check for Docker/K8s
 app.get('/health', (req, res) => {
     res.status(200).send('ok');
 });
+
+app.get('/metrics', metricsHandler);
 
 // Basic request logger for debugging API calls
 app.use((req, res, next) => {
