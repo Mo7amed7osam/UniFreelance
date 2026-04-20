@@ -7,10 +7,42 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  FRONTEND_API_URL: https://gradproject-back-1776705847.francecentral.azurecontainer.io:5000/api
+
+concurrency:
+  group: cd-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      workflows: ${{ steps.filter.outputs.workflows }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Detect changed paths
+      id: filter
+      uses: dorny/paths-filter@v3
+      with:
+        filters: |
+          backend:
+            - 'backend/**'
+          frontend:
+            - 'frontend/**'
+          workflows:
+            - '.github/workflows/**'
+
   build-and-push-backend:
     name: Build and Push Backend Docker Image
+    needs: changes
+    if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.backend == 'true' || needs.changes.outputs.workflows == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -52,6 +84,7 @@ jobs:
       with:
         context: ./backend
         file: ./backend/Dockerfile
+        platforms: linux/amd64
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
@@ -60,6 +93,8 @@ jobs:
 
   build-and-push-frontend:
     name: Build and Push Frontend Docker Image
+    needs: changes
+    if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.workflows == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -101,6 +136,9 @@ jobs:
       with:
         context: ./frontend
         file: ./frontend/Dockerfile
+        platforms: linux/amd64
+        build-args: |
+          VITE_API_URL=${{ vars.VITE_API_URL != '' && vars.VITE_API_URL || env.FRONTEND_API_URL }}
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
@@ -110,7 +148,8 @@ jobs:
   deploy-notification:
     name: Deployment Notification
     runs-on: ubuntu-latest
-    needs: [build-and-push-backend, build-and-push-frontend]
+    needs: [changes, build-and-push-backend, build-and-push-frontend]
+    if: always() && (needs.build-and-push-backend.result == 'success' || needs.build-and-push-frontend.result == 'success')
     permissions:
       contents: read
     
@@ -118,6 +157,8 @@ jobs:
     - name: Send deployment notification
       run: |
         echo "🚀 Deployment successful!"
-        echo "Backend image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest"
-        echo "Frontend image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest"
+        echo "Backend job: ${{ needs.build-and-push-backend.result }}"
+        echo "Frontend job: ${{ needs.build-and-push-frontend.result }}"
+        echo "Backend image: ${{ env.REGISTRY }}/${GITHUB_REPOSITORY,,}/backend:latest"
+        echo "Frontend image: ${{ env.REGISTRY }}/${GITHUB_REPOSITORY,,}/frontend:latest"
 # draft for testing
