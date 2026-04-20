@@ -1,4 +1,7 @@
-export const API_BASE_URL = "http://localhost:5000/api"; // Base URL for API calls
+const rawApiBaseUrl = import.meta.env.VITE_API_URL || '/api';
+export const API_BASE_URL = rawApiBaseUrl.endsWith('/')
+  ? rawApiBaseUrl.slice(0, -1)
+  : rawApiBaseUrl; // Base URL for API calls
 
 export const SKILLS = [
   "React",

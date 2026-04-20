@@ -60,7 +60,7 @@ app.get('/', (req, res) => {
 });
 
 // Start the server
-const PORT = 5001;
+const PORT = Number(process.env.PORT || process.env.BACKEND_PORT || 5000);
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

@@ -1,4 +1,23 @@
 services:
+  mongodb:
+    image: mongo:7.0
+    container_name: unifreelance-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-password}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - unifreelance-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   backend:
     image: node:18-alpine
     container_name: unifreelance-backend
@@ -48,3 +67,8 @@ services:
 volumes:
   backend_node_modules:
   frontend_node_modules:
+  mongodb_data:
+
+networks:
+  unifreelance-network:
+    driver: bridge
