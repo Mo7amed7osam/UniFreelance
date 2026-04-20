@@ -4,274 +4,157 @@
 [![CD Pipeline](https://github.com/Mo7amed7osam/UniFreelance/actions/workflows/cd.yml/badge.svg)](https://github.com/Mo7amed7osam/UniFreelance/actions/workflows/cd.yml)
 [![PR Checks](https://github.com/Mo7amed7osam/UniFreelance/actions/workflows/pr-checks.yml/badge.svg)](https://github.com/Mo7amed7osam/UniFreelance/actions/workflows/pr-checks.yml)
 
-UniFreelance is a student-focused freelancing marketplace that connects students with clients looking for freelance work. The platform features skill-based video interviews to verify student skills, ensuring that clients can find qualified candidates for their job postings.
+UniFreelance is a student-focused freelancing marketplace built with a React frontend and an Express/MongoDB backend. The platform supports job posting, proposals, admin review flows, and video-based skill verification.
 
-**🚀 [Quick Start Guide](QUICKSTART.md)** | **📦 [Deployment Guide](DEPLOYMENT.md)** | **🔄 [CI/CD Overview](CICD.md)** | **🤝 [Contributing](CONTRIBUTING.md)**
+## Documentation
 
-## Table of Contents
+- [Quick Start](QUICKSTART.md)
+- [Deployment Guide](DEPLOYMENT.md)
+- [CI/CD Guide](CICD.md)
+- [CI/CD Summary](CI-CD-SUMMARY.md)
+- [Monitoring Guide](monitoring/README.md)
+- [Contributing](CONTRIBUTING.md)
+- [Testing](TESTING.md)
+- [Security](SECURITY.md)
 
-- [Features](#features)
-- [Technologies](#technologies)
-- [Installation](#installation)
-  - [Prerequisites](#prerequisites)
-  - [Quick Start with Docker](#quick-start-with-docker)
-  - [Manual Setup](#manual-setup)
-- [Deployment](#deployment)
-- [CI/CD Pipeline](#cicd-pipeline)
-- [Usage](#usage)
-- [API Endpoints](#api-endpoints)
-- [Contributing](#contributing)
-- [License](#license)
+## Architecture
 
-## Features
+- Frontend: React, TypeScript, Vite
+- Backend: Node.js, Express
+- Database: MongoDB with Mongoose
+- Auth: JWT
+- Containerization: Docker and Docker Compose
+- Image Registry: GitHub Container Registry
+- Frontend Hosting: Vercel
+- Backend Hosting: Azure Container Instances
+- Monitoring: Grafana, Prometheus, Loki, Promtail, Blackbox Exporter, Alertmanager
 
-- **User Authentication**: Role-based access for Students, Clients, and Admins.
-- **Student Dashboard**: Students can create profiles, browse jobs, and submit proposals.
-- **Skill Verification**: Students can verify their skills through mandatory video interviews.
-- **Admin Dashboard**: Admins can review interviews, assign scores, and manage users.
-- **Job Posting**: Clients can post jobs and view applicants.
-- **Smart Matching**: Automatic notifications for students when jobs matching their skills are posted.
+## Repository Layout
 
-## Technologies
-
-- **Frontend**: React (TypeScript), Vite, TailwindCSS
-- **Backend**: Node.js with Express
-- **Database**: MongoDB
-- **Authentication**: JWT
-- **API Architecture**: RESTful API
-- **Containerization**: Docker & Docker Compose
-- **CI/CD**: GitHub Actions
-
-## Installation
-
-### Prerequisites
-
-- Node.js (v18 or higher)
-- MongoDB (local or cloud instance)
-- Docker & Docker Compose (optional, for containerized setup)
-- Git
-
-### Quick Start with Docker
-
-The fastest way to get started is using Docker Compose:
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/Mo7amed7osam/UniFreelance.git
-   cd UniFreelance
-   ```
-
-2. Create a `.env` file from the example:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-3. Update the `.env` file with your configuration (change passwords and secrets).
-
-4. Start all services:
-
-   ```bash
-   docker-compose up -d
-   ```
-
-5. Access the application:
-   - Frontend: http://localhost
-   - Backend API: http://localhost:5000
-   - MongoDB: localhost:27017
-
-6. To stop all services:
-
-   ```bash
-   docker-compose down
-   ```
-
-### Manual Setup
-
-#### Clone the Repository
-
-```bash
-git clone https://github.com/yourusername/UniFreelance.git
-cd UniFreelance
+```text
+.
+├── backend/                  # Express API
+├── frontend/                 # Vite React application
+├── monitoring/               # Prometheus, Grafana, Loki, Alertmanager config
+├── .github/workflows/        # CI, CD, PR, dependency automation
+├── docker-compose.yml        # Local application stack
+├── docker-compose.monitoring.yml
+└── *.md                      # Project documentation
 ```
 
-### Backend Setup
+## Local Development
 
-1. Navigate to the backend directory:
+### Option 1: Docker Compose
 
-   ```bash
-   cd backend
-   ```
+Create a root `.env` file, then start the full local stack:
 
-2. Install dependencies:
+```bash
+docker compose up -d
+```
 
-   ```bash
-   npm install
-   ```
+Default local endpoints:
 
-3. Create a `.env` file based on the `.env.example` file and configure your environment variables.
+- Frontend: `http://localhost`
+- Backend: `http://localhost:5000`
+- Backend health: `http://localhost:5000/health`
+- MongoDB: `mongodb://localhost:27017`
 
-4. Start the backend server:
+Stop the stack:
 
-   ```bash
-   npm run dev
-   ```
+```bash
+docker compose down
+```
 
-### Frontend Setup
+### Option 2: Run Services Manually
 
-1. Navigate to the frontend directory:
+Backend:
 
-   ```bash
-   cd ../frontend
-   ```
+```bash
+cd backend
+npm install
+npm run dev
+```
 
-2. Install dependencies:
+Frontend:
 
-   ```bash
-   npm install
-   ```
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-3. Start the frontend application:
+Manual development endpoints:
 
-   ```bash
-   npm start
-   ```
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:5000`
 
-## Deployment
+## Required Configuration
 
-### Using Docker
+There is no committed `.env.example` file in this repository. Create your own `.env` values based on the application needs.
 
-The application includes Docker configurations for easy deployment:
+Minimum backend variables:
 
-1. **Build Docker Images**:
+```env
+MONGO_URI=mongodb://admin:password@mongodb:27017/unifreelance?authSource=admin
+JWT_SECRET=change-this-in-real-environments
+PORT=5000
+```
 
-   ```bash
-   # Build backend image
-   docker build -t unifreelance-backend ./backend
+Additional backend variables used by optional features:
 
-   # Build frontend image
-   docker build -t unifreelance-frontend ./frontend
-   ```
+- `INSTAPAY_RECEIVER_NUMBER`
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_SECURE`
+- `SMTP_USER`
+- `SMTP_PASS`
+- `SMTP_FROM`
+- `GEMINI_API_URL`
+- `GEMINI_API_KEY`
 
-2. **Run with Docker Compose**:
+Frontend build-time variable:
 
-   ```bash
-   docker-compose up -d
-   ```
+- `VITE_API_URL`
 
-### CI/CD Pipeline
+The frontend defaults to `/api` when `VITE_API_URL` is not set.
 
-This project includes a fully automated CI/CD pipeline using GitHub Actions:
+## Production Topology
 
-#### Continuous Integration (CI)
+The current production setup reflected in this repository is:
 
-The CI pipeline runs automatically on push and pull requests to `main` and `develop` branches:
+- Frontend deployed on Vercel
+- Backend deployed on Azure Container Instances
+- Frontend API traffic proxied through `frontend/vercel.json`
+- Backend container image published to GHCR
 
-- **Backend CI**: 
-  - Tests on Node.js 18.x and 20.x
-  - Runs unit tests
-  - Validates code integrity
+Important production notes:
 
-- **Frontend CI**: 
-  - Tests on Node.js 18.x and 20.x
-  - Builds production bundle
-  - Uploads build artifacts
+- The backend image must be built for `linux/amd64` for Azure Container Instances.
+- The backend runtime image tag is `latest` or a SHA-based runtime tag, not `buildcache`.
+- The backend listens on `0.0.0.0:5000`.
+- The frontend should call `/api`, not the backend Azure HTTP URL directly, to avoid mixed-content problems in the browser.
 
-- **Security Scan**: 
-  - NPM security audit for both frontend and backend
-  - Trivy vulnerability scanner
-  - SARIF results uploaded to GitHub Security
+## Monitoring
 
-- **Code Quality**: 
-  - Code style checks
-  - Quality metrics
+The repository includes a full local monitoring stack in `docker-compose.monitoring.yml`.
 
-#### Continuous Deployment (CD)
+Once started, local monitoring endpoints are:
 
-The CD pipeline runs automatically on push to `main` branch:
+- Grafana: `http://localhost:3001`
+- Prometheus: `http://localhost:9090`
+- Alertmanager: `http://localhost:9093`
+- Loki: `http://localhost:3100`
+- Blackbox Exporter: `http://localhost:9115`
 
-- **Docker Image Building**: 
-  - Builds and pushes Docker images to GitHub Container Registry
-  - Separate images for backend and frontend
-  - Tagged with branch name, commit SHA, and `latest`
+Full details: [monitoring/README.md](monitoring/README.md)
 
-- **Automated Deployment**: 
-  - Images are automatically built and published
-  - Ready for deployment to any container orchestration platform
+## Current CI/CD Behavior
 
-#### Pull Request Checks
+- CI runs on push and pull request for `main` and `develop`
+- CI uses Node `20.x`
+- CD builds only the changed service image on pushes to `main`
+- Docker images are published to GHCR
+- CD uses `buildcache` only for layer caching, not as a deployable image tag
+- Frontend Docker builds can consume `VITE_API_URL` from a GitHub Actions repository variable
 
-Automated checks on every pull request:
-
-- Validates commit messages
-- Checks for sensitive files
-- Runs lint checks
-- Executes test suite
-- Auto-labels PRs based on changed files
-
-#### Dependency Management
-
-Weekly automated dependency reviews:
-
-- Checks for outdated packages
-- Security vulnerability scanning
-- Runs every Monday at 9 AM UTC
-
-### Manual Deployment
-
-For manual deployment to a server:
-
-1. Copy the `docker-compose.yml` and `.env` files to your server
-2. Update the `.env` file with production values
-3. Run `docker-compose up -d`
-4. Set up a reverse proxy (nginx/traefik) for HTTPS
-
-For detailed deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
-
-For a complete CI/CD pipeline overview, see [CICD.md](CICD.md).
-
-## Usage
-
-- Access the application in your browser at `http://localhost:3000`.
-- Register as a student or client to start using the platform.
-- Admins can log in to manage users and review interviews.
-
-## API Endpoints
-
-- **Authentication**
-  - `POST /auth/register`: Register a new user.
-  - `POST /auth/login`: Log in a user.
-
-- **Skills**
-  - `GET /skills`: Retrieve available skills.
-  - `POST /skills/:skillId/interview/start`: Start a skill verification interview.
-  - `POST /skills/:skillId/interview/upload`: Upload interview video.
-
-- **Jobs**
-  - `POST /jobs`: Post a new job.
-  - `GET /jobs`: Retrieve job listings.
-  - `POST /jobs/:id/proposals`: Submit a proposal for a job.
-
-- **Admin**
-  - `POST /admin/review/:interviewId`: Review a student's interview.
-
-## Contributing
-
-Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct, development process, and how to submit pull requests.
-
-### Quick Start for Contributors
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Run tests and ensure CI passes
-5. Commit your changes (`git commit -m 'feat: add amazing feature'`)
-6. Push to your branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
-
-For detailed guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
+Full details: [CICD.md](CICD.md)

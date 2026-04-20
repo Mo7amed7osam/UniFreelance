@@ -1,374 +1,181 @@
-# CI/CD Pipeline Overview
+# CI/CD Guide
 
-This document provides an overview of the automated CI/CD pipeline implemented for UniFreelance.
+This repository uses GitHub Actions for continuous integration, container image publishing, pull request validation, and dependency review.
 
-## Pipeline Architecture
+## Workflow Files
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     GitHub Repository                        │
-│                  (Push / Pull Request)                       │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   GitHub Actions Workflows                   │
-├─────────────────────────────────────────────────────────────┤
-│                                                               │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │   CI Pipeline │  │  PR Checks   │  │   Security   │      │
-│  │   (ci.yml)    │  │(pr-checks.yml)│ │   Scanning   │      │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘      │
-│         │                  │                  │               │
-│         ▼                  ▼                  ▼               │
-│  ┌────────────────────────────────────────────────┐         │
-│  │  • Build & Test Backend (Node 18.x, 20.x)     │         │
-│  │  • Build Frontend (Node 18.x, 20.x)           │         │
-│  │  • Lint & Code Quality Checks                 │         │
-│  │  • Security Audits (npm audit, Trivy)         │         │
-│  │  • Upload Artifacts                            │         │
-│  └────────────────────────────────────────────────┘         │
-│                                                               │
-│  ┌──────────────────────────────────────────────┐           │
-│  │         CD Pipeline (cd.yml)                  │           │
-│  │        (Triggered on push to main)            │           │
-│  └──────────────────┬───────────────────────────┘           │
-│                     │                                         │
-└─────────────────────┼─────────────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────────┐
-│              GitHub Container Registry (ghcr.io)             │
-├─────────────────────────────────────────────────────────────┤
-│  • Backend Docker Image (tagged: latest, branch, sha)       │
-│  • Frontend Docker Image (tagged: latest, branch, sha)      │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Deployment Target                         │
-│  • Docker Compose (Local/Server)                            │
-│  • Kubernetes Cluster                                        │
-│  • Cloud Platform (AWS ECS, GCP Cloud Run, Azure, etc.)     │
-└─────────────────────────────────────────────────────────────┘
-```
+- `.github/workflows/ci.yml`
+- `.github/workflows/cd.yml`
+- `.github/workflows/pr-checks.yml`
+- `.github/workflows/dependency-updates.yml`
 
-## Workflows
+## CI Pipeline
 
-### 1. CI Pipeline (`ci.yml`)
+File:
 
-**Trigger:** Push or Pull Request to `main` or `develop` branches
+- `.github/workflows/ci.yml`
 
-**Jobs:**
+Triggers:
 
-#### Backend CI
-- **Matrix Strategy:** Node.js 18.x and 20.x
-- **Steps:**
-  1. Checkout code
-  2. Setup Node.js environment
-  3. Install dependencies (npm ci)
-  4. Run tests (npm test)
-  5. Validate build
+- push to `main`
+- push to `develop`
+- pull request to `main`
+- pull request to `develop`
 
-#### Frontend CI
-- **Matrix Strategy:** Node.js 18.x and 20.x
-- **Steps:**
-  1. Checkout code
-  2. Setup Node.js environment
-  3. Install dependencies (npm ci)
-  4. Build production bundle (npm run build)
-  5. Upload build artifacts (Node 20.x only)
+Behavior:
 
-#### Security Scan
-- **Steps:**
-  1. Run npm audit on backend (moderate level)
-  2. Run npm audit on frontend (moderate level)
-  3. Run Trivy vulnerability scanner on filesystem
-  4. Upload SARIF results to GitHub Security
+- detects changed paths first
+- runs backend jobs only when `backend/**` changed
+- runs frontend jobs only when `frontend/**` changed
+- runs both when workflow files changed
 
-#### Code Quality
-- **Steps:**
-  1. Install dependencies for both backend and frontend
-  2. Run code style checks
-  3. Generate quality metrics
+Current CI jobs:
 
-**Duration:** ~5-8 minutes
+### Backend CI
 
----
+- Node version: `20.x`
+- installs backend dependencies with `npm ci`
+- runs `npm test -- --passWithNoTests`
 
-### 2. CD Pipeline (`cd.yml`)
+### Frontend CI
 
-**Trigger:** Push to `main` branch or manual workflow dispatch
+- Node version: `20.x`
+- installs frontend dependencies with `npm ci`
+- runs `npm run build`
+- uploads the built frontend artifact
 
-**Jobs:**
+### Security Scan
 
-#### Build and Push Backend Image
-- **Steps:**
-  1. Checkout code
-  2. Login to GitHub Container Registry
-  3. Extract Docker metadata (tags, labels)
-  4. Setup Docker Buildx
-  5. Build and push backend Docker image
-  6. Use layer caching for optimization
+- backend `npm audit`
+- frontend `npm audit`
+- Trivy filesystem scan
+- SARIF upload to GitHub Security
 
-**Image Tags:**
-- `latest` (for default branch)
-- `main` (branch name)
-- `main-<sha>` (commit SHA)
+### Code Quality
 
-#### Build and Push Frontend Image
-- **Steps:**
-  1. Checkout code
-  2. Login to GitHub Container Registry
-  3. Extract Docker metadata (tags, labels)
-  4. Setup Docker Buildx
-  5. Build and push frontend Docker image
-  6. Use layer caching for optimization
+Current code-quality job is placeholder-style:
 
-**Image Tags:**
-- `latest` (for default branch)
-- `main` (branch name)
-- `main-<sha>` (commit SHA)
+- installs backend and frontend dependencies
+- emits pass messages for backend and frontend style checks
 
-#### Deployment Notification
-- **Dependencies:** Both build jobs must complete
-- **Steps:**
-  1. Display deployment success message
-  2. Show image URLs and tags
+There is no actual lint script configured in either package at the moment.
 
-**Duration:** ~8-12 minutes (depending on build cache)
+## CD Pipeline
 
----
+File:
 
-### 3. PR Checks (`pr-checks.yml`)
+- `.github/workflows/cd.yml`
 
-**Trigger:** Pull request opened, synchronized, or reopened
+Triggers:
 
-**Jobs:**
+- push to `main`
+- manual `workflow_dispatch`
 
-#### Validate PR
-- Check commit messages
-- Scan for sensitive files (`.env`, `.pem`, `.key`, etc.)
-- Analyze PR size (files and lines changed)
-- Warn if PR is too large (>100 files)
+Current behavior:
 
-#### Lint Check
-- Install dependencies
-- Run backend linting
-- Run frontend linting
+- detects changed paths
+- builds and pushes only the changed image
+- uses Docker Buildx
+- publishes to GHCR
+- builds with `platforms: linux/amd64`
 
-#### Test Suite
-- Install dependencies
-- Run backend tests
-- Build frontend
+### Backend Image Job
 
-#### Auto Label
-- Automatically label PRs based on changed files:
-  - `backend` - Backend changes
-  - `frontend` - Frontend changes
-  - `dependencies` - Package.json changes
-  - `docker` - Docker-related changes
-  - `ci/cd` - Workflow changes
-  - `documentation` - Markdown files
+- image: `ghcr.io/<repo>/backend`
+- Dockerfile: `backend/Dockerfile`
+- runtime image is tagged by branch, SHA, and `latest`
+- cache is stored in `:buildcache`
 
-**Duration:** ~4-6 minutes
+Important:
 
----
+- `:buildcache` is not deployable
+- `:buildcache` exists only for build-layer reuse
 
-### 4. Dependency Updates (`dependency-updates.yml`)
+### Frontend Image Job
 
-**Trigger:** 
-- Scheduled: Every Monday at 9 AM UTC
-- Manual: Workflow dispatch
+- image: `ghcr.io/<repo>/frontend`
+- Dockerfile: `frontend/Dockerfile`
+- accepts `VITE_API_URL` as a build argument
+- resolves `VITE_API_URL` from:
+  - GitHub repository variable `VITE_API_URL`, if present
+  - otherwise fallback `FRONTEND_API_URL` from the workflow file
 
-**Jobs:**
+## PR Checks
 
-#### Dependency Review
-- **Steps:**
-  1. Check outdated backend dependencies
-  2. Check outdated frontend dependencies
-  3. Run security audit on backend (high level)
-  4. Run security audit on frontend (high level)
+File:
 
-**Duration:** ~2-3 minutes
+- `.github/workflows/pr-checks.yml`
 
----
+Triggers:
 
-## Docker Images
+- pull request opened
+- pull request synchronized
+- pull request reopened
 
-### Backend Image
+Current jobs:
 
-**Base Image:** `node:18-alpine`
+- validate changed files and PR size
+- basic sensitive-file check
+- placeholder lint job
+- backend test job
+- frontend build job
+- automatic PR labels via `actions/labeler`
 
-**Features:**
-- Production-only dependencies
-- Health check endpoint
-- Exposed port: 5000
+Notes:
 
-**Size:** ~150-200 MB
+- the lint job does not run a real lint script yet
+- the backend PR test job currently uses `npm test` with `continue-on-error: true`
 
-### Frontend Image
+## Dependency Review
 
-**Build Stage:** `node:18-alpine`
-**Production Stage:** `nginx:alpine`
+File:
 
-**Features:**
-- Multi-stage build for optimized size
-- Custom nginx configuration
-- Gzip compression enabled
-- Security headers
-- Health check endpoint
-- SPA routing support
+- `.github/workflows/dependency-updates.yml`
 
-**Size:** ~25-30 MB
+Triggers:
 
----
+- every Monday at `09:00 UTC`
+- manual `workflow_dispatch`
 
-## Environment Variables
+Current jobs:
 
-### Required for Backend
-- `NODE_ENV` - Environment (production/development)
-- `PORT` - Server port (default: 5000)
-- `MONGODB_URI` - MongoDB connection string
-- `JWT_SECRET` - Secret key for JWT tokens
-- `JWT_EXPIRE` - Token expiration time (default: 7d)
+- `npm outdated` for backend
+- `npm outdated` for frontend
+- backend `npm audit`
+- frontend `npm audit`
 
-### Optional for Backend
-- `SMTP_HOST` - Email server host
-- `SMTP_PORT` - Email server port
-- `SMTP_USER` - Email username
-- `SMTP_PASS` - Email password
+## Required GitHub Configuration
 
-### Required for Frontend (Build Time)
-- `VITE_API_URL` - Backend API URL
+Recommended repository configuration:
 
----
+- package publishing allowed for GitHub Actions
+- GitHub Actions enabled
+- repository variable `VITE_API_URL` set to `/api` for Vercel-style proxy deployments
 
-## Monitoring and Notifications
+Example:
 
-### GitHub Actions Status
-- All workflow runs are visible in the Actions tab
-- Failed workflows send notifications to repository watchers
-- Status badges on README show current pipeline status
-
-### Security Scanning
-- Trivy scan results uploaded to GitHub Security tab
-- Dependabot alerts for vulnerable dependencies
-- Weekly dependency review reports
-
----
-
-## Best Practices Implemented
-
-1. **Matrix Testing:** Tests run on multiple Node.js versions (18.x, 20.x)
-2. **Layer Caching:** Docker builds use layer caching for faster rebuilds
-3. **Multi-stage Builds:** Frontend uses multi-stage builds for smaller images
-4. **Security Scanning:** Automated vulnerability detection
-5. **Artifact Management:** Build artifacts retained for 7 days
-6. **Health Checks:** Both images include health check endpoints
-7. **Semantic Versioning:** Images tagged with version, branch, and commit SHA
-8. **Fail-Safe:** Some steps marked as `continue-on-error` to prevent blocking
-9. **Dependency Pinning:** Uses `npm ci` for reproducible installs
-10. **Minimal Base Images:** Alpine Linux for smaller image sizes
-
----
-
-## Deployment Options
-
-### Option 1: Docker Compose (Recommended for Quick Start)
-```bash
-docker compose up -d
+```text
+VITE_API_URL=/api
 ```
 
-### Option 2: Pull Pre-built Images
-```bash
-docker pull ghcr.io/mo7amed7osam/unifreelance/backend:latest
-docker pull ghcr.io/mo7amed7osam/unifreelance/frontend:latest
-docker run -d ghcr.io/mo7amed7osam/unifreelance/backend:latest
-docker run -d ghcr.io/mo7amed7osam/unifreelance/frontend:latest
-```
+## Release and Runtime Notes
 
-### Option 3: Kubernetes
-Use the provided Kubernetes manifests in `k8s/` directory
+- Backend requires Node `20+`
+- Backend image must be `linux/amd64` for Azure Container Instances
+- Frontend defaults to `/api` if `VITE_API_URL` is not set
+- CD publishes images only; it does not currently perform the Azure deployment step
 
-### Option 4: Cloud Platforms
-- AWS ECS/Fargate
-- Google Cloud Run
-- Azure Container Instances
-- DigitalOcean App Platform
+## What the Pipelines Do Not Yet Do
 
----
+- no real lint execution
+- no frontend unit test runner
+- no automatic Azure deployment from GitHub Actions
+- no secret manager integration in workflows
 
-## Troubleshooting CI/CD
+## Recommended Next Improvements
 
-### Common Issues
-
-#### 1. Build Failures
-- Check Node.js version compatibility
-- Verify all dependencies are in package.json
-- Review build logs in GitHub Actions
-
-#### 2. Docker Build Failures
-- Ensure Dockerfile syntax is correct
-- Check for missing files referenced in COPY commands
-- Verify base image availability
-
-#### 3. Test Failures
-- Run tests locally first
-- Check test environment setup
-- Review test logs in CI
-
-#### 4. Authentication Errors (GHCR)
-- Verify GitHub token permissions
-- Check package write permissions in repository settings
-- Ensure GITHUB_TOKEN is available in workflow
-
-### Getting Help
-
-1. Check workflow logs in GitHub Actions tab
-2. Review this documentation
-3. Check Docker and Node.js documentation
-4. Open an issue on GitHub with logs and error messages
-
----
-
-## Future Enhancements
-
-- [ ] Add integration tests in CI pipeline
-- [ ] Implement staging environment deployment
-- [ ] Add performance benchmarking
-- [ ] Set up automated database migrations
-- [ ] Add code coverage reporting
-- [ ] Implement canary deployments
-- [ ] Add smoke tests after deployment
-- [ ] Set up monitoring and alerting (Prometheus, Grafana)
-- [ ] Implement automated rollback on failures
-- [ ] Add end-to-end testing with Playwright/Cypress
-
----
-
-## Maintenance
-
-### Weekly Tasks
-- Review dependency update reports
-- Check security scan results
-- Update outdated dependencies
-
-### Monthly Tasks
-- Review and optimize Docker images
-- Update base images for security patches
-- Review CI/CD performance metrics
-
-### Quarterly Tasks
-- Major dependency updates
-- Review and update deployment documentation
-- Audit access controls and secrets
-
----
-
-## Resources
-
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [Docker Documentation](https://docs.docker.com/)
-- [Node.js Best Practices](https://github.com/goldbergyoni/nodebestpractices)
-- [12-Factor App Methodology](https://12factor.net/)
+- add real lint scripts for backend and frontend
+- make PR checks fail on backend test failures instead of continuing
+- add frontend automated tests
+- add a controlled deploy workflow for Azure Container Instances
+- move the workflow-level frontend API fallback to a repository variable only

@@ -1,37 +1,45 @@
-# UniFreelance Monitoring
+# Monitoring Stack
 
-This stack gives you:
+This repository includes a local observability stack for UniFreelance using Grafana, Prometheus, Alertmanager, Loki, Promtail, and Blackbox Exporter.
 
-- Prometheus for metrics
-- Grafana for dashboards
-- Blackbox Exporter for uptime probes
-- Alertmanager for alert routing
-- Loki + Promtail for Docker log aggregation
-
-## What it monitors
+## What It Monitors
 
 - Azure backend `/health`
-- Vercel frontend root
-- Vercel frontend `/api/skills`
 - Azure backend `/metrics`
+- Vercel frontend root URL
+- Vercel frontend `/api/skills`
+- local Docker container logs through Promtail and Loki
 
-## Run
+## Services
 
-Start the app stack first so the shared Docker network exists:
+- Grafana for dashboards
+- Prometheus for metrics and alert rules
+- Alertmanager for alert routing
+- Blackbox Exporter for external uptime probes
+- Loki for log storage
+- Promtail for Docker log shipping
 
-```bash
-docker compose up -d
-```
-
-Then start monitoring:
+## Start the Stack
 
 ```bash
 docker compose -f docker-compose.monitoring.yml up -d
 ```
 
-## URLs
+Stop it:
 
-- Grafana: `http://localhost:3000`
+```bash
+docker compose -f docker-compose.monitoring.yml down
+```
+
+Validate the compose file:
+
+```bash
+docker compose -f docker-compose.monitoring.yml config
+```
+
+## Local URLs
+
+- Grafana: `http://localhost:3001`
 - Prometheus: `http://localhost:9090`
 - Alertmanager: `http://localhost:9093`
 - Loki: `http://localhost:3100`
@@ -39,19 +47,85 @@ docker compose -f docker-compose.monitoring.yml up -d
 
 Default Grafana credentials:
 
-- user: `admin`
+- username: `admin`
 - password: `admin`
 
-Override them with:
+Optional overrides:
 
 ```bash
 export GRAFANA_ADMIN_USER=admin
 export GRAFANA_ADMIN_PASSWORD=strong-password
+export GRAFANA_PORT=3001
 ```
 
-## Notes
+## What Is Preconfigured
 
-- The Prometheus dashboard is pre-provisioned in Grafana.
-- Promtail reads Docker logs from the local Docker socket, so Loki logs cover local Docker containers.
-- Azure Container Instances logs are still best viewed in Azure CLI or Azure Portal because ACI does not expose a Docker socket.
-- Update the hardcoded Azure and Vercel URLs in `monitoring/prometheus/prometheus.yml` if your deployment URLs change.
+- Prometheus scrape jobs
+- Prometheus alert rules
+- Grafana datasources
+- Grafana dashboard provisioning
+- uptime probes for frontend and backend
+
+Provisioned dashboard:
+
+- `UniFreelance Monitoring`
+
+## Validation Commands
+
+Prometheus ready check:
+
+```bash
+curl http://localhost:9090/-/ready
+```
+
+Grafana health:
+
+```bash
+curl http://localhost:3001/api/health
+```
+
+Prometheus targets:
+
+```bash
+curl http://localhost:9090/api/v1/targets
+```
+
+Alert rules:
+
+```bash
+curl http://localhost:9090/api/v1/rules
+```
+
+## Logs
+
+Promtail reads local Docker logs through `/var/run/docker.sock`.
+
+That means Loki covers:
+
+- local Docker Compose containers
+- local monitoring containers
+
+It does not directly ingest Azure Container Instances logs.
+
+For Azure backend logs, use:
+
+```bash
+az container logs --resource-group gradproject-rg --name gradproject-back
+```
+
+## Important Notes
+
+- Grafana runs on `3001` because `3000` is commonly occupied on local machines
+- Loki may reject very old historical container logs on first bootstrap; new logs still ingest correctly
+- if the Azure backend hostname or Vercel URL changes, update:
+  - `monitoring/prometheus/prometheus.yml`
+  - `monitoring/grafana/dashboards/unifreelance-monitoring.json`
+
+## Key Files
+
+- [`docker-compose.monitoring.yml`](../docker-compose.monitoring.yml)
+- [`monitoring/prometheus/prometheus.yml`](prometheus/prometheus.yml)
+- [`monitoring/prometheus/rules/alerts.yml`](prometheus/rules/alerts.yml)
+- [`monitoring/grafana/dashboards/unifreelance-monitoring.json`](grafana/dashboards/unifreelance-monitoring.json)
+- [`monitoring/loki/config.yml`](loki/config.yml)
+- [`monitoring/promtail/config.yml`](promtail/config.yml)

@@ -1,398 +1,157 @@
-# Contributing to UniFreelance
+# Contributing
 
-Thank you for your interest in contributing to UniFreelance! This document provides guidelines and instructions for contributing to this project.
+Thank you for contributing to UniFreelance.
 
-## Table of Contents
+This document explains how to work on the repository without fighting the current project setup.
 
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [Development Setup](#development-setup)
-- [Making Changes](#making-changes)
-- [Pull Request Process](#pull-request-process)
-- [Coding Standards](#coding-standards)
-- [Testing](#testing)
-- [CI/CD Pipeline](#cicd-pipeline)
-- [Reporting Issues](#reporting-issues)
+## Prerequisites
 
-## Code of Conduct
-
-- Be respectful and inclusive
-- Welcome newcomers and help them get started
-- Focus on constructive feedback
-- Respect differing viewpoints and experiences
-
-## Getting Started
-
-1. **Fork the repository** on GitHub
-2. **Clone your fork** locally:
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/UniFreelance.git
-   cd UniFreelance
-   ```
-3. **Add the upstream repository**:
-   ```bash
-   git remote add upstream https://github.com/Mo7amed7osam/UniFreelance.git
-   ```
-
-## Development Setup
-
-### Prerequisites
-
-- Node.js 18+ and npm
-- MongoDB 7.0+
-- Docker and Docker Compose (optional)
+- Node.js `20.x`
+- npm
+- Docker Desktop
 - Git
 
-### Local Development Environment
+## Repository Setup
 
-#### Option 1: Using Docker Compose (Recommended)
+Clone the repository:
 
 ```bash
-# Copy environment file
-cp .env.example .env
-
-# Start all services
-docker compose up -d
-
-# View logs
-docker compose logs -f
+git clone https://github.com/Mo7amed7osam/UniFreelance.git
+cd UniFreelance
 ```
 
-#### Option 2: Manual Setup
+There is no committed `.env.example` file. Create your own root `.env` with the values required for the services you want to run.
 
-**Backend:**
+Minimum backend values:
+
+```env
+MONGO_URI=your-mongo-uri
+JWT_SECRET=local-dev-secret
+PORT=5000
+```
+
+## Running the Project
+
+### Docker Compose
+
+```bash
+docker compose up -d
+```
+
+### Manual Backend
+
 ```bash
 cd backend
 npm install
-cp .env.example .env
-# Update .env with your local MongoDB connection
 npm run dev
 ```
 
-**Frontend:**
+### Manual Frontend
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-## Making Changes
-
-### Branch Naming Convention
+## Branch Naming
 
 Use descriptive branch names:
 
-- `feature/description` - New features
-- `bugfix/description` - Bug fixes
-- `hotfix/description` - Critical fixes
-- `docs/description` - Documentation updates
-- `refactor/description` - Code refactoring
-- `test/description` - Adding tests
+- `feature/<name>`
+- `fix/<name>`
+- `docs/<name>`
+- `refactor/<name>`
+- `chore/<name>`
 
-Example:
-```bash
-git checkout -b feature/add-user-notifications
+Examples:
+
+- `feature/student-notifications`
+- `fix/login-error-handling`
+- `docs/update-monitoring-guide`
+
+## Commit Messages
+
+Use clear, scoped messages. Conventional commit style is preferred.
+
+Examples:
+
+```text
+feat(backend): add metrics endpoint
+fix(frontend): route API calls through /api
+docs(deployment): update Azure ACI commands
 ```
 
-### Commit Message Guidelines
+## Before Opening a Pull Request
 
-Follow conventional commit format:
+Run the checks that actually exist in this repository.
 
-```
-<type>(<scope>): <subject>
-
-<body>
-
-<footer>
-```
-
-**Types:**
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, etc.)
-- `refactor`: Code refactoring
-- `test`: Adding or updating tests
-- `chore`: Maintenance tasks
-
-**Examples:**
-```
-feat(backend): add user notification system
-
-Implements real-time notifications for users when they receive
-new messages or job applications.
-
-Closes #123
-```
-
-```
-fix(frontend): resolve login form validation issue
-
-The login form was not properly validating email format.
-Added regex validation for email input.
-
-Fixes #456
-```
-
-### Keep Your Fork Updated
-
-```bash
-# Fetch upstream changes
-git fetch upstream
-
-# Merge upstream changes into your branch
-git checkout main
-git merge upstream/main
-
-# Push to your fork
-git push origin main
-```
-
-## Pull Request Process
-
-### Before Submitting
-
-1. **Update your branch** with the latest main:
-   ```bash
-   git fetch upstream
-   git rebase upstream/main
-   ```
-
-2. **Run tests** locally:
-   ```bash
-   # Backend tests
-   cd backend
-   npm test
-
-   # Frontend build
-   cd frontend
-   npm run build
-   ```
-
-3. **Ensure no linting errors**:
-   ```bash
-   # Check your code
-   npm run lint
-   ```
-
-### Submitting a Pull Request
-
-1. **Push your changes** to your fork:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-
-2. **Create a Pull Request** on GitHub:
-   - Go to your fork on GitHub
-   - Click "New Pull Request"
-   - Select your feature branch
-   - Fill in the PR template
-
-3. **PR Title**: Use a clear, descriptive title
-   ```
-   feat: Add user notification system
-   fix: Resolve login validation issue
-   docs: Update deployment documentation
-   ```
-
-4. **PR Description**: Include:
-   - What changes were made
-   - Why these changes are necessary
-   - How to test the changes
-   - Screenshots (for UI changes)
-   - Related issue numbers
-
-### PR Review Process
-
-1. **Automated Checks**: CI/CD pipeline will automatically run:
-   - Code builds (Node 18.x and 20.x)
-   - Tests
-   - Linting
-   - Security scans
-   - PR size validation
-
-2. **Code Review**: 
-   - At least one maintainer will review your PR
-   - Address any requested changes
-   - Respond to comments and questions
-
-3. **Merge**:
-   - Once approved and all checks pass, a maintainer will merge your PR
-   - Your branch can be deleted after merging
-
-## Coding Standards
-
-### JavaScript/TypeScript
-
-- Use ES6+ features
-- Use `const` and `let`, avoid `var`
-- Use arrow functions where appropriate
-- Use async/await over callbacks
-- Add JSDoc comments for public functions
-- Use meaningful variable names
-
-### Backend (Node.js/Express)
-
-- Follow RESTful API conventions
-- Use middleware for common functionality
-- Validate all user inputs
-- Handle errors properly
-- Use try-catch blocks for async operations
-- Log important events and errors
-
-### Frontend (React/TypeScript)
-
-- Use functional components with hooks
-- Keep components small and focused
-- Use TypeScript types properly
-- Follow React best practices
-- Use proper state management
-- Optimize performance (memo, useMemo, useCallback)
-
-### File Structure
-
-```
-backend/
-  ├── src/
-  │   ├── config/       # Configuration files
-  │   ├── controllers/  # Request handlers
-  │   ├── middleware/   # Express middleware
-  │   ├── models/       # Database models
-  │   ├── routes/       # API routes
-  │   ├── services/     # Business logic
-  │   └── utils/        # Utility functions
-
-frontend/
-  ├── src/
-  │   ├── components/   # React components
-  │   ├── pages/        # Page components
-  │   ├── hooks/        # Custom hooks
-  │   ├── utils/        # Utility functions
-  │   ├── services/     # API services
-  │   └── types/        # TypeScript types
-```
-
-## Testing
-
-### Backend Tests
+Backend:
 
 ```bash
 cd backend
-npm test
+npm ci
+npm test -- --passWithNoTests
 ```
 
-Write tests for:
-- API endpoints
-- Business logic
-- Utility functions
-- Database operations
-
-### Frontend Tests
+Frontend:
 
 ```bash
 cd frontend
-npm test
+npm ci
+npm run build
 ```
 
-Write tests for:
-- Components
-- Hooks
-- Utility functions
-- Integration tests
+Docker validation:
 
-### Test Coverage
+```bash
+docker compose config
+docker compose -f docker-compose.monitoring.yml config
+```
 
-Aim for:
-- 80%+ code coverage
-- All critical paths tested
-- Edge cases covered
+## Pull Request Expectations
 
-## CI/CD Pipeline
+Include:
 
-Our CI/CD pipeline automatically runs on all pull requests:
+- a clear summary of what changed
+- why the change was needed
+- any required environment changes
+- screenshots for visible frontend changes
+- deployment notes when infrastructure or Docker behavior changed
 
-### Automated Checks
+Keep PRs small enough to review. The repository PR workflow warns on very large changes.
 
-1. **Build Verification**:
-   - Backend builds on Node 18.x and 20.x
-   - Frontend builds production bundle
+## CI Expectations
 
-2. **Testing**:
-   - All backend tests must pass
-   - Frontend must build successfully
+Current GitHub Actions behavior:
 
-3. **Security**:
-   - npm audit checks for vulnerabilities
-   - Trivy scans for security issues
+- CI runs on `main` and `develop`
+- CD runs on `main`
+- PR checks run on pull requests
+- builds are path-aware
+- Node `20.x` is the standard runtime in CI
 
-4. **Code Quality**:
-   - Linting checks
-   - Code style validation
+Known limitation:
 
-5. **PR Validation**:
-   - Checks for sensitive files
-   - Validates PR size
-   - Auto-labels based on changes
+- there is no real lint script configured yet, so do not rely on CI lint jobs as a code-quality gate
 
-### Pipeline Status
+## Documentation Changes
 
-You can view the status of your PR checks in the GitHub PR interface. All checks must pass before your PR can be merged.
+If you change:
 
-### If Checks Fail
+- deployment behavior
+- environment variables
+- Dockerfiles
+- GitHub Actions
+- monitoring config
 
-1. Review the error messages in the GitHub Actions logs
-2. Fix the issues locally
-3. Push the fixes to your branch
-4. The checks will automatically re-run
+update the relevant Markdown files in the same PR.
 
-## Reporting Issues
+## Security and Secrets
 
-### Before Creating an Issue
+- never commit `.env` files
+- never commit keys, tokens, or certificates
+- rotate any secret that was exposed outside a secure channel
+- use GitHub Security Advisories or private maintainer contact for security issues
 
-1. **Search existing issues** to avoid duplicates
-2. **Check documentation** for solutions
-3. **Try the latest version** to see if the issue persists
-
-### Creating an Issue
-
-Include the following information:
-
-1. **Clear title**: Summarize the issue in one line
-2. **Description**: Detailed explanation of the issue
-3. **Steps to reproduce**: How to recreate the issue
-4. **Expected behavior**: What should happen
-5. **Actual behavior**: What actually happens
-6. **Environment**:
-   - OS and version
-   - Node.js version
-   - Browser (for frontend issues)
-7. **Screenshots**: If applicable
-8. **Error messages**: Complete error logs
-
-### Issue Types
-
-Use appropriate labels:
-- `bug` - Something isn't working
-- `enhancement` - New feature request
-- `documentation` - Documentation improvements
-- `question` - Questions about the project
-- `help wanted` - Extra attention needed
-- `good first issue` - Good for newcomers
-
-## Additional Resources
-
-- [GitHub Flow](https://guides.github.com/introduction/flow/)
-- [Conventional Commits](https://www.conventionalcommits.org/)
-- [JavaScript Best Practices](https://github.com/goldbergyoni/nodebestpractices)
-- [React Best Practices](https://react.dev/learn)
-- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
-
-## Questions?
-
-If you have questions:
-1. Check the [documentation](README.md)
-2. Search [existing issues](https://github.com/Mo7amed7osam/UniFreelance/issues)
-3. Create a new issue with the `question` label
-4. Reach out to maintainers
-
-Thank you for contributing to UniFreelance! 🎉
+Security guide: [SECURITY.md](SECURITY.md)

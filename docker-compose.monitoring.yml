@@ -19,7 +19,6 @@ services:
       - blackbox-exporter
     networks:
       - monitoring-network
-      - app-network
 
   alertmanager:
     image: prom/alertmanager:latest
@@ -48,7 +47,6 @@ services:
       - ./monitoring/blackbox/blackbox.yml:/etc/blackbox_exporter/blackbox.yml:ro
     networks:
       - monitoring-network
-      - app-network
 
   loki:
     image: grafana/loki:latest
@@ -84,7 +82,7 @@ services:
     container_name: unifreelance-grafana
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "${GRAFANA_PORT:-3001}:3000"
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
@@ -112,6 +110,3 @@ volumes:
 networks:
   monitoring-network:
     driver: bridge
-  app-network:
-    external: true
-    name: unifreelance-network
