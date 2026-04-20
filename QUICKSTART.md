@@ -1,264 +1,169 @@
-# Quick Start Guide
+# Quick Start
 
-Get UniFreelance up and running in minutes!
+This guide gets UniFreelance running locally with the smallest possible setup.
 
-## Prerequisites Check
+## Prerequisites
 
-Before you begin, ensure you have:
+- Docker Desktop with Compose support
+- Git
 
-- [ ] Docker and Docker Compose installed
-- [ ] Git installed
-- [ ] 2GB+ free disk space
-- [ ] Internet connection
+Optional for manual development:
 
-Don't have Docker? [Install Docker Desktop](https://www.docker.com/products/docker-desktop)
+- Node.js `20.x`
+- npm
 
-## 3-Step Quick Start
+## Fastest Setup
 
-### Step 1: Clone and Configure
+### 1. Clone the Repository
 
 ```bash
-# Clone the repository
 git clone https://github.com/Mo7amed7osam/UniFreelance.git
 cd UniFreelance
-
-# Create environment file
-cp .env.example .env
 ```
 
-### Step 2: Start the Application
+### 2. Create a Root `.env`
+
+There is no committed `.env.example` file, so create `.env` yourself.
+
+Minimum local values:
+
+```env
+MONGO_USERNAME=admin
+MONGO_PASSWORD=password
+MONGO_URI=mongodb://admin:password@mongodb:27017/unifreelance?authSource=admin
+JWT_SECRET=local-dev-secret
+BACKEND_PORT=5000
+NODE_ENV=production
+INSTAPAY_RECEIVER_NUMBER=01146370900
+```
+
+### 3. Start the Application Stack
 
 ```bash
-# Start all services (MongoDB, Backend, Frontend)
 docker compose up -d
-
-# This will:
-# - Pull required Docker images
-# - Start MongoDB database
-# - Start backend API server
-# - Start frontend web server
 ```
 
-### Step 3: Access the Application
-
-Open your browser and navigate to:
-
-- **Frontend Application**: http://localhost
-- **Backend API**: http://localhost:5000
-- **MongoDB**: localhost:27017
-
-That's it! 🎉 UniFreelance is now running!
-
-## Verify Installation
-
-Check that all services are running:
+### 4. Verify It Works
 
 ```bash
 docker compose ps
-```
-
-You should see:
-```
-NAME                        STATUS
-unifreelance-backend        Up
-unifreelance-frontend       Up
-unifreelance-mongodb        Up (healthy)
-```
-
-### Test the Health Endpoints
-
-```bash
-# Test backend health
 curl http://localhost:5000/health
-
-# Test frontend health
-curl http://localhost/health
 ```
 
-## Common Commands
+Expected local endpoints:
 
-### View Logs
+- Frontend: `http://localhost`
+- Backend: `http://localhost:5000`
+- MongoDB: `localhost:27017`
+
+## Manual Development
+
+Use this if you want hot reload without Docker.
+
+### Backend
 
 ```bash
-# All services
-docker compose logs -f
+cd backend
+npm install
+PORT=5000 MONGO_URI='your-mongo-uri' JWT_SECRET='local-dev-secret' npm run dev
+```
 
-# Specific service
+### Frontend
+
+```bash
+cd frontend
+npm install
+VITE_API_URL=http://localhost:5000/api npm run dev
+```
+
+## Useful Commands
+
+Start local stack:
+
+```bash
+docker compose up -d
+```
+
+Follow logs:
+
+```bash
+docker compose logs -f
+```
+
+Follow one service:
+
+```bash
 docker compose logs -f backend
 docker compose logs -f frontend
 docker compose logs -f mongodb
 ```
 
-### Stop Services
+Stop the stack:
 
 ```bash
-# Stop all services
 docker compose down
+```
 
-# Stop and remove volumes (⚠️ deletes all data)
+Remove containers and volumes:
+
+```bash
 docker compose down -v
 ```
 
-### Restart Services
+Rebuild after code or Dockerfile changes:
 
 ```bash
-# Restart all services
-docker compose restart
-
-# Restart specific service
-docker compose restart backend
-```
-
-### Update Application
-
-```bash
-# Pull latest changes
-git pull
-
-# Rebuild and restart
 docker compose up -d --build
 ```
 
-## Default Credentials
+## Troubleshooting
 
-The application starts with these default values (from `.env` file):
+### Backend Does Not Start
 
-- **MongoDB Username**: admin
-- **MongoDB Password**: password
-- **JWT Secret**: your-secret-key-change-this
+Check:
 
-⚠️ **Security Warning**: Change these values in production!
+- `MONGO_URI` or `MONGODB_URI` is set
+- MongoDB container is healthy
+- Port `5000` is not already taken
+
+Useful commands:
+
+```bash
+docker compose ps
+docker compose logs backend
+docker compose logs mongodb
+```
+
+### Frontend Cannot Reach the API
+
+For local Docker Compose:
+
+- Backend should be available at `http://localhost:5000`
+- Frontend is served at `http://localhost`
+
+For manual frontend development:
+
+- set `VITE_API_URL=http://localhost:5000/api`
+
+### Port Conflict
+
+Check what is using the port:
+
+```bash
+lsof -i :80
+lsof -i :5000
+lsof -i :27017
+```
+
+### Reset the Local Environment
+
+```bash
+docker compose down -v
+docker compose up -d --build
+```
 
 ## Next Steps
 
-### For Users
-
-1. **Register an account** at http://localhost
-2. **Choose your role**: Student or Client
-3. **Complete your profile**
-4. **Start exploring!**
-
-### For Developers
-
-1. **Read the [Contributing Guide](CONTRIBUTING.md)**
-2. **Check out the [CI/CD Documentation](CICD.md)**
-3. **Review the [Deployment Guide](DEPLOYMENT.md)**
-4. **Explore the codebase**:
-   - Backend: `./backend/src/`
-   - Frontend: `./frontend/src/`
-
-## Development Mode
-
-For development with hot-reload:
-
-### Backend Development
-
-```bash
-cd backend
-npm install
-npm run dev
-```
-
-Backend will run on http://localhost:5000 with auto-reload
-
-### Frontend Development
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Frontend will run on http://localhost:5173 with hot-reload
-
-## Troubleshooting
-
-### Port Already in Use
-
-If you see "port already in use" errors:
-
-```bash
-# Check what's using the port
-lsof -i :80    # Frontend
-lsof -i :5000  # Backend
-lsof -i :27017 # MongoDB
-
-# Kill the process or change the port in docker-compose.yml
-```
-
-### Services Won't Start
-
-```bash
-# Check Docker is running
-docker ps
-
-# View detailed logs
-docker compose logs
-
-# Reset everything
-docker compose down -v
-docker compose up -d
-```
-
-### Cannot Connect to Backend
-
-1. Check backend is running: `docker compose ps`
-2. Check backend logs: `docker compose logs backend`
-3. Verify MongoDB is healthy: `docker compose ps mongodb`
-4. Test health endpoint: `curl http://localhost:5000/health`
-
-### Database Connection Errors
-
-```bash
-# Restart MongoDB
-docker compose restart mongodb
-
-# Check MongoDB logs
-docker compose logs mongodb
-
-# Verify MongoDB is healthy
-docker compose exec mongodb mongosh --eval "db.adminCommand('ping')"
-```
-
-## Resource Usage
-
-Expected resource usage:
-
-- **RAM**: ~500MB - 1GB
-- **Disk**: ~500MB for images + data
-- **CPU**: Minimal when idle
-
-## Uninstall
-
-To completely remove UniFreelance:
-
-```bash
-# Stop and remove containers, volumes, and networks
-cd UniFreelance
-docker compose down -v
-
-# Remove Docker images (optional)
-docker rmi unifreelance-backend unifreelance-frontend
-
-# Remove cloned repository
-cd ..
-rm -rf UniFreelance
-```
-
-## Getting Help
-
-- **Documentation Issues**: Check [README.md](README.md)
-- **Deployment Help**: See [DEPLOYMENT.md](DEPLOYMENT.md)
-- **Bug Reports**: [Open an issue](https://github.com/Mo7amed7osam/UniFreelance/issues)
-- **Questions**: Check [existing issues](https://github.com/Mo7amed7osam/UniFreelance/issues)
-
-## Success Checklist
-
-- [x] Cloned repository
-- [x] Created `.env` file
-- [x] Started services with `docker compose up -d`
-- [x] Verified services are running
-- [x] Accessed frontend at http://localhost
-- [x] Tested backend API at http://localhost:5000
-
-Congratulations! You're ready to use UniFreelance! 🚀
+- Read [README.md](README.md) for the full project overview
+- Read [DEPLOYMENT.md](DEPLOYMENT.md) for GHCR, Azure, and Vercel deployment
+- Read [monitoring/README.md](monitoring/README.md) to start Grafana and Prometheus locally
