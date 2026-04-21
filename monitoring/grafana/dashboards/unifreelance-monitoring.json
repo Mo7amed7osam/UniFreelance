@@ -17,7 +17,7 @@
       }
     }
   ],
-  "cursorSync": "Off",
+  "cursorSync": "Crosshair",
   "editable": true,
   "elements": {
     "panel-1": {
@@ -47,7 +47,7 @@
             "transformations": []
           }
         },
-        "description": "Backend metrics endpoint availability",
+        "description": "Current backend metrics scrape status",
         "id": 1,
         "links": [],
         "title": "Backend Status",
@@ -95,7 +95,7 @@
               "colorMode": "background",
               "graphMode": "none",
               "justifyMode": "center",
-              "orientation": "horizontal",
+              "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
                 "calcs": [
@@ -105,8 +105,8 @@
                 "values": false
               },
               "showPercentChange": false,
-              "textMode": "value_and_name",
-              "wideLayout": true
+              "textMode": "value",
+              "wideLayout": false
             }
           },
           "version": "13.0.1"
@@ -140,7 +140,7 @@
             "transformations": []
           }
         },
-        "description": "Frontend availability from blackbox probe",
+        "description": "Current frontend uptime probe status",
         "id": 2,
         "links": [],
         "title": "Frontend Status",
@@ -188,18 +188,18 @@
               "colorMode": "background",
               "graphMode": "none",
               "justifyMode": "center",
-              "orientation": "horizontal",
+              "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
                 "calcs": [
-                  "min"
+                  "lastNotNull"
                 ],
                 "fields": "",
                 "values": false
               },
               "showPercentChange": false,
-              "textMode": "value_and_name",
-              "wideLayout": true
+              "textMode": "value",
+              "wideLayout": false
             }
           },
           "version": "13.0.1"
@@ -233,7 +233,7 @@
             "transformations": []
           }
         },
-        "description": "External health endpoint probe",
+        "description": "Current public API health endpoint status",
         "id": 3,
         "links": [],
         "title": "API Health",
@@ -251,7 +251,7 @@
                     "type": "value",
                     "options": {
                       "0": {
-                        "text": "DOWN",
+                        "text": "UNHEALTHY",
                         "color": "red"
                       },
                       "1": {
@@ -281,18 +281,18 @@
               "colorMode": "background",
               "graphMode": "none",
               "justifyMode": "center",
-              "orientation": "horizontal",
+              "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
                 "calcs": [
-                  "min"
+                  "lastNotNull"
                 ],
                 "fields": "",
                 "values": false
               },
               "showPercentChange": false,
-              "textMode": "value_and_name",
-              "wideLayout": true
+              "textMode": "value",
+              "wideLayout": false
             }
           },
           "version": "13.0.1"
@@ -326,7 +326,7 @@
             "transformations": []
           }
         },
-        "description": "Current MongoDB connection state",
+        "description": "Current MongoDB connectivity state",
         "id": 4,
         "links": [],
         "title": "Database",
@@ -372,6 +372,14 @@
                     {
                       "color": "green",
                       "value": 1
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 2
+                    },
+                    {
+                      "color": "orange",
+                      "value": 3
                     }
                   ]
                 }
@@ -382,7 +390,7 @@
               "colorMode": "background",
               "graphMode": "none",
               "justifyMode": "center",
-              "orientation": "horizontal",
+              "orientation": "auto",
               "percentChangeColorMode": "standard",
               "reduceOptions": {
                 "calcs": [
@@ -392,8 +400,8 @@
                 "values": false
               },
               "showPercentChange": false,
-              "textMode": "value_and_name",
-              "wideLayout": true
+              "textMode": "value",
+              "wideLayout": false
             }
           },
           "version": "13.0.1"
@@ -416,7 +424,7 @@
                     "kind": "DataQuery",
                     "spec": {
                       "expr": "sum(rate(unifreelance_backend_http_requests_total{job=\"backend-cloud\"}[5m]))",
-                      "legendFormat": "requests/sec"
+                      "legendFormat": "Requests/sec"
                     },
                     "version": "v0"
                   },
@@ -428,7 +436,7 @@
             "transformations": []
           }
         },
-        "description": "Incoming request rate over time",
+        "description": "Backend request throughput over time",
         "id": 5,
         "links": [],
         "title": "Request Rate",
@@ -439,18 +447,19 @@
             "fieldConfig": {
               "defaults": {
                 "color": {
-                  "mode": "palette-classic"
+                  "fixedColor": "blue",
+                  "mode": "fixed"
                 },
                 "custom": {
                   "axisBorderShow": false,
                   "axisCenteredZero": false,
                   "axisColorMode": "text",
-                  "axisLabel": "req/s",
+                  "axisLabel": "Requests/sec",
                   "axisPlacement": "auto",
                   "barAlignment": 0,
                   "barWidthFactor": 0.6,
                   "drawStyle": "line",
-                  "fillOpacity": 20,
+                  "fillOpacity": 18,
                   "gradientMode": "none",
                   "hideFrom": {
                     "legend": false,
@@ -459,7 +468,7 @@
                   },
                   "insertNulls": false,
                   "lineInterpolation": "smooth",
-                  "lineWidth": 2,
+                  "lineWidth": 3,
                   "pointSize": 4,
                   "scaleDistribution": {
                     "type": "linear"
@@ -533,7 +542,7 @@
                     "kind": "DataQuery",
                     "spec": {
                       "expr": "sum(rate(unifreelance_backend_http_request_errors_total{job=\"backend-cloud\"}[5m]))",
-                      "legendFormat": "5xx/sec"
+                      "legendFormat": "Errors/sec"
                     },
                     "version": "v0"
                   },
@@ -545,7 +554,7 @@
             "transformations": []
           }
         },
-        "description": "Server-side error rate over time",
+        "description": "Backend server-side errors over time",
         "id": 6,
         "links": [],
         "title": "Error Rate",
@@ -563,12 +572,12 @@
                   "axisBorderShow": false,
                   "axisCenteredZero": false,
                   "axisColorMode": "text",
-                  "axisLabel": "errors/s",
+                  "axisLabel": "Errors/sec",
                   "axisPlacement": "auto",
                   "barAlignment": 0,
                   "barWidthFactor": 0.6,
                   "drawStyle": "line",
-                  "fillOpacity": 18,
+                  "fillOpacity": 16,
                   "gradientMode": "none",
                   "hideFrom": {
                     "legend": false,
@@ -577,7 +586,7 @@
                   },
                   "insertNulls": false,
                   "lineInterpolation": "smooth",
-                  "lineWidth": 2,
+                  "lineWidth": 3,
                   "pointSize": 4,
                   "scaleDistribution": {
                     "type": "linear"
@@ -683,7 +692,7 @@
             "transformations": []
           }
         },
-        "description": "Backend latency percentiles",
+        "description": "Backend API response latency percentiles",
         "id": 7,
         "links": [],
         "title": "Latency",
@@ -700,12 +709,12 @@
                   "axisBorderShow": false,
                   "axisCenteredZero": false,
                   "axisColorMode": "text",
-                  "axisLabel": "seconds",
+                  "axisLabel": "Latency (s)",
                   "axisPlacement": "auto",
                   "barAlignment": 0,
                   "barWidthFactor": 0.6,
                   "drawStyle": "line",
-                  "fillOpacity": 16,
+                  "fillOpacity": 14,
                   "gradientMode": "none",
                   "hideFrom": {
                     "legend": false,
@@ -714,7 +723,7 @@
                   },
                   "insertNulls": false,
                   "lineInterpolation": "smooth",
-                  "lineWidth": 2,
+                  "lineWidth": 3,
                   "pointSize": 4,
                   "scaleDistribution": {
                     "type": "linear"
@@ -749,7 +758,38 @@
                 },
                 "unit": "s"
               },
-              "overrides": []
+              "overrides": [
+                {
+                  "matcher": {
+                    "id": "byName",
+                    "options": "p50"
+                  },
+                  "properties": [
+                    {
+                      "id": "color",
+                      "value": {
+                        "fixedColor": "green",
+                        "mode": "fixed"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "matcher": {
+                    "id": "byName",
+                    "options": "p95"
+                  },
+                  "properties": [
+                    {
+                      "id": "color",
+                      "value": {
+                        "fixedColor": "orange",
+                        "mode": "fixed"
+                      }
+                    }
+                  ]
+                }
+              ]
             },
             "options": {
               "annotations": {
@@ -767,7 +807,7 @@
               },
               "tooltip": {
                 "hideZeros": false,
-                "mode": "single",
+                "mode": "multi",
                 "sort": "none"
               }
             }
@@ -804,7 +844,7 @@
             "transformations": []
           }
         },
-        "description": "External endpoint probe duration",
+        "description": "Probe duration for monitored public endpoints",
         "id": 8,
         "links": [],
         "title": "Uptime Probes",
@@ -821,12 +861,12 @@
                   "axisBorderShow": false,
                   "axisCenteredZero": false,
                   "axisColorMode": "text",
-                  "axisLabel": "seconds",
+                  "axisLabel": "Duration (s)",
                   "axisPlacement": "auto",
                   "barAlignment": 0,
                   "barWidthFactor": 0.6,
                   "drawStyle": "line",
-                  "fillOpacity": 12,
+                  "fillOpacity": 10,
                   "gradientMode": "none",
                   "hideFrom": {
                     "legend": false,
@@ -835,7 +875,7 @@
                   },
                   "insertNulls": false,
                   "lineInterpolation": "smooth",
-                  "lineWidth": 2,
+                  "lineWidth": 3,
                   "pointSize": 4,
                   "scaleDistribution": {
                     "type": "linear"
@@ -878,14 +918,17 @@
                 "multiLane": false
               },
               "legend": {
-                "calcs": [],
-                "displayMode": "list",
+                "calcs": [
+                  "lastNotNull",
+                  "max"
+                ],
+                "displayMode": "table",
                 "placement": "bottom",
                 "showLegend": true
               },
               "tooltip": {
                 "hideZeros": false,
-                "mode": "single",
+                "mode": "multi",
                 "sort": "none"
               }
             }
@@ -921,7 +964,7 @@
             "transformations": []
           }
         },
-        "description": "Recent backend logs from Loki",
+        "description": "Recent backend container logs from Loki",
         "id": 9,
         "links": [],
         "title": "Recent Backend Logs",
@@ -936,7 +979,7 @@
             "options": {
               "dedupStrategy": "none",
               "enableLogDetails": true,
-              "prettifyLogMessage": false,
+              "prettifyLogMessage": true,
               "showCommonLabels": false,
               "showLabels": false,
               "showTime": true,
@@ -1052,7 +1095,7 @@
               "name": "panel-8"
             },
             "height": 9,
-            "width": 10,
+            "width": 12,
             "x": 0,
             "y": 12
           }
@@ -1065,8 +1108,8 @@
               "name": "panel-9"
             },
             "height": 9,
-            "width": 14,
-            "x": 10,
+            "width": 12,
+            "x": 12,
             "y": 12
           }
         }
