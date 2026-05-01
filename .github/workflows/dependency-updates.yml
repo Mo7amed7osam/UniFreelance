@@ -1,0 +1,49 @@
+name: Dependency Updates
+
+on:
+  schedule:
+    # Run every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+jobs:
+  dependency-review:
+    name: Review Dependencies
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+    
+    - name: Check backend dependencies
+      working-directory: ./backend
+      run: |
+        echo "🔍 Checking backend dependencies for updates..."
+        npm outdated || true
+        echo "📦 Backend dependency check complete"
+    
+    - name: Check frontend dependencies
+      working-directory: ./frontend
+      run: |
+        echo "🔍 Checking frontend dependencies for updates..."
+        npm outdated || true
+        echo "📦 Frontend dependency check complete"
+    
+    - name: Security audit backend
+      working-directory: ./backend
+      run: |
+        echo "🔒 Running backend security audit..."
+        npm audit --audit-level=high || true
+    
+    - name: Security audit frontend
+      working-directory: ./frontend
+      run: |
+        echo "🔒 Running frontend security audit..."
+        npm audit --audit-level=high || true

@@ -1,0 +1,21 @@
+backend:
+  - backend/**/*
+
+frontend:
+  - frontend/**/*
+
+dependencies:
+  - '**/package.json'
+  - '**/package-lock.json'
+
+docker:
+  - '**/Dockerfile'
+  - '**/docker-compose.yml'
+  - '**/.dockerignore'
+
+ci/cd:
+  - '.github/workflows/**'
+
+documentation:
+  - '**/*.md'
+  - 'docs/**/*'
