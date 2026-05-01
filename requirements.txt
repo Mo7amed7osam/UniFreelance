@@ -1,0 +1,19 @@
+# Essential Libraries Only
+fastapi>=0.104.0
+uvicorn>=0.24.0
+python-dotenv>=1.0.0
+httpx>=0.24.0
+pydantic>=2.5.0
+python-multipart>=0.0.6
+
+# Voice & Audio
+groq>=0.4.0
+pyaudio>=0.2.11
+webrtcvad-wheels>=2.0.10
+
+# Camera & Vision
+opencv-python>=4.8.0
+numpy>=1.24.0
+
+# Basic Utilities
+requests>=2.31.0
