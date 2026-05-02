@@ -52,6 +52,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/skills', skillRoutes);
 app.use('/api/interview', aiInterviewRoutes);
+app.use('/api/interviews', aiInterviewRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/proposals', proposalRoutes);
