@@ -1,16 +1,24 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Search, SendHorizonal } from 'lucide-react';
 import { toast } from 'sonner';
+
 import { fetchJobs, getStudentProposals, submitProposal } from '@/services/api';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { PageHeader } from '@/components/ui/page-header';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from '@/components/ui/textarea';
 import { useAuthContext } from '@/context/AuthContext';
 
-const JobList: React.FC = () => {
+interface JobListProps {
+  embedded?: boolean;
+}
+
+const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
   const [search, setSearch] = useState('');
   const [proposalDetails, setProposalDetails] = useState<Record<string, string>>({});
   const [proposalTimeline, setProposalTimeline] = useState<Record<string, string>>({});
@@ -45,8 +53,7 @@ const JobList: React.FC = () => {
   }, [proposals]);
 
   const proposalMutation = useMutation({
-    mutationFn: ({ jobId, details, proposedBudget }: any) =>
-      submitProposal(jobId, { details, proposedBudget }),
+    mutationFn: ({ jobId, details, proposedBudget }: any) => submitProposal(jobId, { details, proposedBudget }),
     onSuccess: () => {
       toast.success('Proposal submitted');
       queryClient.invalidateQueries({ queryKey: ['student', 'proposals', userId] });
@@ -80,11 +87,7 @@ const JobList: React.FC = () => {
       return;
     }
 
-    const composedDetails = [
-      `Cover Letter: ${details}`,
-      timeline ? `Timeline: ${timeline}` : null,
-      portfolio ? `Portfolio Links: ${portfolio}` : null,
-    ]
+    const composedDetails = [`Cover Letter: ${details}`, timeline ? `Timeline: ${timeline}` : null, portfolio ? `Portfolio Links: ${portfolio}` : null]
       .filter(Boolean)
       .join('\n');
 
@@ -101,152 +104,142 @@ const JobList: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-        <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-widest text-ink-400">
-            Student workspace
-          </p>
-          <h2 className="text-3xl font-semibold dark:text-white">
-            Job board
-          </h2>
+    <div className="space-y-6">
+      {!embedded ? (
+        <PageHeader
+          eyebrow="Student workspace"
+          title="Job board"
+          description="Discover student-friendly opportunities, filter quickly, and send tailored proposals."
+        />
+      ) : null}
+
+      <div className="glass-panel flex flex-col gap-4 px-5 py-5 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="text-lg font-semibold text-ink-900 dark:text-white">Open opportunities</p>
+          <p className="text-sm text-ink-500 dark:text-ink-300">Search by title, skill, or project description.</p>
         </div>
 
-        <Input
-          placeholder="Search jobs by title or description"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="md:max-w-sm"
-        />
+        <label className="flex min-h-11 w-full items-center gap-3 rounded-2xl border border-white/70 bg-white/80 px-4 shadow-soft dark:border-white/10 dark:bg-white/5 md:max-w-sm">
+          <Search size={16} className="text-ink-400 dark:text-ink-300" />
+          <Input
+            placeholder="Search jobs"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="min-h-0 border-0 bg-transparent px-0 shadow-none focus:ring-0 dark:bg-transparent"
+          />
+        </label>
       </div>
 
-      {/* Loading */}
-      {isLoading && (
-        <div className="grid gap-4 md:grid-cols-2">
+      {isLoading ? (
+        <div className="grid gap-4 xl:grid-cols-2">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-56 w-full" />
+            <Skeleton key={i} className="h-[26rem] w-full rounded-3xl" />
           ))}
         </div>
-      )}
+      ) : null}
 
-      {/* Error */}
-      {isError && (
-        <Card>
-          <CardContent className="py-10 text-center">
-            <p className="text-sm text-rose-500">
-              Failed to fetch jobs. Please try again.
-            </p>
-          </CardContent>
-        </Card>
-      )}
+      {isError ? (
+        <EmptyState title="Unable to load jobs" description="The job board could not be loaded right now. Please try again in a moment." />
+      ) : null}
 
-      {/* Empty */}
-      {!isLoading && !isError && filteredJobs.length === 0 && (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <p className="text-sm text-ink-500">
-              {debouncedSearch
-                ? 'No jobs match your search yet.'
-                : 'No jobs available yet.'}
-            </p>
-          </CardContent>
-        </Card>
-      )}
+      {!isLoading && !isError && filteredJobs.length === 0 ? (
+        <EmptyState
+          title={debouncedSearch ? 'No jobs match this search' : 'No jobs available yet'}
+          description={
+            debouncedSearch
+              ? 'Try a broader keyword or remove filters to see more opportunities.'
+              : 'New job posts will appear here as clients publish them.'
+          }
+        />
+      ) : null}
 
-      {/* Jobs */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 xl:grid-cols-2">
         {filteredJobs.map((job: any) => {
           const jobKey = job._id || job.id;
           const hasSubmitted = submittedJobIds.has(jobKey);
 
           return (
-            <Card key={jobKey}>
-              <CardHeader className="space-y-2">
-                <CardTitle>{job.title}</CardTitle>
+            <Card key={jobKey} className="overflow-hidden p-0">
+              <CardHeader className="space-y-4 p-6">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="space-y-2">
+                    <CardTitle className="text-2xl">{job.title}</CardTitle>
+                    <p className="text-sm text-ink-500 dark:text-ink-300">
+                      {job.description}
+                    </p>
+                  </div>
+                  <Badge variant={hasSubmitted ? 'success' : 'brand'}>{hasSubmitted ? 'Applied' : 'Open'}</Badge>
+                </div>
+
                 <div className="flex flex-wrap gap-2">
-                  {job.requiredSkills.map((skill: any) => (
-                    <Badge key={skill._id || skill} variant="brand">
+                  {(job.requiredSkills || []).map((skill: any) => (
+                    <Badge key={skill._id || skill} variant="subtle">
                       {skill.name || skill}
                     </Badge>
                   ))}
                 </div>
               </CardHeader>
 
-              <CardContent className="space-y-5">
-                <p className="text-sm text-ink-600">
-                  {job.description}
-                </p>
-
-                {(job.budgetMin || job.budgetMax || job.duration) && (
-                  <div className="text-xs text-ink-500">
-                    {job.budgetMin !== undefined || job.budgetMax !== undefined ? (
-                      <span>
-                        Budget: {job.budgetMin ?? '—'} - {job.budgetMax ?? '—'}
-                      </span>
-                    ) : null}
-                    {job.duration && (
-                      <span className="ml-2">
-                        Duration: {job.duration}
-                      </span>
-                    )}
+              <CardContent className="space-y-5 p-6 pt-0">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="muted-panel rounded-2xl p-3">
+                    <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">Budget</p>
+                    <p className="mt-2 text-sm font-semibold text-ink-900 dark:text-white">
+                      {job.budgetMin !== undefined || job.budgetMax !== undefined ? `${job.budgetMin ?? '—'} - ${job.budgetMax ?? '—'}` : 'Flexible'}
+                    </p>
                   </div>
-                )}
+                  <div className="muted-panel rounded-2xl p-3">
+                    <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">Timeline</p>
+                    <p className="mt-2 text-sm font-semibold text-ink-900 dark:text-white">{job.duration || 'Discuss on approval'}</p>
+                  </div>
+                  <div className="muted-panel rounded-2xl p-3">
+                    <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">Status</p>
+                    <p className="mt-2 text-sm font-semibold text-ink-900 dark:text-white">{hasSubmitted ? 'Proposal sent' : 'Ready to apply'}</p>
+                  </div>
+                </div>
 
-                <div className="space-y-3">
+                <div className="grid gap-4 md:grid-cols-2">
                   <Input
                     placeholder="Proposed budget (optional)"
                     type="number"
                     min={0}
                     value={proposalBudget[jobKey] || ''}
-                    onChange={(e) =>
-                      setProposalBudget((p) => ({ ...p, [jobKey]: e.target.value }))
-                    }
+                    onChange={(e) => setProposalBudget((p) => ({ ...p, [jobKey]: e.target.value }))}
                     disabled={hasSubmitted}
                   />
-
-                  <Textarea
-                    placeholder="Cover letter"
-                    value={proposalDetails[jobKey] || ''}
-                    onChange={(e) =>
-                      setProposalDetails((p) => ({ ...p, [jobKey]: e.target.value }))
-                    }
+                  <Input
+                    placeholder="Timeline (e.g. 2 weeks)"
+                    value={proposalTimeline[jobKey] || ''}
+                    onChange={(e) => setProposalTimeline((p) => ({ ...p, [jobKey]: e.target.value }))}
                     disabled={hasSubmitted}
                   />
+                </div>
 
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <Input
-                      placeholder="Timeline (e.g. 2 weeks)"
-                      value={proposalTimeline[jobKey] || ''}
-                      onChange={(e) =>
-                        setProposalTimeline((p) => ({ ...p, [jobKey]: e.target.value }))
-                      }
-                      disabled={hasSubmitted}
-                    />
-                    <Input
-                      placeholder="Portfolio links"
-                      value={proposalPortfolio[jobKey] || ''}
-                      onChange={(e) =>
-                        setProposalPortfolio((p) => ({ ...p, [jobKey]: e.target.value }))
-                      }
-                      disabled={hasSubmitted}
-                    />
-                  </div>
+                <Textarea
+                  placeholder="Write a concise cover letter that explains why you fit this role."
+                  value={proposalDetails[jobKey] || ''}
+                  onChange={(e) => setProposalDetails((p) => ({ ...p, [jobKey]: e.target.value }))}
+                  disabled={hasSubmitted}
+                  rows={5}
+                />
 
-                  <Button
-                    type="button"
-                    onClick={() => handleSubmitProposal(jobKey)}
-                    disabled={proposalMutation.isPending || hasSubmitted}
-                  >
-                    {hasSubmitted
-                      ? 'Proposal submitted'
-                      : proposalMutation.isPending
+                <Input
+                  placeholder="Portfolio links"
+                  value={proposalPortfolio[jobKey] || ''}
+                  onChange={(e) => setProposalPortfolio((p) => ({ ...p, [jobKey]: e.target.value }))}
+                  disabled={hasSubmitted}
+                />
+
+                <Button type="button" onClick={() => handleSubmitProposal(jobKey)} disabled={proposalMutation.isPending || hasSubmitted} className="w-full">
+                  <SendHorizonal size={18} />
+                  {hasSubmitted
+                    ? 'Proposal submitted'
+                    : proposalMutation.isPending
                       ? 'Submitting...'
                       : isFetching
-                      ? 'Refreshing...'
-                      : 'Submit proposal'}
-                  </Button>
-                </div>
+                        ? 'Refreshing jobs...'
+                        : 'Submit proposal'}
+                </Button>
               </CardContent>
             </Card>
           );

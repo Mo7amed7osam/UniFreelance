@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+
 import {
   createTopUpRequest,
   downloadTopUpScreenshot,
@@ -9,9 +10,11 @@ import {
 } from '@/services/api';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
+import { PageHeader } from '@/components/ui/page-header';
 import { Skeleton } from '@/components/ui/skeleton';
+import { StatCard } from '@/components/ui/stat-card';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Table,
@@ -45,8 +48,7 @@ const ClientWallet: React.FC = () => {
   });
 
   const topupMutation = useMutation({
-    mutationFn: (payload: { amount: number; screenshot: File; note?: string }) =>
-      createTopUpRequest(payload),
+    mutationFn: (payload: { amount: number; screenshot: File; note?: string }) => createTopUpRequest(payload),
     onSuccess: () => {
       toast.success('Top-up request submitted.');
       setAmount('');
@@ -90,238 +92,95 @@ const ClientWallet: React.FC = () => {
   const instapayReceiver = balanceData?.instapayReceiver || '01146370900';
 
   return (
-    <div
-      className="
-        space-y-10 rounded-2xl p-6
-        bg-gradient-to-br from-ink-50 via-white to-brand-100/30
-        dark:bg-gradient-to-br dark:from-ink-900 dark:via-ink-900 dark:to-ink-800
-      "
-    >
-      {/* Header */}
-      <div className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-widest text-ink-400 dark:text-ink-400">
-          Client Wallet
-        </p>
-        <h1 className="text-3xl font-semibold text-ink-900 dark:text-white">
-          Wallet &{' '}
-          <span className="text-brand-600 dark:text-brand-400">
-            top-ups
-          </span>
-        </h1>
-        <p className="text-sm text-ink-500 dark:text-ink-400">
-          Manage your balance and funding requests.
-        </p>
+    <div className="space-y-8">
+      <PageHeader
+        eyebrow="Client wallet"
+        title="Wallet and top-ups"
+        description="Fund your balance, attach proof cleanly, and keep escrow-ready capital available for hiring."
+      />
+
+      <div className="grid gap-4 xl:grid-cols-3">
+        <StatCard
+          label="Current balance"
+          value={balanceLoading ? <Skeleton className="h-10 w-24" /> : `$${Number(balanceData?.balance || 0).toFixed(2)}`}
+          caption="Funds ready for escrow-backed hiring."
+          tone="brand"
+        />
+
+        <div className="glass-panel xl:col-span-2 p-6">
+          <h2 className="text-2xl font-semibold">Instapay instructions</h2>
+          <p className="mt-2 text-sm text-ink-500 dark:text-ink-300">
+            Transfer the exact amount to <span className="font-semibold text-ink-900 dark:text-white">{instapayReceiver}</span>, then upload the payment screenshot below.
+          </p>
+        </div>
       </div>
 
-      {/* Balance & Instructions */}
-      <div className="grid gap-5 md:grid-cols-3">
-        {/* Balance */}
-        <Card
-          className="
-            bg-gradient-to-br from-brand-500 to-brand-700 text-white
-            transition-all hover:-translate-y-1 hover:shadow-xl
-          "
-        >
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-white/80">
-              Current balance
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {balanceLoading ? (
-              <Skeleton className="h-8 w-24 bg-white/30" />
-            ) : (
-              <p className="text-4xl font-semibold text-white">
-                ${Number(balanceData?.balance || 0).toFixed(2)}
-              </p>
-            )}
-            <p className="text-sm text-white/80">
-              Funds held in escrow for contracts.
-            </p>
-          </CardContent>
-        </Card>
+      <div className="glass-panel p-6">
+        <div className="space-y-5">
+          <div>
+            <h2 className="text-2xl font-semibold">Submit top-up request</h2>
+            <p className="text-sm text-ink-500 dark:text-ink-300">Add the transfer amount, attach proof, and include any useful reference note.</p>
+          </div>
 
-        {/* Instapay */}
-        <Card
-          className="
-            md:col-span-2
-            bg-white/80 backdrop-blur-sm transition-all
-            hover:shadow-xl
-            dark:bg-ink-800 dark:border-ink-700
-          "
-        >
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-ink-900 dark:text-white">
-              Instapay instructions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-ink-600 dark:text-ink-400">
-              Transfer the exact amount to Instapay receiver{' '}
-              <span className="font-semibold text-ink-900 dark:text-white">
-                {instapayReceiver}
-              </span>
-              , then upload the payment screenshot.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Top-up Form */}
-      <Card
-        className="
-          bg-white/80 backdrop-blur-sm transition-all
-          hover:shadow-xl
-          dark:bg-ink-800 dark:border-ink-700
-        "
-      >
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-ink-900 dark:text-white">
-            Submit top-up request
-          </CardTitle>
-        </CardHeader>
-
-        <CardContent className="space-y-6">
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-ink-700 dark:text-ink-300">
-                Amount
-              </label>
-              <Input
-                type="number"
-                min={0}
-                placeholder="e.g. 500"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                disabled={topupMutation.isPending}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-ink-700 dark:text-ink-300">
-                Screenshot
-              </label>
-              <Input
-                type="file"
-                accept="image/png,image/jpeg,image/jpg,image/webp"
-                onChange={(e) => setScreenshot(e.target.files?.[0] || null)}
-                disabled={topupMutation.isPending}
-              />
-              {screenshot && (
-                <p className="text-xs text-ink-500 dark:text-ink-400">
-                  {screenshot.name}
-                </p>
-              )}
-            </div>
+            <Input type="number" min={0} placeholder="Amount" value={amount} onChange={(e) => setAmount(e.target.value)} disabled={topupMutation.isPending} />
+            <Input type="file" accept="image/png,image/jpeg,image/jpg,image/webp" onChange={(e) => setScreenshot(e.target.files?.[0] || null)} disabled={topupMutation.isPending} />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-ink-700 dark:text-ink-300">
-              Note (optional)
-            </label>
-            <Textarea
-              rows={3}
-              placeholder="Add any reference details."
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              disabled={topupMutation.isPending}
-            />
-          </div>
+          {screenshot ? <p className="text-sm text-ink-500 dark:text-ink-300">{screenshot.name}</p> : null}
 
-          <Button
-            type="button"
-            disabled={topupMutation.isPending}
-            onClick={handleSubmit}
-          >
+          <Textarea rows={4} placeholder="Optional note" value={note} onChange={(e) => setNote(e.target.value)} disabled={topupMutation.isPending} />
+
+          <Button type="button" disabled={topupMutation.isPending} onClick={handleSubmit}>
             {topupMutation.isPending ? 'Submitting…' : 'Submit top-up'}
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* History */}
-      <Card
-        className="
-          bg-white/80 backdrop-blur-sm transition-all
-          hover:shadow-xl
-          dark:bg-ink-800 dark:border-ink-700
-        "
-      >
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-ink-900 dark:text-white">
-            Top-up history
-          </CardTitle>
-        </CardHeader>
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-2xl font-semibold">Top-up history</h2>
+          <p className="text-sm text-ink-500 dark:text-ink-300">Review every funding request, approval status, and uploaded screenshot.</p>
+        </div>
 
-        <CardContent>
-          {topupsLoading ? (
-            <Skeleton className="h-32 w-full" />
-          ) : (topups || []).length === 0 ? (
-            <p className="text-sm text-ink-500 dark:text-ink-400">
-              No top-ups submitted yet.
-            </p>
-          ) : (
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableHeaderCell>Amount</TableHeaderCell>
-                  <TableHeaderCell>Status</TableHeaderCell>
-                  <TableHeaderCell>Submitted</TableHeaderCell>
-                  <TableHeaderCell>Action</TableHeaderCell>
+        {topupsLoading ? (
+          <Skeleton className="h-40 w-full rounded-3xl" />
+        ) : (topups || []).length === 0 ? (
+          <EmptyState title="No top-up requests yet" description="Your funding history will appear here after the first top-up submission." />
+        ) : (
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Status</TableHeaderCell>
+                <TableHeaderCell>Submitted</TableHeaderCell>
+                <TableHeaderCell>Action</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {(topups || []).map((topup: any) => (
+                <TableRow key={topup._id}>
+                  <TableCell className="font-semibold">${topup.amount}</TableCell>
+                  <TableCell>
+                    <Badge variant={topup.status === 'APPROVED' ? 'success' : topup.status === 'DECLINED' ? 'danger' : 'warning'}>
+                      {topup.status}
+                    </Badge>
+                    {topup.status === 'DECLINED' && topup.decisionReason ? (
+                      <p className="mt-2 text-xs text-rose-600 dark:text-rose-300">{topup.decisionReason}</p>
+                    ) : null}
+                  </TableCell>
+                  <TableCell>{topup.createdAt ? new Date(topup.createdAt).toLocaleDateString() : '—'}</TableCell>
+                  <TableCell>
+                    <Button variant="outline" size="sm" onClick={() => openScreenshot(topup._id)}>
+                      View screenshot
+                    </Button>
+                  </TableCell>
                 </TableRow>
-              </TableHead>
-
-              <TableBody>
-                {(topups || []).map((topup: any) => (
-                  <TableRow
-                    key={topup._id}
-                    className="transition-colors hover:bg-brand-50/40 dark:hover:bg-ink-800"
-                  >
-                    <TableCell className="font-medium">
-                      ${topup.amount}
-                    </TableCell>
-
-                    <TableCell>
-                      <Badge
-                        variant={
-                          topup.status === 'APPROVED'
-                            ? 'success'
-                            : topup.status === 'DECLINED'
-                            ? 'danger'
-                            : 'warning'
-                        }
-                      >
-                        {topup.status}
-                      </Badge>
-
-                      {topup.status === 'DECLINED' && topup.decisionReason && (
-                        <p className="mt-1 text-xs text-rose-500 dark:text-rose-400">
-                          {topup.decisionReason}
-                        </p>
-                      )}
-                    </TableCell>
-
-                    <TableCell>
-                      {topup.createdAt
-                        ? new Date(topup.createdAt).toLocaleDateString()
-                        : '—'}
-                    </TableCell>
-
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => openScreenshot(topup._id)}
-                      >
-                        View screenshot
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </section>
     </div>
   );
 };

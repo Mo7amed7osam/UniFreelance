@@ -7,22 +7,12 @@ export const Card = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      // base
-      'card-surface p-6 rounded-2xl transition-all duration-200',
-
-      // light mode
-      'bg-white text-ink-900 border border-ink-100',
-
-      // dark mode 
-      'dark:bg-ink-950 dark:text-ink-50 dark:border-ink-700',
-
+      'card-surface surface-ring rounded-3xl p-6 text-ink-900 transition-all duration-200 dark:text-ink-50',
       className
     )}
     {...props}
   />
 );
-
-
 
 export const CardHeader = ({
   className,
@@ -30,7 +20,7 @@ export const CardHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      'mb-4 flex flex-col gap-1',
+      'mb-5 flex flex-col gap-1.5',
       className
     )}
     {...props}
@@ -43,7 +33,7 @@ export const CardTitle = ({
 }: React.HTMLAttributes<HTMLHeadingElement>) => (
   <h3
     className={cn(
-      'text-lg font-semibold tracking-tight dark:text-white',
+      'text-xl font-semibold tracking-tight text-ink-900 dark:text-white',
       className
     )}
     {...props}
@@ -56,7 +46,7 @@ export const CardDescription = ({
 }: React.HTMLAttributes<HTMLParagraphElement>) => (
   <p
     className={cn(
-      'text-sm leading-relaxed text-ink-500',
+      'text-sm leading-6 text-ink-500 dark:text-ink-300',
       className
     )}
     {...props}

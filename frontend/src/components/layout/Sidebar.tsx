@@ -5,12 +5,15 @@ import {
   FileBadge,
   Home,
   LayoutDashboard,
+  ShieldCheck,
   Users,
   Wallet,
 } from 'lucide-react';
+
+import logo from '@/assets/logo.png';
+import { Badge } from '@/components/ui/badge';
 import useAuth from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
-import logo from '@/assets/logo.png';
 
 export const navByRole = {
   Student: [
@@ -30,8 +33,14 @@ export const navByRole = {
   ],
   Admin: [
     { label: 'Dashboard', to: '/admin/dashboard', icon: LayoutDashboard },
-    { label: 'Payments', to: '/admin/payments', icon: ClipboardList },
+    { label: 'Payments', to: '/admin/payments', icon: ShieldCheck },
   ],
+};
+
+const roleLabel = {
+  Student: 'Student workspace',
+  Client: 'Client workspace',
+  Admin: 'Admin control',
 };
 
 export const Sidebar = () => {
@@ -39,50 +48,66 @@ export const Sidebar = () => {
   const items = user ? navByRole[user.role] || [] : [];
 
   return (
-<aside className="fixed left-0 top-0 hidden h-screen w-64 flex-col border-r border-ink-100 bg-white px-6 py-6 md:flex dark:border-ink-800 dark:bg-ink-900">
-      
-      {/* Logo (بالجريدينت الأصلي زي ما طلبت بالظبط) */}
-      <div className="flex items-center gap-4">
-        <img
-          src={logo}
-          alt="UniFreelance Logo"
-          className="h-12 w-12 object-contain"
-        />
+    <aside className="fixed inset-y-4 left-4 hidden w-72 md:block">
+      <div className="glass-panel flex h-full flex-col px-5 py-5">
+        <div className="flex items-center gap-3 rounded-2xl border border-white/50 bg-white/60 p-3 dark:border-white/10 dark:bg-white/5">
+          <img src={logo} alt="UniFreelance" className="h-12 w-12 rounded-2xl object-contain" />
+          <div className="min-w-0">
+            <p className="truncate text-lg font-semibold text-ink-900 dark:text-white">UniFreelance</p>
+            <p className="truncate text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">
+              {user ? roleLabel[user.role as keyof typeof roleLabel] : 'Workspace'}
+            </p>
+          </div>
+        </div>
 
-        <span className="text-xl font-bold leading-tight">
-          <span className="bg-gradient-to-r from-brand-500 via-brand-600 to-brand-700 bg-clip-text text-transparent">
-            Uni
-          </span>
-          <span className="bg-gradient-to-r from-ink-700 to-ink-900 bg-clip-text text-transparent dark:from-ink-100 dark:to-ink-300">
-            Freelance
-          </span>
-        </span>
+        <div className="mt-8 flex items-center justify-between px-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-ink-400 dark:text-ink-300">Navigation</p>
+          {user ? <Badge variant="brand">{user.role}</Badge> : null}
+        </div>
+
+        <nav className="mt-4 flex-1 space-y-1.5">
+          {items.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  cn(
+                    'group flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-200',
+                    'text-ink-500 hover:bg-white/70 hover:text-ink-900 dark:text-ink-300 dark:hover:bg-white/6 dark:hover:text-white',
+                    isActive &&
+                      'bg-gradient-to-r from-brand-600 via-brand-500 to-accent-500 text-white shadow-soft hover:text-white dark:text-white'
+                  )
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <span
+                      className={cn(
+                        'flex h-10 w-10 items-center justify-center rounded-2xl transition-colors',
+                        isActive
+                          ? 'bg-white/15 text-white'
+                          : 'bg-brand-50 text-brand-600 dark:bg-white/8 dark:text-brand-200'
+                      )}
+                    >
+                      <Icon size={18} />
+                    </span>
+                    <span className="truncate">{item.label}</span>
+                  </>
+                )}
+              </NavLink>
+            );
+          })}
+        </nav>
+
+        <div className="mt-6 rounded-2xl bg-ink-900 px-4 py-4 text-white dark:bg-[#07101d]">
+          <p className="text-sm font-semibold text-white">Verified work wins faster.</p>
+          <p className="mt-2 text-xs leading-5 text-white/68">
+            Keep your profile, proposals, and interview status polished and up to date.
+          </p>
+        </div>
       </div>
-
-      {/* Navigation */}
-      <nav className="mt-12 space-y-1 text-sm">
-        {items.map((item) => {
-          const Icon = item.icon;
-          return (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 rounded-xl px-3 py-2 font-medium transition-all',
-                  'text-ink-600 hover:bg-ink-50 hover:text-ink-900',
-                  'dark:text-ink-300 dark:hover:bg-ink-800 dark:hover:text-white',
-                  isActive &&
-                    'bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-400'
-                )
-              }
-            >
-              <Icon size={18} />
-              {item.label}
-            </NavLink>
-          );
-        })}
-      </nav>
     </aside>
   );
 };

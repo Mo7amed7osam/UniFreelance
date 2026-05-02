@@ -1,10 +1,14 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+
 import { getStudentProfile, getStudentProposals } from '@/services/api';
 import useAuth from '@/hooks/useAuth';
 import JobList from './JobList';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState } from '@/components/ui/empty-state';
+import { PageHeader } from '@/components/ui/page-header';
+import { Skeleton } from '@/components/ui/skeleton';
+import { StatCard } from '@/components/ui/stat-card';
 import {
   Table,
   TableBody,
@@ -13,7 +17,6 @@ import {
   TableHeaderCell,
   TableRow,
 } from '@/components/ui/table';
-import { Skeleton } from '@/components/ui/skeleton';
 
 const StudentDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -31,154 +34,68 @@ const StudentDashboard: React.FC = () => {
     enabled: !!userId,
   });
 
+  const proposalList = proposals || [];
+  const activeProposals = proposalList.filter((proposal: any) => ['submitted', 'shortlisted'].includes(proposal.status)).length;
+
   return (
-    <div className="
-      space-y-10 rounded-2xl p-6
-      bg-gradient-to-br from-ink-50 via-white to-brand-100/30
-      dark:bg-gradient-to-br dark:from-ink-900 dark:via-ink-900 dark:to-ink-800
-    ">
-      {/* Header */}
-      <div className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-widest text-ink-400 dark:text-ink-400">
-          Student Dashboard
-        </p>
-        <h1 className="text-3xl font-semibold text-ink-900 dark:text-white">
-          Welcome back,{' '}
-          <span className="text-brand-600 dark:text-brand-400">
-            {user?.name}
-          </span>
-        </h1>
-        <p className="text-sm text-ink-500 dark:text-ink-400">
-          Here’s what’s happening with your account today.
-        </p>
+    <div className="space-y-8">
+      <PageHeader
+        eyebrow="Student dashboard"
+        title={
+          <>
+            Welcome back, <span className="text-brand-600 dark:text-brand-300">{user?.name}</span>
+          </>
+        }
+        description="Track profile credibility, active proposals, earnings, and new jobs from one clear student workspace."
+      />
+
+      <div className="grid gap-4 xl:grid-cols-4 md:grid-cols-2">
+        <StatCard
+          label="Verified skills"
+          value={profileLoading ? <Skeleton className="h-10 w-24" /> : profile?.verifiedSkills?.length || 0}
+          caption="Add more interview passes to strengthen your profile."
+        />
+        <StatCard
+          label="Active proposals"
+          value={proposalsLoading ? <Skeleton className="h-10 w-24" /> : activeProposals}
+          caption="Keep your best applications moving with clear follow-up."
+        />
+        <StatCard
+          label="Available balance"
+          value={profileLoading ? <Skeleton className="h-10 w-24" /> : `$${profile?.balance?.toFixed?.(2) || '0.00'}`}
+          caption="Released earnings available for withdrawal."
+          tone="brand"
+        />
+        <StatCard
+          label="Profile status"
+          value={<Badge variant="success">Active</Badge>}
+          caption="Your public profile is visible to hiring clients."
+        />
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-5 md:grid-cols-4">
-        {/* Verified Skills */}
-        <Card className="
-          bg-white/80 backdrop-blur-sm transition-all
-          hover:-translate-y-1 hover:shadow-xl
-          dark:bg-ink-800 dark:border-ink-700
-        ">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-ink-500 dark:text-ink-400">
-              Verified Skills
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {profileLoading ? (
-              <Skeleton className="h-8 w-24" />
-            ) : (
-              <p className="text-4xl font-semibold text-ink-900 dark:text-white">
-                {profile?.verifiedSkills?.length || 0}
-              </p>
-            )}
-            <p className="text-sm text-ink-500 dark:text-ink-400">
-              Boost your profile with video interviews.
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Active Proposals */}
-        <Card className="
-          bg-white/80 backdrop-blur-sm transition-all
-          hover:-translate-y-1 hover:shadow-xl
-          dark:bg-ink-800 dark:border-ink-700
-        ">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-ink-500 dark:text-ink-400">
-              Active Proposals
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {proposalsLoading ? (
-              <Skeleton className="h-8 w-24" />
-            ) : (
-              <p className="text-4xl font-semibold text-ink-900 dark:text-white">
-                {(proposals || []).filter((proposal: any) =>
-                  ['submitted', 'shortlisted'].includes(proposal.status)
-                ).length}
-              </p>
-            )}
-            <p className="text-sm text-ink-500 dark:text-ink-400">
-              Keep tabs on client responses.
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Balance */}
-        <Card className="
-          bg-gradient-to-br from-brand-500 to-brand-700 text-white
-          transition-all hover:-translate-y-1 hover:shadow-xl
-        ">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-white/80">
-              Balance
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {profileLoading ? (
-              <Skeleton className="h-8 w-24 bg-white/30" />
-            ) : (
-              <p className="text-4xl font-semibold text-white">
-                ${profile?.balance?.toFixed?.(2) || '0.00'}
-              </p>
-            )}
-            <p className="text-sm text-white/80">
-              Earnings released after acceptance.
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Profile Status */}
-        <Card className="
-          bg-white/80 backdrop-blur-sm transition-all
-          hover:-translate-y-1 hover:shadow-xl
-          dark:bg-ink-800 dark:border-ink-700
-        ">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-ink-500 dark:text-ink-400">
-              Profile Status
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
-              Active
-            </Badge>
-            <p className="text-sm text-ink-500 dark:text-ink-400">
-              Your profile is visible to clients.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Available Jobs */}
       <section className="space-y-4">
-        <h2 className="relative inline-block text-xl font-semibold text-ink-900 dark:text-white">
-          Available Jobs
-          <span className="absolute -bottom-1 left-0 h-1 w-1/3 rounded-full bg-brand-500"></span>
-        </h2>
-        <JobList />
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-semibold">Job board</h2>
+            <p className="text-sm text-ink-500 dark:text-ink-300">Browse roles and send proposals without leaving the dashboard.</p>
+          </div>
+        </div>
+        <JobList embedded />
       </section>
 
-      {/* Recent Applications */}
       <section className="space-y-4">
-        <h2 className="relative inline-block text-xl font-semibold text-ink-900 dark:text-white">
-          Recent Applications
-          <span className="absolute -bottom-1 left-0 h-1 w-1/3 rounded-full bg-brand-500"></span>
-        </h2>
+        <div>
+          <h2 className="text-2xl font-semibold">Recent applications</h2>
+          <p className="text-sm text-ink-500 dark:text-ink-300">See where your applications stand and which clients have responded.</p>
+        </div>
 
         {proposalsLoading ? (
-          <Skeleton className="h-40 w-full" />
-        ) : (proposals || []).length === 0 ? (
-          <Card className="border-dashed dark:bg-ink-800 dark:border-ink-700">
-            <CardContent className="py-10 text-center">
-              <p className="text-sm text-ink-500 dark:text-ink-400">
-                No proposals yet. Apply to a job to get started.
-              </p>
-            </CardContent>
-          </Card>
+          <Skeleton className="h-44 w-full rounded-3xl" />
+        ) : proposalList.length === 0 ? (
+          <EmptyState
+            title="No proposals yet"
+            description="Start from the job board above and apply to roles that match your skills."
+          />
         ) : (
           <Table>
             <TableHead>
@@ -189,33 +106,26 @@ const StudentDashboard: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {(proposals || []).map((proposal: any) => (
-                <TableRow
-                  key={proposal._id}
-                  className="transition-colors hover:bg-brand-50/40 dark:hover:bg-ink-800"
-                >
-                  <TableCell className="font-medium">
-                    {proposal.jobId?.title || 'Job'}
-                  </TableCell>
+              {proposalList.map((proposal: any) => (
+                <TableRow key={proposal._id}>
+                  <TableCell className="font-semibold">{proposal.jobId?.title || 'Job'}</TableCell>
                   <TableCell>
                     <Badge
                       variant={
                         proposal.status === 'accepted'
                           ? 'success'
                           : proposal.status === 'rejected'
-                          ? 'danger'
-                          : proposal.status === 'shortlisted'
-                          ? 'brand'
-                          : 'warning'
+                            ? 'danger'
+                            : proposal.status === 'shortlisted'
+                              ? 'brand'
+                              : 'warning'
                       }
                     >
                       {proposal.status || 'submitted'}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-ink-500 dark:text-ink-400">
-                    {proposal.createdAt
-                      ? new Date(proposal.createdAt).toLocaleDateString()
-                      : '—'}
+                  <TableCell className="text-ink-500 dark:text-ink-300">
+                    {proposal.createdAt ? new Date(proposal.createdAt).toLocaleDateString() : '—'}
                   </TableCell>
                 </TableRow>
               ))}

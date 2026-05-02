@@ -3,16 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowRight, BriefcaseBusiness, GraduationCap, Shield } from 'lucide-react';
 import { toast } from 'sonner';
+
 import useAuth from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
@@ -25,6 +21,24 @@ const registerSchema = z.object({
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
+
+const roleCards = [
+  {
+    icon: GraduationCap,
+    title: 'Students',
+    body: 'Show verified skills, apply to roles, and manage contracts in one place.',
+  },
+  {
+    icon: BriefcaseBusiness,
+    title: 'Clients',
+    body: 'Post jobs, review proposals, and shortlist verified student talent faster.',
+  },
+  {
+    icon: Shield,
+    title: 'Trusted workflow',
+    body: 'Verification, contracts, and payment steps stay structured from the start.',
+  },
+];
 
 const Register: React.FC = () => {
   const { register: registerUser } = useAuth();
@@ -43,113 +57,97 @@ const Register: React.FC = () => {
     try {
       const user = await registerUser(values);
       toast.success('Account created successfully');
-      if (user?.role === 'Client') {
-        navigate('/client/dashboard');
-      } else {
-        navigate('/student/dashboard');
-      }
+      if (user?.role === 'Client') navigate('/client/dashboard');
+      else navigate('/student/dashboard');
     } catch {
       toast.error('Registration failed. Please try again.');
     }
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-gradient-to-br from-ink-950 via-ink-900 to-brand-900 px-6 py-12 text-white">
-      {/* Background glow */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute left-1/4 top-1/4 h-72 w-72 rounded-full bg-brand-600/30 blur-3xl" />
-        <div className="absolute right-1/4 bottom-1/4 h-72 w-72 rounded-full bg-purple-600/20 blur-3xl" />
-      </div>
-
-      <div className="w-full max-w-md">
-        <Card className="rounded-2xl border border-white/10 bg-white/90 text-ink-900 shadow-2xl backdrop-blur-xl">
-          <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold">
-              Create your{' '}
-              <span className="text-brand-600">UniFreelance</span> account
-            </CardTitle>
-            <CardDescription className="text-ink-500">
-              Showcase skills or hire verified student talent.
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent>
-            <form
-              className="space-y-5"
-              onSubmit={handleSubmit(onSubmit)}
-            >
-              <div className="space-y-1.5">
-                <Label htmlFor="name">Full name</Label>
-                <Input
-                  id="name"
-                  placeholder="Alex Johnson"
-                  {...register('name')}
-                />
-                {errors.name && (
-                  <p className="text-xs text-rose-500">
-                    {errors.name.message}
-                  </p>
-                )}
+    <div className="page-shell min-h-screen px-4 py-6 sm:px-6 lg:px-8">
+      <div className="page-container grid min-h-[calc(100vh-3rem)] gap-6 lg:grid-cols-[0.92fr_1.08fr]">
+        <div className="flex items-center justify-center order-2 lg:order-1">
+          <Card className="w-full max-w-xl">
+            <CardHeader className="space-y-3">
+              <div className="page-eyebrow">Create account</div>
+              <div className="space-y-2">
+                <CardTitle className="text-3xl">Join the UniFreelance marketplace</CardTitle>
+                <CardDescription>
+                  Create a student or client account. The workflow stays the same, but the dashboard adapts to your role.
+                </CardDescription>
               </div>
+            </CardHeader>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="alex@unifreelance.com"
-                  {...register('email')}
-                />
-                {errors.email && (
-                  <p className="text-xs text-rose-500">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
+            <CardContent className="space-y-6">
+              <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+                <div className="space-y-2">
+                  <Label htmlFor="name">Full name</Label>
+                  <Input id="name" placeholder="Alex Johnson" {...register('name')} />
+                  {errors.name ? <p className="text-sm text-rose-600 dark:text-rose-300">{errors.name.message}</p> : null}
+                </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  {...register('password')}
-                />
-                {errors.password && (
-                  <p className="text-xs text-rose-500">
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" placeholder="alex@unifreelance.com" {...register('email')} />
+                  {errors.email ? <p className="text-sm text-rose-600 dark:text-rose-300">{errors.email.message}</p> : null}
+                </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="role">Role</Label>
-                <Select id="role" {...register('role')}>
-                  <option value="Student">Student</option>
-                  <option value="Client">Client</option>
-                </Select>
-              </div>
+                <div className="grid gap-5 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input id="password" type="password" placeholder="Choose a password" {...register('password')} />
+                    {errors.password ? <p className="text-sm text-rose-600 dark:text-rose-300">{errors.password.message}</p> : null}
+                  </div>
 
-              <Button
-                className="w-full"
-                type="submit"
-                disabled={isSubmitting}
-              >
-                {isSubmitting
-                  ? 'Creating account...'
-                  : 'Create account'}
-              </Button>
-            </form>
+                  <div className="space-y-2">
+                    <Label htmlFor="role">Role</Label>
+                    <Select id="role" {...register('role')}>
+                      <option value="Student">Student</option>
+                      <option value="Client">Client</option>
+                    </Select>
+                  </div>
+                </div>
 
-            <p className="mt-6 text-center text-sm text-ink-500">
-              Already have an account?{' '}
-              <Link
-                className="font-semibold text-brand-600"
-                to="/login"
-              >
-                Sign in
-              </Link>
-            </p>
+                <Button className="w-full" size="lg" type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? 'Creating account...' : 'Create account'}
+                  {!isSubmitting ? <ArrowRight size={18} /> : null}
+                </Button>
+              </form>
+
+              <p className="text-center text-sm text-ink-500 dark:text-ink-300">
+                Already have an account?{' '}
+                <Link className="font-semibold text-brand-600 dark:text-brand-200" to="/login">
+                  Sign in
+                </Link>
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="order-1 overflow-hidden bg-gradient-to-br from-white/88 via-brand-50/80 to-accent-50/70 p-0 lg:order-2 dark:bg-gradient-to-br dark:from-ink-dark-surface/84 dark:via-brand-400/10 dark:to-accent-400/10">
+          <CardContent className="flex h-full flex-col justify-between gap-8 p-10">
+            <div className="space-y-4">
+              <p className="page-eyebrow">Why UniFreelance</p>
+              <h1 className="text-balance text-5xl font-semibold">A cleaner path from student potential to paid work.</h1>
+              <p className="page-copy">
+                The platform is built to reduce uncertainty for both sides: students can prove capability, and clients can hire with clearer signals.
+              </p>
+            </div>
+
+            <div className="grid gap-4">
+              {roleCards.map((item) => (
+                <div key={item.title} className="muted-panel flex items-start gap-4 rounded-2xl p-4">
+                  <div className="rounded-2xl bg-brand-50 p-3 text-brand-600 dark:bg-brand-400/10 dark:text-brand-200">
+                    <item.icon size={20} />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-ink-900 dark:text-white">{item.title}</p>
+                    <p className="text-sm text-ink-500 dark:text-ink-300">{item.body}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>

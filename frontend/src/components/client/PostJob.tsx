@@ -4,14 +4,17 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowRight, BriefcaseBusiness, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
+
 import { getSkills, postJob } from '@/services/api';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { PageHeader } from '@/components/ui/page-header';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from '@/components/ui/textarea';
 
 const formSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters.'),
@@ -68,9 +71,7 @@ const PostJob: React.FC = () => {
   });
 
   const toggleSkill = (skillId: string) => {
-    const next = selectedSkills.includes(skillId)
-      ? selectedSkills.filter((id) => id !== skillId)
-      : [...selectedSkills, skillId];
+    const next = selectedSkills.includes(skillId) ? selectedSkills.filter((id) => id !== skillId) : [...selectedSkills, skillId];
     setValue('requiredSkills', next, { shouldValidate: true });
   };
 
@@ -86,167 +87,125 @@ const PostJob: React.FC = () => {
   };
 
   return (
-    <div
-      className="
-        space-y-10 rounded-2xl p-6
-        bg-gradient-to-br from-ink-50 via-white to-brand-100/30
-        dark:bg-gradient-to-br dark:from-ink-900 dark:via-ink-900 dark:to-ink-800
-      "
-    >
-      {/* Header */}
-      <div className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-widest text-ink-400 dark:text-ink-400">
-          Client Workspace
-        </p>
-        <h1 className="text-3xl font-semibold text-ink-900 dark:text-white">
-          Post a{' '}
-          <span className="text-brand-600 dark:text-brand-400">
-            new job
-          </span>
-        </h1>
-        <p className="text-sm text-ink-500 dark:text-ink-400">
-          Share project details and start receiving proposals.
-        </p>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        eyebrow="Client workspace"
+        title="Post a new job"
+        description="Create a brief that looks professional, sets expectations clearly, and attracts stronger student proposals."
+      />
 
-      {/* Form Card */}
-      <Card
-        className="
-          bg-white/80 backdrop-blur-sm transition-all
-          hover:shadow-xl
-          dark:bg-ink-800 dark:border-ink-700
-        "
-      >
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-ink-900 dark:text-white">
-            Job details
-          </CardTitle>
-        </CardHeader>
-
-        <CardContent>
-          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-            {/* Title */}
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-ink-700 dark:text-ink-300">
-                Job title
-              </label>
-              <Input
-                placeholder="e.g. UI designer for mobile app"
-                {...register('title')}
-              />
-              {errors.title && (
-                <p className="text-xs text-rose-500">
-                  {errors.title.message}
-                </p>
-              )}
-            </div>
-
-            {/* Description */}
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-ink-700 dark:text-ink-300">
-                Description
-              </label>
-              <Textarea
-                rows={5}
-                placeholder="Describe the project, scope, and goals..."
-                {...register('description')}
-              />
-              {errors.description && (
-                <p className="text-xs text-rose-500">
-                  {errors.description.message}
-                </p>
-              )}
-            </div>
-
-            {/* Budget & Duration */}
-            <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
+        <Card>
+          <CardContent className="space-y-6 p-6">
+            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-ink-700 dark:text-ink-300">
-                  Min budget
-                </label>
-                <Input type="number" min={0} placeholder="e.g. 300" {...register('minBudget')} />
+                <label className="text-sm font-semibold text-ink-700 dark:text-ink-200">Job title</label>
+                <Input placeholder="UI designer for a student marketplace redesign" {...register('title')} />
+                {errors.title ? <p className="text-sm text-rose-600 dark:text-rose-300">{errors.title.message}</p> : null}
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-ink-700 dark:text-ink-300">
-                  Max budget
-                </label>
-                <Input type="number" min={0} placeholder="e.g. 600" {...register('maxBudget')} />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-ink-700 dark:text-ink-300">
-                  Duration (optional)
-                </label>
-                <Input placeholder="e.g. 2 weeks" {...register('duration')} />
-              </div>
-            </div>
 
-            {/* Skills */}
-            <div className="space-y-3">
-              <label className="text-sm font-semibold text-ink-700 dark:text-ink-300">
-                Required skills
-              </label>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-ink-700 dark:text-ink-200">Project description</label>
+                <Textarea rows={6} placeholder="Describe the scope, deliverables, goals, and what a great outcome looks like." {...register('description')} />
+                {errors.description ? <p className="text-sm text-rose-600 dark:text-rose-300">{errors.description.message}</p> : null}
+              </div>
 
-              {isLoading ? (
-                <Skeleton className="h-20 w-full" />
-              ) : (skills || []).length === 0 ? (
-                <p className="text-sm text-ink-500 dark:text-ink-400">
-                  No skills available. Contact admin to add skills.
-                </p>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {(skills || []).map((skill: any) => {
-                    const active = selectedSkills.includes(skill._id);
-                    return (
-                      <button
-                        key={skill._id}
-                        type="button"
-                        onClick={() => toggleSkill(skill._id)}
-                        className={`
-                          rounded-full border px-3 py-1 text-xs font-semibold transition
-                          ${
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-ink-700 dark:text-ink-200">Min budget</label>
+                  <Input type="number" min={0} placeholder="300" {...register('minBudget')} />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-ink-700 dark:text-ink-200">Max budget</label>
+                  <Input type="number" min={0} placeholder="900" {...register('maxBudget')} />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-ink-700 dark:text-ink-200">Duration</label>
+                  <Input placeholder="2 weeks" {...register('duration')} />
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-ink-700 dark:text-ink-200">Required skills</label>
+                {isLoading ? (
+                  <Skeleton className="h-24 w-full rounded-3xl" />
+                ) : (skills || []).length === 0 ? (
+                  <p className="text-sm text-ink-500 dark:text-ink-300">No skills available. Contact admin to add skills.</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {(skills || []).map((skill: any) => {
+                      const active = selectedSkills.includes(skill._id);
+                      return (
+                        <button
+                          key={skill._id}
+                          type="button"
+                          onClick={() => toggleSkill(skill._id)}
+                          className={[
+                            'rounded-full border px-4 py-2 text-sm font-semibold transition',
                             active
-                              ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-400'
-                              : 'border-ink-200 text-ink-600 hover:bg-ink-50 dark:border-ink-600 dark:text-ink-300 dark:hover:bg-ink-700'
-                          }
-                        `}
-                      >
-                        {skill.name}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+                              ? 'border-brand-300 bg-brand-50 text-brand-700 dark:border-brand-400/25 dark:bg-brand-400/10 dark:text-brand-200'
+                              : 'border-ink-200 bg-white/60 text-ink-600 hover:border-ink-300 hover:bg-ink-50 dark:border-ink-dark-border dark:bg-white/5 dark:text-ink-300 dark:hover:bg-white/8',
+                          ].join(' ')}
+                        >
+                          {skill.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
 
-              {errors.requiredSkills && (
-                <p className="text-xs text-rose-500 dark:text-rose-500">
-  Select at least one skill.
-</p>
+                {errors.requiredSkills ? <p className="text-sm text-rose-600 dark:text-rose-300">Select at least one skill.</p> : null}
 
-              )}
+                {selectedSkills.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {selectedSkills.map((id) => {
+                      const skill = (skills || []).find((s: any) => s._id === id);
+                      return (
+                        <Badge key={id} variant="brand">
+                          {skill?.name || id}
+                        </Badge>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
 
-              {selectedSkills.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {selectedSkills.map((id) => {
-                    const skill = (skills || []).find((s: any) => s._id === id);
-                    return (
-                      <Badge key={id} variant="brand">
-                        {skill?.name || id}
-                      </Badge>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Submit */}
-            <div className="pt-2">
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Posting…' : 'Publish job'}
+              <Button type="submit" size="lg" disabled={isSubmitting}>
+                {isSubmitting ? 'Publishing...' : 'Publish job'}
+                {!isSubmitting ? <ArrowRight size={18} /> : null}
               </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+            </form>
+          </CardContent>
+        </Card>
+
+        <div className="space-y-5">
+          <Card className="overflow-hidden bg-ink-950 p-0 text-white dark:bg-[#07101d]">
+            <CardContent className="space-y-4 p-6">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10">
+                <BriefcaseBusiness size={20} />
+              </div>
+              <h2 className="text-2xl font-semibold text-white">What strong job posts do well</h2>
+              <ul className="space-y-3 text-sm leading-6 text-white/72">
+                <li>Explain the goal, not just the task list.</li>
+                <li>Set a clear budget range and timeline up front.</li>
+                <li>Ask for the skills that actually determine success.</li>
+              </ul>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="space-y-4 p-6">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-400/10 dark:text-brand-200">
+                <Wallet size={20} />
+              </div>
+              <h2 className="text-2xl font-semibold">Before you publish</h2>
+              <p className="text-sm text-ink-500 dark:text-ink-300">
+                Students see this brief before they spend time tailoring a proposal. A clearer post usually produces better applications.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };

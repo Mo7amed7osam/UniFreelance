@@ -27,33 +27,22 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({
   }, [cameraStream]);
 
   return (
-    <div className="pointer-events-none w-full max-w-[14rem] rounded-[1.4rem] border border-white/8 bg-black/55 p-2 shadow-[0_18px_55px_rgba(0,0,0,0.45)] backdrop-blur-md">
-      <div className="overflow-hidden rounded-[1rem] border border-white/8 bg-black">
-        <video
-          ref={previewRef}
-          className="aspect-[4/5] w-full object-cover"
-          autoPlay
-          playsInline
-          muted
-        />
+    <div className="pointer-events-none w-full max-w-[15rem] rounded-[1.6rem] border border-white/10 bg-black/60 p-2.5 shadow-[0_24px_60px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+      <div className="overflow-hidden rounded-[1.15rem] border border-white/10 bg-black">
+        <video ref={previewRef} className="aspect-[4/5] w-full object-cover" autoPlay playsInline muted />
       </div>
 
-      <div className="space-y-1 px-1.5 pb-0.5 pt-2">
+      <div className="space-y-2 px-1.5 pb-1 pt-3">
         <div className="flex items-center justify-between gap-2">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/55">You</p>
-          <span
-            className={[
-              'h-2.5 w-2.5 rounded-full transition-colors',
-              isRecording ? 'bg-rose-400 shadow-[0_0_12px_rgba(251,113,133,0.95)]' : 'bg-emerald-400',
-            ].join(' ')}
-          />
+          <div className="flex items-center gap-2">
+            <span className={['h-2.5 w-2.5 rounded-full transition-colors', isRecording ? 'bg-rose-400 shadow-[0_0_12px_rgba(251,113,133,0.95)]' : 'bg-emerald-400'].join(' ')} />
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/55">{isRecording ? 'Live' : 'Ready'}</span>
+          </div>
         </div>
 
-        <p className="text-xs text-white/62">
-          {statusText || 'Camera stays live during the interview.'}
-        </p>
-
-        {error ? <p className="text-[11px] text-rose-300">{error}</p> : null}
+        <p className="text-xs leading-5 text-white/68">{statusText || 'Camera stays live during the interview.'}</p>
+        {error ? <p className="rounded-2xl border border-rose-300/15 bg-rose-500/10 px-2.5 py-2 text-[11px] text-rose-200">{error}</p> : null}
       </div>
     </div>
   );

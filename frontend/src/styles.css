@@ -1,101 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ===================== */
-/* Base */
-/* ===================== */
 @layer base {
   :root {
     color-scheme: light;
+    --page-gradient:
+      radial-gradient(circle at top left, rgba(59, 130, 246, 0.16), transparent 28%),
+      radial-gradient(circle at top right, rgba(6, 182, 212, 0.12), transparent 24%),
+      linear-gradient(180deg, #f8fbff 0%, #f7fafc 42%, #eef5ff 100%);
+    --surface-border: rgba(148, 163, 184, 0.18);
   }
 
   .dark {
     color-scheme: dark;
+    --page-gradient:
+      radial-gradient(circle at top left, rgba(56, 189, 248, 0.14), transparent 28%),
+      radial-gradient(circle at top right, rgba(59, 130, 246, 0.18), transparent 22%),
+      linear-gradient(180deg, #08111f 0%, #0b1424 56%, #0f1b2d 100%);
+    --surface-border: rgba(140, 163, 191, 0.18);
+  }
+
+  * {
+    @apply border-ink-200;
+  }
+
+  html {
+    @apply scroll-smooth;
   }
 
   body {
-    @apply antialiased;
-    font-family: "Space Grotesk", "Segoe UI", sans-serif;
+    @apply min-h-screen bg-ink-50 text-ink-900 antialiased;
+    font-family: 'Manrope', 'Segoe UI', sans-serif;
+    background-image: var(--page-gradient);
   }
 
-  /* Light */
-  html:not(.dark) body {
-    @apply bg-ink-50 text-ink-900;
-  }
-
-  /* Dark */
   .dark body {
-    background-color: #0d1117;
-    color: #c9d1d9;
+    @apply text-ink-dark-text;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Poppins', 'Manrope', sans-serif;
+    @apply tracking-tight text-ink-900 dark:text-white;
+  }
+
+  p {
+    @apply leading-7 text-ink-600 dark:text-ink-300;
   }
 
   a {
-    @apply text-brand-600 hover:text-brand-700;
+    @apply text-brand-600 transition-colors hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200;
   }
 
-  .dark a {
-    @apply text-brand-400 hover:text-brand-300;
+  button,
+  [role='button'] {
+    @apply cursor-pointer;
+  }
+
+  ::selection {
+    @apply bg-brand-200 text-brand-900;
   }
 }
 
-/* ===================== */
-/* Layout & Components */
-/* ===================== */
 @layer components {
-  /* App shell background */
   .page-shell {
     @apply min-h-screen;
+    background-image: var(--page-gradient);
   }
 
-  /* Light background */
-  html:not(.dark) .page-shell {
-    @apply bg-gradient-to-br from-white via-ink-50 to-brand-50;
+  .page-container {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 
-  /* Dark background (GitHub-like) */
-  .dark .page-shell {
-    background: linear-gradient(
-      180deg,
-      #0d1117 0%,
-      #0d1117 60%,
-      #161b22 100%
-    );
+  .page-copy {
+    @apply max-w-3xl text-base text-ink-500 dark:text-ink-300;
   }
 
-  /* Cards */
+  .page-eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.26em] text-brand-600 dark:text-brand-300;
+  }
+
+  .glass-panel {
+    @apply rounded-3xl border border-white/70 shadow-card backdrop-blur-xl dark:border-white/10;
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+
+  .dark .glass-panel {
+    background-color: rgba(15, 27, 45, 0.8);
+  }
+
   .card-surface {
-    @apply rounded-2xl border shadow-card;
+    @apply glass-panel;
   }
 
-  html:not(.dark) .card-surface {
-    @apply border-ink-100 bg-white;
+  .muted-panel {
+    @apply rounded-2xl border border-ink-200/80 backdrop-blur-sm dark:border-ink-dark-border;
+    background-color: rgba(255, 255, 255, 0.65);
   }
 
-  .dark .card-surface {
-    background-color: #161b22;
-    border-color: #30363d;
+  .dark .muted-panel {
+    background-color: rgba(15, 27, 45, 0.65);
+  }
+
+  .kpi-card {
+    @apply glass-panel relative overflow-hidden p-6;
+  }
+
+  .kpi-card::before {
+    content: '';
+    @apply pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-500 via-accent-400 to-brand-300;
   }
 }
 
-/* ===================== */
-/* Animations */
-/* ===================== */
-@keyframes shimmer {
-  100% {
-    transform: translateX(100%);
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .surface-ring {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
   }
 }
-@layer base {
-  .dark {
-    --tw-text-opacity: 1;
-  }
 
-  .dark p {
-    color: theme('colors.ink.300');
-  }
-
-  .dark label {
-    color: theme('colors.ink.300');
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }

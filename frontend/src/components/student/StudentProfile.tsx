@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Link2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
+
 import useAuth from '@/hooks/useAuth';
 import {
   getStudentProfile,
@@ -8,11 +10,13 @@ import {
   uploadStudentCV,
   uploadStudentPhoto,
 } from '@/services/api';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PageHeader } from '@/components/ui/page-header';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 
 type Review = {
@@ -35,7 +39,6 @@ const StudentProfile: React.FC = () => {
     university: '',
     portfolioLinks: '',
   });
-
   const [reviews, setReviews] = useState<Review[]>([]);
 
   const { data: profile, isLoading, isError } = useQuery({
@@ -65,7 +68,7 @@ const StudentProfile: React.FC = () => {
     onError: () => toast.error('Failed to update profile'),
   });
 
-  const { mutateAsync: uploadCv, isPending } = useMutation({
+  const { mutateAsync: uploadCv, isPending: isUploadingCv } = useMutation({
     mutationFn: (file: File) => uploadStudentCV(userId, file),
     onSuccess: () => {
       toast.success('CV uploaded successfully');
@@ -84,8 +87,8 @@ const StudentProfile: React.FC = () => {
     },
   });
 
-  if (!user || isLoading) return <div className="text-ink-500">Loading...</div>;
-  if (isError || !profile) return <div className="text-rose-500">Failed to load profile</div>;
+  if (!user || isLoading) return <Skeleton className="h-80 w-full rounded-3xl" />;
+  if (isError || !profile) return <EmptyState title="Unable to load profile" description="Refresh the page and try again. Your profile data could not be loaded." />;
 
   const apiBase = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
   const origin = apiBase.endsWith('/api') ? apiBase.slice(0, -4) : apiBase;
@@ -94,151 +97,137 @@ const StudentProfile: React.FC = () => {
   const cvUrl = asset(profile.cvUrl);
 
   return (
-    <Card className="relative overflow-hidden border-ink-100 bg-white/80 backdrop-blur-sm">
-      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-500 via-brand-600 to-brand-700" />
+    <div className="space-y-8">
+      <PageHeader
+        eyebrow="Student profile"
+        title="Profile and credibility"
+        description="Keep your public profile, verified skills, portfolio links, and proof of work polished for clients."
+      />
 
-      <CardHeader className="pb-6">
-         <CardTitle className="text-2xl font-semibold text-ink-900 dark:text-ink-100">
-          {profile.name}
-        </CardTitle>
-        <p className="text-sm text-ink-500">{profile.email}</p>
-      </CardHeader>
-
-      <CardContent className="space-y-10">
-        <div className="flex flex-col gap-6 md:flex-row md:items-center">
+      <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
+        <div className="glass-panel space-y-6 p-6">
           <div className="flex items-center gap-4">
-            <div className="h-20 w-20 overflow-hidden rounded-2xl border border-ink-200 dark:border-ink-700 bg-ink-50 dark:bg-ink-800">
+            <div className="h-24 w-24 overflow-hidden rounded-3xl border border-ink-200 bg-ink-50 dark:border-white/10 dark:bg-white/5">
               {photoUrl ? (
-                <img src={photoUrl} className="h-full w-full object-cover" />
+                <img src={photoUrl} alt={profile.name} className="h-full w-full object-cover" />
               ) : (
-                <div className="flex h-full w-full items-center justify-center text-xs text-ink-400">
-                  No photo
-                </div>
+                <div className="flex h-full w-full items-center justify-center text-xs text-ink-400 dark:text-ink-300">No photo</div>
               )}
             </div>
-            <input
-              ref={photoInputRef}
-              type="file"
-              accept="image/*"
-              onChange={(e) => e.target.files && uploadPhoto(e.target.files[0])}
-              className="hidden"
-            />
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={isUploadingPhoto}
-              onClick={() => photoInputRef.current?.click()}
-            >
-              Upload photo
-            </Button>
+            <div className="space-y-3">
+              <div>
+                <h2 className="text-2xl font-semibold">{profile.name}</h2>
+                <p className="text-sm text-ink-500 dark:text-ink-300">{profile.email}</p>
+              </div>
+              <input ref={photoInputRef} type="file" accept="image/*" onChange={(e) => e.target.files && uploadPhoto(e.target.files[0])} className="hidden" />
+              <Button size="sm" variant="outline" disabled={isUploadingPhoto} onClick={() => photoInputRef.current?.click()}>
+                <Upload size={16} />
+                {isUploadingPhoto ? 'Uploading...' : 'Upload photo'}
+              </Button>
+            </div>
           </div>
 
-          <div className="flex-1 space-y-2">
+          <div className="grid gap-3">
+            <div className="muted-panel rounded-2xl p-4">
+              <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">Verified skills</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {profile.verifiedSkills?.length ? (
+                  profile.verifiedSkills.map((s: any) => (
+                    <Badge key={s._id} variant="brand">
+                      {s.skill?.name} ({s.score})
+                    </Badge>
+                  ))
+                ) : (
+                  <Badge variant="subtle">No verified skills yet</Badge>
+                )}
+              </div>
+            </div>
+
+            <div className="muted-panel rounded-2xl p-4">
+              <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">Curriculum vitae</p>
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                {cvUrl ? (
+                  <a href={cvUrl} target="_blank" rel="noreferrer" className="text-sm font-semibold text-brand-600 dark:text-brand-200">
+                    View current CV
+                  </a>
+                ) : (
+                  <span className="text-sm text-ink-500 dark:text-ink-300">No CV uploaded</span>
+                )}
+                <label>
+                  <input type="file" hidden onChange={(e) => e.target.files && uploadCv(e.target.files[0])} />
+                  <Button size="sm" variant="outline" disabled={isUploadingCv}>
+                    {isUploadingCv ? 'Uploading...' : 'Upload CV'}
+                  </Button>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="glass-panel space-y-5 p-6">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Name</Label>
+              <Input value={formValues.name} onChange={(e) => setFormValues((p) => ({ ...p, name: e.target.value }))} />
+            </div>
+            <div className="space-y-2">
+              <Label>University</Label>
+              <Input value={formValues.university} onChange={(e) => setFormValues((p) => ({ ...p, university: e.target.value }))} />
+            </div>
+          </div>
+
+          <div className="space-y-2">
             <Label>Profile photo URL</Label>
-            <Input
-              value={formValues.profilePhotoUrl}
-              onChange={(e) => setFormValues((p) => ({ ...p, profilePhotoUrl: e.target.value }))}
-            />
+            <Input value={formValues.profilePhotoUrl} onChange={(e) => setFormValues((p) => ({ ...p, profilePhotoUrl: e.target.value }))} />
           </div>
-        </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-2">
-            <Label>Name</Label>
-            <Input
-              value={formValues.name}
-              onChange={(e) => setFormValues((p) => ({ ...p, name: e.target.value }))}
-            />
+            <Label>Description</Label>
+            <Textarea rows={5} value={formValues.description} onChange={(e) => setFormValues((p) => ({ ...p, description: e.target.value }))} />
           </div>
+
           <div className="space-y-2">
-            <Label>University</Label>
-            <Input
-              value={formValues.university}
-              onChange={(e) => setFormValues((p) => ({ ...p, university: e.target.value }))}
-            />
+            <Label>Portfolio links</Label>
+            <Textarea rows={4} value={formValues.portfolioLinks} onChange={(e) => setFormValues((p) => ({ ...p, portfolioLinks: e.target.value }))} />
+            <p className="flex items-center gap-2 text-sm text-ink-500 dark:text-ink-300">
+              <Link2 size={16} />
+              Put one link per line for a cleaner public profile.
+            </p>
           </div>
+
+          <Button
+            onClick={() =>
+              saveProfile({
+                ...formValues,
+                portfolioLinks: formValues.portfolioLinks,
+              })
+            }
+            disabled={isSaving}
+          >
+            {isSaving ? 'Saving...' : 'Save profile'}
+          </Button>
         </div>
+      </div>
 
-        <div className="space-y-2">
-          <Label>Description</Label>
-          <Textarea
-            rows={4}
-            value={formValues.description}
-            onChange={(e) => setFormValues((p) => ({ ...p, description: e.target.value }))}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label>Portfolio links</Label>
-          <Textarea
-            rows={3}
-            value={formValues.portfolioLinks}
-            onChange={(e) => setFormValues((p) => ({ ...p, portfolioLinks: e.target.value }))}
-          />
-        </div>
-
-        <Button
-          onClick={() =>
-            saveProfile({
-              ...formValues,
-              portfolioLinks: formValues.portfolioLinks,
-            })
-          }
-          disabled={isSaving}
-          className="bg-gradient-to-r from-brand-600 to-brand-700"
-        >
-          {isSaving ? 'Saving...' : 'Save profile'}
-        </Button>
-
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold">Verified Skills</h3>
-          <div className="flex flex-wrap gap-2">
-            {profile.verifiedSkills?.length ? (
-              profile.verifiedSkills.map((s: any) => (
-                <Badge key={s._id} variant="brand">
-                  {s.skill?.name} ({s.score})
-                </Badge>
-              ))
-            ) : (
-              <p className="text-sm text-ink-500">No verified skills yet.</p>
-            )}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          {cvUrl ? (
-            <a href={cvUrl} target="_blank" className="text-sm font-semibold text-brand-600">
-              View CV
-            </a>
-          ) : (
-            <span className="text-sm text-ink-500">No CV uploaded</span>
-          )}
-          <label>
-            <input type="file" hidden onChange={(e) => e.target.files && uploadCv(e.target.files[0])} />
-            <Button size="sm" variant="outline">
-              Upload CV
-            </Button>
-          </label>
-        </div>
-
-        <div className="space-y-4">
-          <h3 className="text-sm font-semibold">Client reviews</h3>
-          {reviews.length ? (
-            reviews.map((r, i) => (
-              <div key={i} className="rounded-xl border border-ink-100 bg-white p-4">
-                <p className="font-medium">{r.clientName}</p>
-                <p className="text-xs text-ink-500">
+      <section className="space-y-4">
+        <h2 className="text-2xl font-semibold">Client reviews</h2>
+        {reviews.length ? (
+          <div className="grid gap-4 lg:grid-cols-2">
+            {reviews.map((r, i) => (
+              <div key={i} className="glass-panel p-5">
+                <p className="font-semibold text-ink-900 dark:text-white">{r.clientName}</p>
+                <p className="text-sm text-ink-500 dark:text-ink-300">
                   {r.jobTitle} • Rating {r.rating}/5
                 </p>
-                {r.comment && <p className="mt-2 text-sm text-ink-600">{r.comment}</p>}
+                {r.comment ? <p className="mt-3 text-sm text-ink-600 dark:text-ink-300">{r.comment}</p> : null}
               </div>
-            ))
-          ) : (
-            <p className="text-sm text-ink-500">No reviews yet.</p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+            ))}
+          </div>
+        ) : (
+          <EmptyState title="No reviews yet" description="Completed client engagements and submitted reviews will appear here." />
+        )}
+      </section>
+    </div>
   );
 };
 

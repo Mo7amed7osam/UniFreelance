@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { CheckCircle2, Mic, MonitorUp, Video } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
@@ -18,19 +19,19 @@ interface InterviewSetupProps {
   onEnterInterview: () => void;
 }
 
-const StatusPill = ({
-  label,
-  ready,
-}: {
-  label: string;
-  ready: boolean;
-}) => (
+const setupSteps = [
+  { key: 'camera', title: 'Open camera', body: 'Keep your face clearly visible before entering the live interview.', icon: Video },
+  { key: 'mic', title: 'Test microphone', body: 'Confirm the meter reacts while you speak normally.', icon: Mic },
+  { key: 'screen', title: 'Share entire screen', body: 'Gravis needs the full screen context, not a tab or single window.', icon: MonitorUp },
+];
+
+const StatusPill = ({ label, ready }: { label: string; ready: boolean }) => (
   <span
     className={[
-      'inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold',
+      'inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em]',
       ready
-        ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800/70 dark:bg-emerald-950/30 dark:text-emerald-200'
-        : 'border-ink-200 bg-ink-50 text-ink-600 dark:border-ink-700 dark:bg-ink-800/60 dark:text-ink-300',
+        ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200'
+        : 'border-ink-200 bg-white/70 text-ink-500 dark:border-white/10 dark:bg-white/5 dark:text-ink-300',
     ].join(' ')}
   >
     <span className={['h-2 w-2 rounded-full', ready ? 'bg-emerald-500' : 'bg-ink-400'].join(' ')} />
@@ -68,19 +69,14 @@ export const InterviewSetup: React.FC<InterviewSetupProps> = ({
 
   return (
     <div className="space-y-8">
-      <section className="overflow-hidden rounded-[2rem] border border-ink-200 bg-white shadow-card dark:border-ink-700 dark:bg-ink-900/70">
-        <div className="grid gap-8 p-8 lg:grid-cols-[1.15fr_0.85fr]">
+      <section className="overflow-hidden rounded-[2rem] border border-white/70 bg-white/82 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/82">
+        <div className="grid gap-8 p-6 lg:grid-cols-[1.05fr_0.95fr] lg:p-8">
           <div className="space-y-6">
             <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-600 dark:text-brand-300">
-                Pre-check
-              </p>
-              <h1 className="text-4xl font-semibold text-ink-900 dark:text-white">
-                Set up your interview call before you enter.
-              </h1>
-              <p className="max-w-2xl text-sm text-ink-500 dark:text-ink-300">
-                Open your camera, confirm your microphone, and share your entire screen once. Gravis
-                will keep the same session active across the whole interview.
+              <p className="page-eyebrow">Pre-call device check</p>
+              <h1 className="text-balance text-4xl font-semibold sm:text-5xl">Prepare your Gravis interview setup.</h1>
+              <p className="page-copy">
+                Complete the camera, microphone, and screen-share checks once before entering the live interview space. The setup will stay active across the session.
               </p>
             </div>
 
@@ -90,77 +86,71 @@ export const InterviewSetup: React.FC<InterviewSetupProps> = ({
               <StatusPill label="Entire screen shared" ready={screenReady} />
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => void onOpenCamera()}
-                disabled={isStartingCamera || cameraReady}
-                className="justify-between"
-              >
-                <span>{isStartingCamera ? 'Opening camera...' : cameraReady ? 'Camera ready' : 'Open camera'}</span>
-                <span className="text-xs text-white/70">{cameraReady ? 'Done' : 'Step 1'}</span>
-              </Button>
+            <div className="grid gap-4">
+              {setupSteps.map((step, index) => {
+                const ready = step.key === 'camera' ? cameraReady : step.key === 'mic' ? micReady : screenReady;
+                const busy = step.key === 'camera' ? isStartingCamera : step.key === 'mic' ? isTestingMicrophone : isStartingScreenShare;
+                const action =
+                  step.key === 'camera' ? () => void onOpenCamera() : step.key === 'mic' ? () => void onTestMicrophone() : () => void onShareScreen();
+                const label =
+                  step.key === 'camera'
+                    ? ready
+                      ? 'Camera ready'
+                      : busy
+                        ? 'Opening camera...'
+                        : 'Open camera'
+                    : step.key === 'mic'
+                      ? ready
+                        ? 'Microphone ready'
+                        : busy
+                          ? 'Testing microphone...'
+                          : 'Test microphone'
+                      : ready
+                        ? 'Entire screen ready'
+                        : busy
+                          ? 'Sharing screen...'
+                          : 'Share entire screen';
 
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => void onTestMicrophone()}
-                disabled={isTestingMicrophone}
-                className="justify-between"
-              >
-                <span>
-                  {isTestingMicrophone
-                    ? 'Testing microphone...'
-                    : micReady
-                      ? 'Microphone ready'
-                      : 'Test microphone'}
-                </span>
-                <span className="text-xs text-white/70">{micReady ? 'Done' : 'Step 2'}</span>
-              </Button>
+                return (
+                  <div key={step.key} className="muted-panel flex flex-col gap-4 rounded-3xl p-5 md:flex-row md:items-center md:justify-between">
+                    <div className="flex items-start gap-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-400/10 dark:text-brand-200">
+                        <step.icon size={20} />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-semibold text-ink-900 dark:text-white">{index + 1}. {step.title}</p>
+                          {ready ? <CheckCircle2 size={16} className="text-emerald-500" /> : null}
+                        </div>
+                        <p className="text-sm text-ink-500 dark:text-ink-300">{step.body}</p>
+                      </div>
+                    </div>
 
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => void onShareScreen()}
-                disabled={isStartingScreenShare || screenReady}
-                className="justify-between sm:col-span-2"
-              >
-                <span>
-                  {isStartingScreenShare
-                    ? 'Sharing entire screen...'
-                    : screenReady
-                      ? 'Entire screen ready'
-                      : 'Share entire screen'}
-                </span>
-                <span className="text-xs text-white/70">{screenReady ? 'Done' : 'Step 3'}</span>
-              </Button>
+                    <Button type="button" variant={ready ? 'soft' : 'default'} onClick={action} disabled={busy || (step.key !== 'mic' && ready)}>
+                      {label}
+                    </Button>
+                  </div>
+                );
+              })}
             </div>
 
-            <div className="space-y-3 rounded-2xl border border-ink-100 bg-ink-50/80 p-4 dark:border-ink-700 dark:bg-ink-800/60">
+            <div className="rounded-3xl border border-ink-200 bg-ink-50/80 p-5 dark:border-white/10 dark:bg-white/5">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold text-ink-900 dark:text-white">Microphone activity</p>
-                  <p className="text-xs text-ink-500 dark:text-ink-400">
-                    Speak normally and confirm the meter responds.
-                  </p>
+                  <p className="text-xs text-ink-500 dark:text-ink-300">A healthy signal means the meter should rise while you speak.</p>
                 </div>
-                <span className="text-xs font-medium text-ink-500 dark:text-ink-400">
-                  {micReady ? 'Ready' : 'Waiting'}
-                </span>
+                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-400 dark:text-ink-300">{micReady ? 'Ready' : 'Waiting'}</span>
               </div>
 
-              <div className="flex items-end gap-1">
+              <div className="mt-4 flex items-end gap-1">
                 {Array.from({ length: 18 }).map((_, index) => {
                   const threshold = (index + 1) / 18;
                   const active = micLevel >= threshold;
                   return (
                     <span
                       key={index}
-                      className={[
-                        'w-full rounded-full transition-all duration-150',
-                        active ? 'bg-emerald-500' : 'bg-ink-200 dark:bg-ink-700',
-                      ].join(' ')}
+                      className={['w-full rounded-full transition-all duration-150', active ? 'bg-emerald-500' : 'bg-ink-200 dark:bg-white/10'].join(' ')}
                       style={{ height: `${12 + (index % 6) * 6}px` }}
                     />
                   );
@@ -169,45 +159,32 @@ export const InterviewSetup: React.FC<InterviewSetupProps> = ({
             </div>
 
             {error ? (
-              <p className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-200">
+              <p className="rounded-3xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-200">
                 {error}
               </p>
             ) : null}
           </div>
 
           <div className="space-y-6">
-            <div className="overflow-hidden rounded-[1.75rem] border border-ink-200 bg-ink-950 shadow-soft dark:border-ink-700">
+            <div className="overflow-hidden rounded-[1.75rem] border border-ink-200 bg-ink-950 shadow-glass dark:border-white/10">
               <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 text-white/80">
                 <span className="text-sm font-medium">Camera preview</span>
                 <span className="text-xs">{cameraReady ? 'Live' : 'Waiting for camera'}</span>
               </div>
               <div className="aspect-[4/5] bg-ink-950">
-                <video
-                  ref={previewRef}
-                  className="h-full w-full object-cover"
-                  autoPlay
-                  playsInline
-                  muted
-                />
+                <video ref={previewRef} className="h-full w-full object-cover" autoPlay playsInline muted />
               </div>
             </div>
 
-            <div className="rounded-[1.75rem] border border-brand-200 bg-gradient-to-br from-brand-50 via-white to-ink-50 p-6 dark:border-brand-900/40 dark:from-brand-950/20 dark:via-ink-900 dark:to-ink-800">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-600 dark:text-brand-300">
-                Before you enter
-              </p>
+            <div className="rounded-[1.75rem] border border-brand-200 bg-gradient-to-br from-brand-50 via-white to-accent-50 p-6 dark:border-brand-400/20 dark:from-brand-400/10 dark:via-ink-dark-surface dark:to-accent-400/10">
+              <p className="page-eyebrow">Before you enter</p>
               <ul className="mt-4 space-y-3 text-sm text-ink-600 dark:text-ink-300">
-                <li>Keep your face clearly visible in the camera frame.</li>
-                <li>Share your entire screen, not a window or tab.</li>
-                <li>Once you enter, Gravis will keep this setup active for every question.</li>
+                <li>Keep your face visible and your microphone unobstructed.</li>
+                <li>Share your entire screen and avoid switching away during the session.</li>
+                <li>When ready, Gravis will continue with a polished live interview experience.</li>
               </ul>
 
-              <Button
-                type="button"
-                className="mt-6 w-full"
-                onClick={onEnterInterview}
-                disabled={!canEnterInterview}
-              >
+              <Button type="button" className="mt-6 w-full" size="lg" onClick={onEnterInterview} disabled={!canEnterInterview}>
                 Enter interview
               </Button>
             </div>

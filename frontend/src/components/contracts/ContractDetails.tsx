@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+
 import useAuth from '@/hooks/useAuth';
 import {
   acceptContractWork,
@@ -12,8 +13,10 @@ import {
 } from '@/services/api';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
+import { PageHeader } from '@/components/ui/page-header';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -37,8 +40,7 @@ const ContractDetails: React.FC = () => {
   });
 
   const submitMutation = useMutation({
-    mutationFn: (payload: { message: string; links?: string[] }) =>
-      submitContractWork(id as string, payload),
+    mutationFn: (payload: { message: string; links?: string[] }) => submitContractWork(id as string, payload),
     onSuccess: () => {
       toast.success('Work submitted successfully.');
       setSubmissionMessage('');
@@ -73,8 +75,7 @@ const ContractDetails: React.FC = () => {
   });
 
   const reviewMutation = useMutation({
-    mutationFn: (payload: { rating: number; comment?: string }) =>
-      submitContractReview(id as string, payload),
+    mutationFn: (payload: { rating: number; comment?: string }) => submitContractReview(id as string, payload),
     onSuccess: () => {
       toast.success('Review submitted.');
       setHasReviewed(true);
@@ -86,74 +87,72 @@ const ContractDetails: React.FC = () => {
     },
   });
 
-  if (isLoading) {
-    return <Skeleton className="h-64 w-full" />;
-  }
-
-  if (isError || !data?.contract) {
-    return (
-      <Card>
-        <CardContent>
-          <p className="text-sm text-rose-500">Failed to load contract.</p>
-        </CardContent>
-      </Card>
-    );
-  }
+  if (isLoading) return <Skeleton className="h-80 w-full rounded-3xl" />;
+  if (isError || !data?.contract) return <EmptyState title="Unable to load contract" description="The contract could not be loaded right now." />;
 
   const { contract, submissions } = data;
 
   const steps = [
-    { label: 'HIRED', active: true },
-    { label: 'SUBMITTED', active: ['submitted', 'completed'].includes(contract.status) },
-    { label: 'ACCEPTED', active: contract.status === 'completed' },
-    { label: 'PAID', active: contract.escrowStatus === 'released' },
-    { label: 'REVIEWED', active: hasReviewed },
+    { label: 'Hired', active: true },
+    { label: 'Submitted', active: ['submitted', 'completed'].includes(contract.status) },
+    { label: 'Accepted', active: contract.status === 'completed' },
+    { label: 'Paid', active: contract.escrowStatus === 'released' },
+    { label: 'Reviewed', active: hasReviewed },
   ];
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{contract.jobId?.title || 'Contract'}</CardTitle>
-          <p className="text-sm text-ink-500">
-            Client: {contract.clientId?.name || 'Client'} • Student: {contract.studentId?.name || 'Student'}
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-4">
+    <div className="space-y-8">
+      <PageHeader
+        eyebrow="Contract workspace"
+        title={contract.jobId?.title || 'Contract'}
+        description={`Client: ${contract.clientId?.name || 'Client'} • Student: ${contract.studentId?.name || 'Student'}`}
+        actions={
           <div className="flex flex-wrap gap-2">
             <Badge variant="brand">{contract.status}</Badge>
-            <Badge variant={contract.escrowStatus === 'released' ? 'success' : 'warning'}>
-              {contract.escrowStatus}
-            </Badge>
-            <Badge variant="default">Budget: ${contract.agreedBudget}</Badge>
+            <Badge variant={contract.escrowStatus === 'released' ? 'success' : 'warning'}>{contract.escrowStatus}</Badge>
           </div>
-          <div className="flex flex-wrap gap-2 text-xs text-ink-500">
-            {steps.map((step) => (
-              <span
-                key={step.label}
-                className={`rounded-full px-3 py-1 ${
-                  step.active ? 'bg-brand-50 text-brand-700' : 'bg-ink-50 text-ink-400'
-                }`}
-              >
-                {step.label}
-              </span>
-            ))}
+        }
+      />
+
+      <Card>
+        <CardContent className="space-y-5 p-6">
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="muted-panel rounded-2xl p-4">
+              <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">Agreed budget</p>
+              <p className="mt-2 text-lg font-semibold text-ink-900 dark:text-white">${contract.agreedBudget}</p>
+            </div>
+            <div className="muted-panel rounded-2xl p-4 md:col-span-2">
+              <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">Progress</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {steps.map((step) => (
+                  <span
+                    key={step.label}
+                    className={[
+                      'rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em]',
+                      step.active
+                        ? 'bg-brand-50 text-brand-700 dark:bg-brand-400/10 dark:text-brand-200'
+                        : 'bg-ink-100 text-ink-400 dark:bg-white/5 dark:text-ink-300',
+                    ].join(' ')}
+                  >
+                    {step.label}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Submissions</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4 p-6">
+          <h2 className="text-2xl font-semibold">Submissions</h2>
           {(submissions || []).length ? (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {(submissions || []).map((submission: any) => (
-                <div key={submission._id} className="rounded-xl border border-ink-100 p-3">
-                  <p className="text-sm text-ink-700">{submission.message}</p>
+                <div key={submission._id} className="muted-panel rounded-2xl p-4">
+                  <p className="text-sm text-ink-700 dark:text-ink-200">{submission.message}</p>
                   {(submission.links || []).length ? (
-                    <div className="mt-2 text-xs text-brand-600">
+                    <div className="mt-3 space-y-1 text-sm">
                       {(submission.links || []).map((link: string, index: number) => (
                         <div key={`${link}-${index}`}>
                           <a href={link} target="_blank" rel="noreferrer">
@@ -163,27 +162,25 @@ const ContractDetails: React.FC = () => {
                       ))}
                     </div>
                   ) : null}
-                  <p className="mt-2 text-xs text-ink-400">
+                  <p className="mt-3 text-xs text-ink-400 dark:text-ink-300">
                     {submission.createdAt ? new Date(submission.createdAt).toLocaleString() : ''}
                   </p>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-ink-500">No submissions yet.</p>
+            <EmptyState title="No submissions yet" description="Work deliveries and review history will appear here once the student submits progress." />
           )}
         </CardContent>
       </Card>
 
       {isStudent ? (
         <Card>
-          <CardHeader>
-            <CardTitle>Deliver work</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4 p-6">
+            <h2 className="text-2xl font-semibold">Deliver work</h2>
             <Textarea
               rows={4}
-              placeholder="Describe your delivery and notes."
+              placeholder="Describe the delivery and anything the client should review."
               value={submissionMessage}
               onChange={(e) => setSubmissionMessage(e.target.value)}
               disabled={submitMutation.isPending}
@@ -216,77 +213,53 @@ const ContractDetails: React.FC = () => {
 
       {isClient ? (
         <Card>
-          <CardHeader>
-            <CardTitle>Client actions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex flex-wrap gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                disabled={acceptMutation.isPending || contract.status !== 'submitted'}
-                onClick={() => acceptMutation.mutate()}
-              >
-                {acceptMutation.isPending ? 'Releasing...' : 'Accept work & release escrow'}
+          <CardContent className="space-y-4 p-6">
+            <h2 className="text-2xl font-semibold">Client actions</h2>
+            <div className="flex flex-wrap gap-3">
+              <Button type="button" variant="outline" disabled={acceptMutation.isPending || contract.status !== 'submitted'} onClick={() => acceptMutation.mutate()}>
+                {acceptMutation.isPending ? 'Releasing...' : 'Accept work and release escrow'}
               </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                disabled={requestChangesMutation.isPending || contract.status !== 'submitted'}
-                onClick={() => requestChangesMutation.mutate()}
-              >
+              <Button type="button" variant="ghost" disabled={requestChangesMutation.isPending || contract.status !== 'submitted'} onClick={() => requestChangesMutation.mutate()}>
                 {requestChangesMutation.isPending ? 'Updating...' : 'Request changes'}
               </Button>
             </div>
-            <div className="space-y-2">
-              <p className="text-xs text-ink-500">
-                Reviews are available after escrow is released.
-              </p>
-              <div className="grid gap-3 md:grid-cols-2">
-                <Input
-                  placeholder="Rating (1-5)"
-                  type="number"
-                  min={1}
-                  max={5}
-                  value={reviewRating}
-                  onChange={(e) => setReviewRating(e.target.value)}
-                  disabled={reviewMutation.isPending || contract.escrowStatus !== 'released' || hasReviewed}
-                />
-              </div>
-              <Textarea
-                rows={3}
-                placeholder="Share your feedback"
-                value={reviewComment}
-                onChange={(e) => setReviewComment(e.target.value)}
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <Input
+                placeholder="Rating (1-5)"
+                type="number"
+                min={1}
+                max={5}
+                value={reviewRating}
+                onChange={(e) => setReviewRating(e.target.value)}
                 disabled={reviewMutation.isPending || contract.escrowStatus !== 'released' || hasReviewed}
               />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={
-                  reviewMutation.isPending ||
-                  contract.escrowStatus !== 'released' ||
-                  hasReviewed ||
-                  !reviewRating.trim()
-                }
-                onClick={() =>
-                  (() => {
-                    const ratingValue = Number(reviewRating);
-                    if (!Number.isFinite(ratingValue) || ratingValue < 1 || ratingValue > 5) {
-                      toast.error('Rating must be between 1 and 5.');
-                      return;
-                    }
-                    reviewMutation.mutate({
-                      rating: ratingValue,
-                      comment: reviewComment.trim() || undefined,
-                    });
-                  })()
-                }
-              >
-                {hasReviewed ? 'Review submitted' : reviewMutation.isPending ? 'Submitting...' : 'Submit review'}
-              </Button>
             </div>
+            <Textarea
+              rows={3}
+              placeholder="Share your feedback"
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+              disabled={reviewMutation.isPending || contract.escrowStatus !== 'released' || hasReviewed}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              disabled={reviewMutation.isPending || contract.escrowStatus !== 'released' || hasReviewed || !reviewRating.trim()}
+              onClick={() => {
+                const ratingValue = Number(reviewRating);
+                if (!Number.isFinite(ratingValue) || ratingValue < 1 || ratingValue > 5) {
+                  toast.error('Rating must be between 1 and 5.');
+                  return;
+                }
+                reviewMutation.mutate({
+                  rating: ratingValue,
+                  comment: reviewComment.trim() || undefined,
+                });
+              }}
+            >
+              {hasReviewed ? 'Review submitted' : reviewMutation.isPending ? 'Submitting...' : 'Submit review'}
+            </Button>
           </CardContent>
         </Card>
       ) : null}

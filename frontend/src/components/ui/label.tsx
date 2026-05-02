@@ -7,7 +7,7 @@ export const Label = ({
 }: React.LabelHTMLAttributes<HTMLLabelElement>) => (
   <label
     className={cn(
-      'mb-1 block text-sm font-medium text-ink-600 transition-colors',
+      'mb-1 block text-sm font-medium text-ink-700 transition-colors dark:text-ink-200',
       className
     )}
     {...props}

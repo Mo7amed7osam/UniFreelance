@@ -1,6 +1,8 @@
 import { NavLink } from 'react-router-dom';
-import useAuth from '@/hooks/useAuth';
+
 import { cn } from '@/lib/utils';
+import useAuth from '@/hooks/useAuth';
+
 import { navByRole } from './Sidebar';
 
 export const MobileNav = () => {
@@ -13,33 +15,30 @@ export const MobileNav = () => {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-20 flex items-center justify-around border-t border-ink-100 bg-white/90 px-2 py-2 backdrop-blur-sm shadow-soft md:hidden"
+      className="fixed bottom-3 left-3 right-3 z-30 rounded-[1.75rem] border border-white/70 bg-white/88 p-2 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/88 md:hidden"
       aria-label="Primary"
     >
-      {items.map((item) => {
-        const Icon = item.icon;
-        return (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            className={({ isActive }) =>
-              cn(
-                'group flex w-full flex-col items-center gap-1 rounded-xl px-2 py-1 text-center text-[11px] font-medium leading-tight text-ink-500 transition-all',
-                'hover:text-ink-900',
-                isActive && 'bg-brand-50 text-brand-700'
-              )
-            }
-          >
-            <Icon
-              size={18}
-              className="transition-transform group-hover:-translate-y-0.5"
-            />
-            <span className="transition-colors">
-              {item.label}
-            </span>
-          </NavLink>
-        );
-      })}
+      <div className="grid grid-cols-3 gap-2">
+        {items.slice(0, 6).map((item) => {
+          const Icon = item.icon;
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                cn(
+                  'group flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 text-center text-[11px] font-semibold leading-tight transition-all duration-200',
+                  'text-ink-500 hover:bg-brand-50 hover:text-ink-900 dark:text-ink-300 dark:hover:bg-white/8 dark:hover:text-white',
+                  isActive && 'bg-gradient-to-r from-brand-600 via-brand-500 to-accent-500 text-white shadow-soft hover:text-white'
+                )
+              }
+            >
+              <Icon size={18} className="transition-transform group-hover:-translate-y-0.5" />
+              <span className="line-clamp-1">{item.label}</span>
+            </NavLink>
+          );
+        })}
+      </div>
     </nav>
   );
 };

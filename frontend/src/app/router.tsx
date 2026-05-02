@@ -22,11 +22,12 @@ import { AppShell } from '@/components/layout/AppShell';
 import ContractDetails from '@/components/contracts/ContractDetails';
 import AIInterviewPage from '@/features/ai-interview/pages/AIInterviewPage';
 import AIInterviewResultPage from '@/features/ai-interview/pages/AIInterviewResultPage';
+import LandingPage from '@/components/marketing/LandingPage';
 
 export const AppRouter = () => (
   <BrowserRouter>
     <Routes>
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
@@ -214,7 +215,7 @@ export const AppRouter = () => (
         }
       />
 
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   </BrowserRouter>
 );

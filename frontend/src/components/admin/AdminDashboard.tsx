@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+
 import {
   createSkill,
   deleteAdminJob,
@@ -11,13 +12,14 @@ import {
   getInterviews,
   getSkills,
 } from '@/services/api';
-
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
+import { PageHeader } from '@/components/ui/page-header';
 import { Select } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { StatCard } from '@/components/ui/stat-card';
 import {
   Table,
   TableBody,
@@ -72,8 +74,7 @@ const AdminDashboard: React.FC = () => {
   });
 
   const createSkillMutation = useMutation({
-    mutationFn: (payload: { name: string; description: string }) =>
-      createSkill(payload),
+    mutationFn: (payload: { name: string; description: string }) => createSkill(payload),
     onSuccess: () => {
       toast.success('Skill created.');
       setSkillName('');
@@ -83,204 +84,72 @@ const AdminDashboard: React.FC = () => {
   });
 
   const sortedSkills = useMemo(() => {
-    return (skills || [])
-      .slice()
-      .sort((a: any, b: any) => a.name.localeCompare(b.name));
+    return (skills || []).slice().sort((a: any, b: any) => a.name.localeCompare(b.name));
   }, [skills]);
 
   return (
-    <div
-      className="
-        space-y-10 rounded-2xl p-6
-        bg-gradient-to-br from-ink-50 via-white to-brand-100/30
-        dark:bg-gradient-to-br dark:from-ink-900 dark:via-ink-900 dark:to-ink-800
-      "
-    >
-      {/* Header */}
-      <div className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-widest text-ink-400">
-          Admin Dashboard
-        </p>
-        <h1 className="text-3xl font-semibold text-ink-900 dark:text-white">
-          Platform{' '}
-          <span className="text-brand-600 dark:text-brand-400">
-            control center
-          </span>
-        </h1>
-        <p className="text-sm text-ink-500 dark:text-ink-400">
-          Manage interviews, users, jobs, and skills.
-        </p>
+    <div className="space-y-8">
+      <PageHeader
+        eyebrow="Admin dashboard"
+        title="Platform control center"
+        description="Review AI interview outcomes, maintain the skill library, and keep jobs and accounts tidy."
+      />
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <StatCard label="Interview queue" value={interviewsLoading ? <Skeleton className="h-10 w-24" /> : (interviews || []).length} caption="Items in the selected review state." />
+        <StatCard label="Users" value={usersLoading ? <Skeleton className="h-10 w-24" /> : (users || []).length} caption="Accounts currently on the platform." />
+        <StatCard label="Jobs" value={jobsLoading ? <Skeleton className="h-10 w-24" /> : (jobs || []).length} caption="Live and historical marketplace listings." />
+        <StatCard label="Skills" value={skillsLoading ? <Skeleton className="h-10 w-24" /> : sortedSkills.length} caption="Interview tracks available to students." tone="brand" />
       </div>
 
-      {/* Interview Filter */}
-      <Card className="bg-white/80 backdrop-blur-sm dark:bg-ink-800 dark:border-ink-700">
-        <CardHeader>
-          <CardTitle className="text-lg text-ink-900 dark:text-white">
-            Interview filter
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="max-w-sm">
-          <Select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
-            <option value="SUBMITTED">Submitted</option>
-            <option value="PASSED">Passed</option>
-            <option value="FAILED">Failed</option>
-          </Select>
-        </CardContent>
-      </Card>
-
-      {/* Interviews */}
-      {interviewsLoading ? (
-        <Skeleton className="h-48 w-full" />
-      ) : (interviews || []).length === 0 ? (
-        <Card className="border-dashed dark:bg-ink-800 dark:border-ink-700">
-          <CardContent className="py-10 text-center">
-            <p className="text-sm text-ink-500 dark:text-ink-400">
-              No interviews found.
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableHeaderCell>Student</TableHeaderCell>
-              <TableHeaderCell>Skill</TableHeaderCell>
-              <TableHeaderCell>AI result</TableHeaderCell>
-              <TableHeaderCell>Review</TableHeaderCell>
-              <TableHeaderCell>Action</TableHeaderCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {(interviews || []).map((interview: any) => (
-              <TableRow
-                key={interview.sessionId}
-                className="hover:bg-brand-50/40 dark:hover:bg-ink-700"
-              >
-                <TableCell>{interview.user?.name || '-'}</TableCell>
-                <TableCell>{interview.skillRef?.name || interview.skill}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant={
-                      interview.finalRecommendation === 'pass'
-                        ? 'success'
-                        : interview.finalRecommendation === 'fail'
-                        ? 'danger'
-                        : 'warning'
-                    }
-                  >
-                    {interview.finalRecommendation || 'needs_review'}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant={
-                      interview.reviewStatus === 'pass'
-                        ? 'success'
-                        : interview.reviewStatus === 'fail'
-                        ? 'danger'
-                        : 'warning'
-                    }
-                  >
-                    {interview.reviewStatus || 'pending'}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Button
-                    size="sm"
-                    onClick={() =>
-                      navigate(`/admin/review-interview/${interview.sessionId}`)
-                    }
-                  >
-                    Review
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-
-      {/* Skills */}
-      <section className="space-y-4">
-        <h2 className="relative inline-block text-xl font-semibold text-ink-900 dark:text-white">
-          Skills
-          <span className="absolute -bottom-1 left-0 h-1 w-1/3 bg-brand-500 rounded-full"></span>
-        </h2>
-
-        <Card className="bg-white/80 backdrop-blur-sm dark:bg-ink-800 dark:border-ink-700">
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <Input
-                placeholder="Skill name"
-                value={skillName}
-                onChange={(e) => setSkillName(e.target.value)}
-              />
-              <Input
-                placeholder="Description"
-                value={skillDescription}
-                onChange={(e) => setSkillDescription(e.target.value)}
-              />
-            </div>
-
-            <Button
-              onClick={() =>
-                createSkillMutation.mutate({
-                  name: skillName,
-                  description: skillDescription,
-                })
-              }
-            >
-              Add skill
-            </Button>
-          </CardContent>
-        </Card>
-
-        <div className="flex flex-wrap gap-2">
-          {sortedSkills.map((skill: any) => (
-            <Badge key={skill._id}>{skill.name}</Badge>
-          ))}
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-semibold">Interview review queue</h2>
+            <p className="text-sm text-ink-500 dark:text-ink-300">Move through pending AI interview sessions with a clearer review surface.</p>
+          </div>
+          <div className="w-full max-w-xs">
+            <Select value={status} onChange={(e) => setStatus(e.target.value)}>
+              <option value="SUBMITTED">Submitted</option>
+              <option value="PASSED">Passed</option>
+              <option value="FAILED">Failed</option>
+            </Select>
+          </div>
         </div>
-      </section>
 
-      {/* Users */}
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold text-ink-900 dark:text-white">
-          Users
-        </h2>
-
-        {usersLoading ? (
-          <Skeleton className="h-40 w-full" />
+        {interviewsLoading ? (
+          <Skeleton className="h-44 w-full rounded-3xl" />
+        ) : (interviews || []).length === 0 ? (
+          <EmptyState title="No interviews found" description="Try another filter to review a different slice of the interview queue." />
         ) : (
           <Table>
             <TableHead>
               <TableRow>
-                <TableHeaderCell>Name</TableHeaderCell>
-                <TableHeaderCell>Role</TableHeaderCell>
-                <TableHeaderCell>Email</TableHeaderCell>
+                <TableHeaderCell>Student</TableHeaderCell>
+                <TableHeaderCell>Skill</TableHeaderCell>
+                <TableHeaderCell>AI result</TableHeaderCell>
+                <TableHeaderCell>Review</TableHeaderCell>
                 <TableHeaderCell>Action</TableHeaderCell>
               </TableRow>
             </TableHead>
-
             <TableBody>
-              {(users || []).map((user: any) => (
-                <TableRow key={user._id}>
-                  <TableCell>{user.name}</TableCell>
+              {(interviews || []).map((interview: any) => (
+                <TableRow key={interview.sessionId}>
+                  <TableCell className="font-semibold">{interview.user?.name || '-'}</TableCell>
+                  <TableCell>{interview.skillRef?.name || interview.skill}</TableCell>
                   <TableCell>
-                    <Badge>{user.role}</Badge>
+                    <Badge variant={interview.finalRecommendation === 'pass' ? 'success' : interview.finalRecommendation === 'fail' ? 'danger' : 'warning'}>
+                      {interview.finalRecommendation || 'needs_review'}
+                    </Badge>
                   </TableCell>
-                  <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        deleteUserMutation.mutate(user._id)
-                      }
-                    >
-                      Delete
+                    <Badge variant={interview.reviewStatus === 'pass' ? 'success' : interview.reviewStatus === 'fail' ? 'danger' : 'warning'}>
+                      {interview.reviewStatus || 'pending'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Button size="sm" onClick={() => navigate(`/admin/review-interview/${interview.sessionId}`)}>
+                      Review
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -288,52 +157,96 @@ const AdminDashboard: React.FC = () => {
             </TableBody>
           </Table>
         )}
-      </section>
+      </div>
 
-      {/* Jobs */}
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold text-ink-900 dark:text-white">
-          Jobs
-        </h2>
+      <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold">Skill library</h2>
+          <div className="glass-panel space-y-4 p-6">
+            <Input placeholder="Skill name" value={skillName} onChange={(e) => setSkillName(e.target.value)} />
+            <Input placeholder="Description" value={skillDescription} onChange={(e) => setSkillDescription(e.target.value)} />
+            <Button
+              onClick={() => createSkillMutation.mutate({ name: skillName, description: skillDescription })}
+              disabled={createSkillMutation.isPending}
+            >
+              {createSkillMutation.isPending ? 'Adding...' : 'Add skill'}
+            </Button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {sortedSkills.map((skill: any) => (
+              <Badge key={skill._id} variant="subtle">
+                {skill.name}
+              </Badge>
+            ))}
+          </div>
+        </div>
 
-        {jobsLoading ? (
-          <Skeleton className="h-40 w-full" />
-        ) : (
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableHeaderCell>Title</TableHeaderCell>
-                <TableHeaderCell>Status</TableHeaderCell>
-                <TableHeaderCell>Employer</TableHeaderCell>
-                <TableHeaderCell>Action</TableHeaderCell>
-              </TableRow>
-            </TableHead>
+        <div className="space-y-5">
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold">Users</h2>
+            {usersLoading ? (
+              <Skeleton className="h-44 w-full rounded-3xl" />
+            ) : (
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableHeaderCell>Name</TableHeaderCell>
+                    <TableHeaderCell>Role</TableHeaderCell>
+                    <TableHeaderCell>Email</TableHeaderCell>
+                    <TableHeaderCell>Action</TableHeaderCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {(users || []).map((user: any) => (
+                    <TableRow key={user._id}>
+                      <TableCell className="font-semibold">{user.name}</TableCell>
+                      <TableCell><Badge variant="subtle">{user.role}</Badge></TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>
+                        <Button variant="ghost" size="sm" onClick={() => deleteUserMutation.mutate(user._id)}>
+                          Delete
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </div>
 
-            <TableBody>
-              {(jobs || []).map((job: any) => (
-                <TableRow key={job._id}>
-                  <TableCell>{job.title}</TableCell>
-                  <TableCell>
-                    <Badge>{job.status}</Badge>
-                  </TableCell>
-                  <TableCell>{job.employer?.name}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        deleteJobMutation.mutate(job._id)
-                      }
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </section>
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold">Jobs</h2>
+            {jobsLoading ? (
+              <Skeleton className="h-44 w-full rounded-3xl" />
+            ) : (
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableHeaderCell>Title</TableHeaderCell>
+                    <TableHeaderCell>Status</TableHeaderCell>
+                    <TableHeaderCell>Employer</TableHeaderCell>
+                    <TableHeaderCell>Action</TableHeaderCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {(jobs || []).map((job: any) => (
+                    <TableRow key={job._id}>
+                      <TableCell className="font-semibold">{job.title}</TableCell>
+                      <TableCell><Badge variant="subtle">{job.status}</Badge></TableCell>
+                      <TableCell>{job.employer?.name}</TableCell>
+                      <TableCell>
+                        <Button variant="ghost" size="sm" onClick={() => deleteJobMutation.mutate(job._id)}>
+                          Delete
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
