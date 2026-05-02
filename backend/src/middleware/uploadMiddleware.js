@@ -1,36 +1,21 @@
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
-
-const ensureDirectory = (dirPath) => {
-  if (fs.existsSync(dirPath)) {
-    const stat = fs.lstatSync(dirPath);
-    if (!stat.isDirectory()) {
-      const backupPath = `${dirPath}.bak-${Date.now()}`;
-      fs.renameSync(dirPath, backupPath);
-    }
-  }
-  if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
-  }
-};
+const { ensureDirectory, getInterviewUploadsDir, getUploadsRoot } = require('../utils/storagePaths');
 
 // Configure storage for uploaded files
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // Set destination based on file type
     const fileType = file.mimetype.split('/')[0];
-    let uploadPath = 'uploads/cvs';
+    let uploadPath = path.join(getUploadsRoot(), 'cvs');
     if (fileType === 'video') {
-      uploadPath = 'uploads/videos';
+      uploadPath = getInterviewUploadsDir();
     } else if (fileType === 'image') {
-      uploadPath = 'uploads/photos';
+      uploadPath = path.join(getUploadsRoot(), 'photos');
     }
-    const fullPath = path.join(__dirname, '../../', uploadPath);
-    const uploadsRoot = path.join(__dirname, '../../', 'uploads');
-    ensureDirectory(uploadsRoot);
-    ensureDirectory(fullPath);
-    cb(null, fullPath);
+    ensureDirectory(getUploadsRoot());
+    ensureDirectory(uploadPath);
+    cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
     // Set the filename to be unique

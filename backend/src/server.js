@@ -12,6 +12,7 @@ const contractRoutes = require('./routes/contractRoutes');
 const walletRoutes = require('./routes/walletRoutes');
 const aiInterviewRoutes = require('./modules/ai-interview/interview.routes');
 const connectDB = require('./config/database');
+const { ensureDirectory, getUploadsRoot } = require('./utils/storagePaths');
 const { metricsMiddleware, metricsHandler } = require('./monitoring/metrics');
 
 // Load environment variables from .env file
@@ -46,6 +47,7 @@ app.use((req, res, next) => {
 
 // Connect to MongoDB
 connectDB();
+ensureDirectory(getUploadsRoot());
 
 // Define API routes
 app.use('/api/auth', authRoutes);
@@ -58,7 +60,7 @@ app.use('/api/students', studentRoutes);
 app.use('/api/proposals', proposalRoutes);
 app.use('/api/contracts', contractRoutes);
 app.use('/api/wallet', walletRoutes);
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+app.use('/uploads', express.static(getUploadsRoot()));
 app.get('/', (req, res) => {
     console.log("server is working");
     res.status(200).send('ok');

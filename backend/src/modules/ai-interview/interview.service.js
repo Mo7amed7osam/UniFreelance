@@ -5,7 +5,7 @@ const Proposal = require('../../models/Proposal');
 const Skill = require('../../models/Skill');
 const User = require('../../models/User');
 const InterviewSession = require('./interview.model');
-const { toAbsolutePath, toPublicUploadUrl } = require('./media.service');
+const { cleanupUploadedFile, persistInterviewVideo, toAbsolutePath, toPublicUploadUrl } = require('./media.service');
 const { evaluateVideoAnswer, generateInterviewQuestions } = require('./ai.service');
 
 const buildError = (status, message) => {
@@ -48,21 +48,21 @@ const serializeSession = (session) => ({
   skill: session.skill,
   skillRef: session.skillRef
     ? {
-        _id: String(session.skillRef._id),
-        name: session.skillRef.name,
-        description: session.skillRef.description,
-      }
+      _id: String(session.skillRef._id),
+      name: session.skillRef.name,
+      description: session.skillRef.description,
+    }
     : null,
   job: session.job && typeof session.job === 'object'
     ? { _id: String(session.job._id), title: session.job.title }
     : session.job
-    ? String(session.job)
-    : null,
+      ? String(session.job)
+      : null,
   proposal: session.proposal && typeof session.proposal === 'object'
     ? { _id: String(session.proposal._id), status: session.proposal.status }
     : session.proposal
-    ? String(session.proposal)
-    : null,
+      ? String(session.proposal)
+      : null,
   status: session.status,
   questions: (session.questions || []).map((question) => ({
     id: question.questionId,
@@ -302,12 +302,28 @@ const submitAnswer = async ({ sessionId, user, questionId, cameraFile, screenFil
     originalName: cameraFile.originalname,
   });
 
+  const cameraVideo = await persistInterviewVideo({
+    filePath: cameraFile.path,
+    sessionId: String(session._id),
+    questionId: question.questionId,
+    kind: 'camera',
+  });
+
+  const screenVideo = await persistInterviewVideo({
+    filePath: screenFile.path,
+    sessionId: String(session._id),
+    questionId: question.questionId,
+    kind: 'screen',
+  });
+
   session.answers.push({
     questionId: question.questionId,
     questionText: question.text,
-    videoUrl: toPublicUploadUrl(cameraFile),
-    cameraVideoUrl: toPublicUploadUrl(cameraFile),
-    screenVideoUrl: toPublicUploadUrl(screenFile),
+    videoUrl: cameraVideo.url || toPublicUploadUrl(cameraFile),
+    cameraVideoUrl: cameraVideo.url || toPublicUploadUrl(cameraFile),
+    screenVideoUrl: screenVideo.url || toPublicUploadUrl(screenFile),
+    cameraVideoPublicId: cameraVideo.publicId || null,
+    screenVideoPublicId: screenVideo.publicId || null,
     mimeType: cameraFile.mimetype,
     transcript: evaluation.transcript,
     processingError: evaluation.processingError || null,
@@ -336,6 +352,9 @@ const submitAnswer = async ({ sessionId, user, questionId, cameraFile, screenFil
   }
 
   await session.save();
+
+  await cleanupUploadedFile(cameraFile?.path);
+  await cleanupUploadedFile(screenFile?.path);
 
   const createdAnswer = session.answers[session.answers.length - 1];
   return {

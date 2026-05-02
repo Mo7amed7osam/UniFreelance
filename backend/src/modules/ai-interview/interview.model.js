@@ -18,6 +18,8 @@ const InterviewAnswerSchema = new Schema(
     videoUrl: { type: String, trim: true, default: null },
     cameraVideoUrl: { type: String, trim: true, default: null },
     screenVideoUrl: { type: String, trim: true, default: null },
+    cameraVideoPublicId: { type: String, trim: true, default: null },
+    screenVideoPublicId: { type: String, trim: true, default: null },
     mimeType: { type: String, trim: true },
     transcript: { type: String, default: null },
     processingError: { type: String, default: null },

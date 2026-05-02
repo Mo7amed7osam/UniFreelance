@@ -1,23 +1,9 @@
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-
-const ensureDirectory = (dirPath) => {
-  if (fs.existsSync(dirPath)) {
-    const stat = fs.lstatSync(dirPath);
-    if (!stat.isDirectory()) {
-      const backupPath = `${dirPath}.bak-${Date.now()}`;
-      fs.renameSync(dirPath, backupPath);
-    }
-  }
-  if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
-  }
-};
+const { ensureDirectory, getTopupUploadsDir } = require('../utils/storagePaths');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = path.join(__dirname, '../../private/topups');
+    const uploadPath = getTopupUploadsDir();
     ensureDirectory(uploadPath);
     cb(null, uploadPath);
   },

@@ -3,9 +3,14 @@ const os = require('os');
 const path = require('path');
 const { spawn } = require('child_process');
 const ffmpegStatic = require('ffmpeg-static');
+const { ensureDirectory, getInterviewUploadsDir, getUploadsRoot } = require('../../utils/storagePaths');
+const { uploadInterviewVideo, isCloudinaryConfigured } = require('./cloudinary.service');
 
-const uploadsRoot = path.join(__dirname, '../../uploads');
 const resolvedFfmpegPath = process.env.FFMPEG_PATH || ffmpegStatic;
+const publicUploadsBaseUrl = (process.env.UPLOADS_PUBLIC_BASE_URL || '').trim().replace(/\/$/, '');
+
+ensureDirectory(getUploadsRoot());
+ensureDirectory(getInterviewUploadsDir());
 
 const toPublicUploadUrl = (file) => {
   if (!file?.filename) {
@@ -14,7 +19,13 @@ const toPublicUploadUrl = (file) => {
 
   const normalizedDestination = (file.destination || '').replace(/\\/g, '/');
   const folderName = normalizedDestination.split('/').pop() || 'videos';
-  return `/uploads/${folderName}/${file.filename}`;
+  const relativePath = `/uploads/${folderName}/${file.filename}`;
+
+  if (publicUploadsBaseUrl) {
+    return `${publicUploadsBaseUrl}${relativePath}`;
+  }
+
+  return relativePath;
 };
 
 const toAbsolutePath = (file) => {
@@ -24,7 +35,7 @@ const toAbsolutePath = (file) => {
   if (!file?.filename) {
     return null;
   }
-  return path.join(uploadsRoot, 'videos', file.filename);
+  return path.join(getInterviewUploadsDir(), file.filename);
 };
 
 const readFileAsBase64 = async (filePath) => {
@@ -38,6 +49,14 @@ const cleanupTemporaryArtifacts = async (...artifactPaths) => {
       .filter(Boolean)
       .map((artifactPath) => fs.promises.rm(artifactPath, { force: true, recursive: true }).catch(() => undefined))
   );
+};
+
+const cleanupUploadedFile = async (filePath) => {
+  if (!filePath) {
+    return;
+  }
+
+  await fs.promises.unlink(filePath).catch(() => undefined);
 };
 
 const runFfmpeg = (args) =>
@@ -105,9 +124,36 @@ const extractAudioFromVideo = async (videoPath) => {
   }
 };
 
+const persistInterviewVideo = async ({ filePath, sessionId, questionId, kind }) => {
+  const publicId = `${sessionId}/${questionId}/${kind}`;
+  const folder = process.env.CLOUDINARY_UPLOAD_FOLDER || `unifreelance/interviews/${sessionId}/${questionId}`;
+  const cloudinaryResult = await uploadInterviewVideo({
+    filePath,
+    publicId,
+    folder,
+  });
+
+  if (cloudinaryResult) {
+    await cleanupUploadedFile(filePath);
+    return {
+      url: cloudinaryResult.url,
+      publicId: cloudinaryResult.publicId,
+      storage: 'cloudinary',
+    };
+  }
+
+  return {
+    url: null,
+    publicId: null,
+    storage: isCloudinaryConfigured ? 'cloudinary' : 'local',
+  };
+};
+
 module.exports = {
   cleanupTemporaryArtifacts,
+  cleanupUploadedFile,
   extractAudioFromVideo,
+  persistInterviewVideo,
   readFileAsBase64,
   toAbsolutePath,
   toPublicUploadUrl,
