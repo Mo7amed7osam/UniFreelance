@@ -245,6 +245,10 @@ const evaluateVideoAnswer = async ({ skill, question, filePath, mimeType, origin
 
   try {
     extractedAudio = await extractAudioFromVideo(filePath);
+    if (extractedAudio?.noAudio) {
+      // Uploaded video lacks audio — require manual review with a clear reason
+      return manualReviewEvaluation(extractedAudio.reason, null);
+    }
   } catch (error) {
     return manualReviewEvaluation(error.message, null);
   }
@@ -328,7 +332,7 @@ const evaluateVideoAnswer = async ({ skill, question, filePath, mimeType, origin
       );
     }
   } finally {
-    await cleanupTemporaryArtifacts(extractedAudio?.tempDir);
+    await cleanupTemporaryArtifacts(extractedAudio?.tempDir, extractedAudio?.downloadedTempDir);
   }
 };
 

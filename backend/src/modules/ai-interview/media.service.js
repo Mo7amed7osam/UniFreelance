@@ -2,6 +2,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawn } = require('child_process');
+const axios = require('axios');
 const ffmpegStatic = require('ffmpeg-static');
 const { ensureDirectory, getInterviewUploadsDir, getUploadsRoot } = require('../../utils/storagePaths');
 const { uploadInterviewVideo, isCloudinaryConfigured } = require('./cloudinary.service');
@@ -66,6 +67,7 @@ const runFfmpeg = (args) =>
       return;
     }
 
+    const cmd = `${resolvedFfmpegPath} ${args.join(' ')}`;
     const ffmpegProcess = spawn(resolvedFfmpegPath, args, {
       stdio: ['ignore', 'ignore', 'pipe'],
     });
@@ -77,6 +79,7 @@ const runFfmpeg = (args) =>
     });
 
     ffmpegProcess.on('error', (error) => {
+      console.error('[ffmpeg] process error:', cmd, error && error.message);
       reject(error);
     });
 
@@ -86,7 +89,33 @@ const runFfmpeg = (args) =>
         return;
       }
 
-      reject(new Error(stderr.trim() || `ffmpeg exited with code ${code}`));
+      const message = stderr.trim() || `ffmpeg exited with code ${code}`;
+      // Log command and stderr for easier debugging in production
+      console.error('[ffmpeg] command:', cmd);
+      console.error('[ffmpeg] stderr:', message);
+      reject(new Error(message));
+    });
+  });
+
+// Probe video for audio stream by running ffmpeg -i and inspecting stderr for 'Audio:'
+const probeForAudio = (videoPath) =>
+  new Promise((resolve) => {
+    if (!resolvedFfmpegPath) {
+      resolve({ hasAudio: false, stderr: 'FFmpeg binary not available' });
+      return;
+    }
+
+    const ff = spawn(resolvedFfmpegPath, ['-i', videoPath], { stdio: ['ignore', 'ignore', 'pipe'] });
+    let stderr = '';
+    ff.stderr.on('data', (chunk) => {
+      stderr += chunk.toString();
+    });
+    ff.on('close', () => {
+      const hasAudio = /Audio:|Stream #\d+:\d+.*Audio:/i.test(stderr);
+      resolve({ hasAudio, stderr: stderr.trim() });
+    });
+    ff.on('error', (err) => {
+      resolve({ hasAudio: false, stderr: String(err && err.message) });
     });
   });
 
@@ -95,14 +124,58 @@ const extractAudioFromVideo = async (videoPath) => {
     throw new Error('Video path is required for audio extraction.');
   }
 
+  // If the path looks like a remote URL, download it first
+  let localVideoPath = videoPath;
+  let downloadedTempDir = null;
+
+  if (/^https?:\/\//i.test(videoPath)) {
+    downloadedTempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'unifreelance-ai-video-'));
+    localVideoPath = path.join(downloadedTempDir, 'remote_video');
+    const writer = fs.createWriteStream(localVideoPath);
+    const resp = await axios({ method: 'get', url: videoPath, responseType: 'stream', timeout: 20000 });
+    await new Promise((resolve, reject) => {
+      resp.data.pipe(writer);
+      writer.on('finish', resolve);
+      writer.on('error', reject);
+    });
+  }
+
+  // Ensure the file exists and is readable
+  try {
+    await fs.promises.access(localVideoPath, fs.constants.R_OK);
+  } catch (err) {
+    if (downloadedTempDir) await cleanupTemporaryArtifacts(downloadedTempDir);
+    throw new Error('Video file is not accessible for audio extraction.');
+  }
+
   const tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'unifreelance-ai-audio-'));
   const audioPath = path.join(tempDir, 'answer.wav');
 
+  // Ensure tempDir is writable
   try {
-    await runFfmpeg([
+    await fs.promises.access(tempDir, fs.constants.W_OK);
+  } catch (err) {
+    if (downloadedTempDir) await cleanupTemporaryArtifacts(downloadedTempDir);
+    await cleanupTemporaryArtifacts(tempDir);
+    throw new Error('Temporary directory not writable for audio extraction.');
+  }
+
+  try {
+    // Probe for audio before attempting extraction
+    const probe = await probeForAudio(localVideoPath);
+    if (!probe.hasAudio) {
+      await cleanupTemporaryArtifacts(downloadedTempDir);
+      return {
+        noAudio: true,
+        reason: 'Uploaded camera video does not contain an audio track.',
+        stderr: probe.stderr,
+      };
+    }
+
+    const args = [
       '-y',
       '-i',
-      videoPath,
+      localVideoPath,
       '-vn',
       '-acodec',
       'pcm_s16le',
@@ -111,15 +184,18 @@ const extractAudioFromVideo = async (videoPath) => {
       '-ac',
       '1',
       audioPath,
-    ]);
+    ];
+    console.log('[ffmpeg] running:', `${resolvedFfmpegPath} ${args.join(' ')}`);
+    await runFfmpeg(args);
 
     return {
       audioPath,
       audioMimeType: 'audio/wav',
       tempDir,
+      downloadedTempDir,
     };
   } catch (error) {
-    await cleanupTemporaryArtifacts(tempDir);
+    await cleanupTemporaryArtifacts(tempDir, downloadedTempDir);
     throw new Error(`Audio extraction failed: ${error.message}`);
   }
 };

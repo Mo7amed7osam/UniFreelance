@@ -22,7 +22,7 @@ type RecordedCapture = {
   screenFile: File;
 };
 
-const SHOW_MIC_DEBUG = true;
+const SHOW_MIC_DEBUG = false; // Hide mic debug during live interview
 
 const getErrorMessage = (error: unknown, fallback: string) => {
   if (
@@ -112,7 +112,14 @@ const AIInterviewPage: React.FC = () => {
     onSuccess: async (response) => {
       isUploadingRef.current = false;
       setRetryPayload(null);
-      setStatusError(null);
+      // If server indicated no audio, show friendly message
+      const NO_AUDIO_SERVER_MSG = 'Uploaded camera video does not contain an audio track.';
+      const NO_AUDIO_FRIENDLY = "We couldn't detect audio in your recording. Please make sure your microphone is enabled and try again.";
+      if (response?.evaluation?.processingError === NO_AUDIO_SERVER_MSG) {
+        setStatusError(NO_AUDIO_FRIENDLY);
+      } else {
+        setStatusError(null);
+      }
       await queryClient.invalidateQueries({ queryKey: ['ai-interview', sessionId] });
       if (response.completed) {
         navigate(`/student/ai-interview/${sessionId}/result`);
