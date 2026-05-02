@@ -33,6 +33,7 @@ UniFreelance is a student-focused freelancing marketplace built with a React fro
 
 ```text
 .
+├── ai-interview/             # Auxiliary Python AI interview tooling
 ├── backend/                  # Express API
 ├── frontend/                 # Vite React application
 ├── monitoring/               # Prometheus, Grafana, Loki, Alertmanager config
@@ -41,6 +42,8 @@ UniFreelance is a student-focused freelancing marketplace built with a React fro
 ├── docker-compose.monitoring.yml
 └── *.md                      # Project documentation
 ```
+
+The `ai-interview/` directory contains separate Python-based interview, voice, STT, and camera-monitoring experiments that are not part of the main Docker Compose marketplace stack.
 
 ## Local Development
 
