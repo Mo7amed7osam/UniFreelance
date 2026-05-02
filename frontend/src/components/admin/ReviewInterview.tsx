@@ -114,11 +114,11 @@ const ReviewInterview: React.FC = () => {
                 <div className="space-y-4">
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="muted-panel rounded-2xl p-4">
-                      <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">AI score</p>
+                      <p className="label-muted">AI score</p>
                       <p className="mt-2 text-lg font-semibold text-ink-900 dark:text-white">{response.score ?? 'Pending manual review'}</p>
                     </div>
                     <div className="muted-panel rounded-2xl p-4">
-                      <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">AI recommendation</p>
+                      <p className="label-muted">AI recommendation</p>
                       <div className="mt-2">
                         <Badge variant={response.recommendation === 'pass' ? 'success' : response.recommendation === 'fail' ? 'danger' : 'warning'}>
                           {response.recommendation}
@@ -127,14 +127,14 @@ const ReviewInterview: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-dashed border-ink-200 p-4 text-sm text-ink-600 dark:border-white/10 dark:text-ink-300">
+                  <div className="rounded-2xl border border-dashed border-ink-200 bg-ink-50/80 p-4 text-sm text-ink-700 dark:border-white/10 dark:bg-white/5 dark:text-ink-200">
                     {response.feedback}
                   </div>
 
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
                       <p className="text-sm font-semibold text-ink-900 dark:text-white">Strengths</p>
-                      <ul className="space-y-2 text-sm text-ink-500 dark:text-ink-300">
+                      <ul className="space-y-2 text-sm text-ink-600 dark:text-ink-200">
                         {(response.strengths?.length ? response.strengths : ['None captured.']).map((item: string) => (
                           <li key={item}>• {item}</li>
                         ))}
@@ -142,7 +142,7 @@ const ReviewInterview: React.FC = () => {
                     </div>
                     <div className="space-y-2">
                       <p className="text-sm font-semibold text-ink-900 dark:text-white">Weaknesses</p>
-                      <ul className="space-y-2 text-sm text-ink-500 dark:text-ink-300">
+                      <ul className="space-y-2 text-sm text-ink-600 dark:text-ink-200">
                         {(response.weaknesses?.length ? response.weaknesses : ['None captured.']).map((item: string) => (
                           <li key={item}>• {item}</li>
                         ))}
@@ -152,7 +152,7 @@ const ReviewInterview: React.FC = () => {
 
                   <div className="space-y-2">
                     <p className="text-sm font-semibold text-ink-900 dark:text-white">Transcript</p>
-                    <div className="rounded-2xl border border-dashed border-ink-200 p-4 text-sm text-ink-600 dark:border-white/10 dark:text-ink-300">
+                    <div className="rounded-2xl border border-dashed border-ink-200 bg-ink-50/80 p-4 text-sm text-ink-700 dark:border-white/10 dark:bg-white/5 dark:text-ink-200">
                       {response.transcript || 'Transcript unavailable. Manual review required.'}
                     </div>
                   </div>

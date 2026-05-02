@@ -382,7 +382,7 @@ const AIInterviewPage: React.FC = () => {
     return (
       <Card>
         <CardContent className="space-y-4 py-8">
-          <p className="text-sm text-ink-500 dark:text-ink-400">Interview session not found.</p>
+          <p className="text-sm text-ink-600 dark:text-ink-300">Interview session not found.</p>
           <Button type="button" variant="ghost" onClick={handleBackToSkills}>
             Back to skills
           </Button>
@@ -395,7 +395,7 @@ const AIInterviewPage: React.FC = () => {
     return (
       <Card>
         <CardContent className="space-y-4 py-8">
-          <p className="text-sm text-ink-500 dark:text-ink-400">
+          <p className="text-sm text-ink-600 dark:text-ink-300">
             Interview already completed. Open result page.
           </p>
           <Button type="button" onClick={() => navigate(`/student/ai-interview/${session.sessionId}/result`)}>
@@ -410,7 +410,7 @@ const AIInterviewPage: React.FC = () => {
     return (
       <Card>
         <CardContent className="space-y-4 py-8">
-          <p className="text-sm text-ink-500 dark:text-ink-400">No interview questions are available.</p>
+          <p className="text-sm text-ink-600 dark:text-ink-300">No interview questions are available.</p>
           <Button type="button" variant="ghost" onClick={handleBackToSkills}>
             Back to skills
           </Button>
@@ -444,13 +444,13 @@ const AIInterviewPage: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <Badge variant="brand" className="border-white/10 bg-white/8 text-white">
+              <Badge variant="brand" className="border-white/14 bg-white/14 text-white">
                 {session.answers.length + 1} / {session.questions.length}
               </Badge>
               <Button
                 type="button"
                 variant="ghost"
-                className="border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+                className="border border-white/14 bg-white/12 text-white hover:bg-white/18 hover:text-white"
                 onClick={handleBackToSkills}
               >
                 Leave
@@ -496,7 +496,7 @@ const AIInterviewPage: React.FC = () => {
                   />
                 </div>
 
-                <div className="mt-3 space-y-1 text-xs text-white/72">
+                <div className="mt-3 space-y-1 text-xs text-white/84">
                   <p>State: {micDebugState}</p>
                   <p>Camera: {cameraReady ? 'ready' : 'offline'}</p>
                   <p>Screen: {screenReady ? 'ready' : 'offline'}</p>
@@ -551,7 +551,7 @@ const AIInterviewPage: React.FC = () => {
                   {canReplayQuestion ? (
                     <button
                       type="button"
-                      className="text-white/72 underline decoration-white/25 underline-offset-4 transition hover:text-white"
+                      className="text-white/84 underline decoration-white/25 underline-offset-4 transition hover:text-white"
                       onClick={handleReplayQuestion}
                     >
                       Replay question
@@ -561,7 +561,7 @@ const AIInterviewPage: React.FC = () => {
                   {retryPayload ? (
                     <button
                       type="button"
-                      className="text-white/72 underline decoration-white/25 underline-offset-4 transition hover:text-white"
+                      className="text-white/84 underline decoration-white/25 underline-offset-4 transition hover:text-white"
                       onClick={handleRetryUpload}
                       disabled={answerMutation.isPending}
                     >
@@ -572,7 +572,7 @@ const AIInterviewPage: React.FC = () => {
                   {statusError ? (
                     <button
                       type="button"
-                      className="text-white/72 underline decoration-white/25 underline-offset-4 transition hover:text-white"
+                      className="text-white/84 underline decoration-white/25 underline-offset-4 transition hover:text-white"
                       onClick={handleRestartAnswer}
                       disabled={answerMutation.isPending || !cameraReady || !micReady || !screenReady}
                     >
@@ -583,7 +583,7 @@ const AIInterviewPage: React.FC = () => {
                   {statusError && (!cameraReady || !micReady || !screenReady) ? (
                     <button
                       type="button"
-                      className="text-white/72 underline decoration-white/25 underline-offset-4 transition hover:text-white"
+                      className="text-white/84 underline decoration-white/25 underline-offset-4 transition hover:text-white"
                       onClick={handleReturnToSetup}
                     >
                       Reconnect setup

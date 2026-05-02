@@ -107,11 +107,11 @@ const StudentProfile: React.FC = () => {
       <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
         <div className="glass-panel space-y-6 p-6">
           <div className="flex items-center gap-4">
-            <div className="h-24 w-24 overflow-hidden rounded-3xl border border-ink-200 bg-ink-50 dark:border-white/10 dark:bg-white/5">
+            <div className="h-24 w-24 overflow-hidden rounded-3xl border border-ink-200 bg-ink-50 dark:border-white/10 dark:bg-white/6">
               {photoUrl ? (
                 <img src={photoUrl} alt={profile.name} className="h-full w-full object-cover" />
               ) : (
-                <div className="flex h-full w-full items-center justify-center text-xs text-ink-400 dark:text-ink-300">No photo</div>
+                <div className="flex h-full w-full items-center justify-center text-xs text-ink-500 dark:text-ink-300">No photo</div>
               )}
             </div>
             <div className="space-y-3">
@@ -129,7 +129,7 @@ const StudentProfile: React.FC = () => {
 
           <div className="grid gap-3">
             <div className="muted-panel rounded-2xl p-4">
-              <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">Verified skills</p>
+              <p className="label-muted">Verified skills</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {profile.verifiedSkills?.length ? (
                   profile.verifiedSkills.map((s: any) => (
@@ -144,7 +144,7 @@ const StudentProfile: React.FC = () => {
             </div>
 
             <div className="muted-panel rounded-2xl p-4">
-              <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">Curriculum vitae</p>
+              <p className="label-muted">Curriculum vitae</p>
               <div className="mt-3 flex flex-wrap items-center gap-3">
                 {cvUrl ? (
                   <a href={cvUrl} target="_blank" rel="noreferrer" className="text-sm font-semibold text-brand-600 dark:text-brand-200">

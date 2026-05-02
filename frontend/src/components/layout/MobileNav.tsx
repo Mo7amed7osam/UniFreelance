@@ -15,7 +15,7 @@ export const MobileNav = () => {
 
   return (
     <nav
-      className="fixed bottom-3 left-3 right-3 z-30 rounded-[1.75rem] border border-white/70 bg-white/88 p-2 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/88 md:hidden"
+      className="fixed bottom-3 left-3 right-3 z-30 rounded-[1.75rem] border border-ink-200 bg-white/95 p-2 shadow-card backdrop-blur-xl dark:border-ink-dark-border dark:bg-ink-dark-surface/92 md:hidden"
       aria-label="Primary"
     >
       <div className="grid grid-cols-3 gap-2">
@@ -28,7 +28,7 @@ export const MobileNav = () => {
               className={({ isActive }) =>
                 cn(
                   'group flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 text-center text-[11px] font-semibold leading-tight transition-all duration-200',
-                  'text-ink-500 hover:bg-brand-50 hover:text-ink-900 dark:text-ink-300 dark:hover:bg-white/8 dark:hover:text-white',
+                  'text-ink-700 hover:bg-brand-50 hover:text-ink-900 dark:text-ink-200 dark:hover:bg-white/8 dark:hover:text-white',
                   isActive && 'bg-gradient-to-r from-brand-600 via-brand-500 to-accent-500 text-white shadow-soft hover:text-white'
                 )
               }

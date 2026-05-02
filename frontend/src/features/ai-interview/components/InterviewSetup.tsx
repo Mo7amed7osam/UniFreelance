@@ -31,7 +31,7 @@ const StatusPill = ({ label, ready }: { label: string; ready: boolean }) => (
       'inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em]',
       ready
         ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200'
-        : 'border-ink-200 bg-white/70 text-ink-500 dark:border-white/10 dark:bg-white/5 dark:text-ink-300',
+        : 'border-ink-200 bg-white/92 text-ink-600 dark:border-white/10 dark:bg-white/8 dark:text-ink-200',
     ].join(' ')}
   >
     <span className={['h-2 w-2 rounded-full', ready ? 'bg-emerald-500' : 'bg-ink-400'].join(' ')} />
@@ -69,7 +69,7 @@ export const InterviewSetup: React.FC<InterviewSetupProps> = ({
 
   return (
     <div className="space-y-8">
-      <section className="overflow-hidden rounded-[2rem] border border-white/70 bg-white/82 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/82">
+      <section className="overflow-hidden rounded-[2rem] border border-ink-200 bg-white/95 shadow-card backdrop-blur-xl dark:border-ink-dark-border dark:bg-ink-dark-surface/90">
         <div className="grid gap-8 p-6 lg:grid-cols-[1.05fr_0.95fr] lg:p-8">
           <div className="space-y-6">
             <div className="space-y-3">
@@ -114,7 +114,7 @@ export const InterviewSetup: React.FC<InterviewSetupProps> = ({
                 return (
                   <div key={step.key} className="muted-panel flex flex-col gap-4 rounded-3xl p-5 md:flex-row md:items-center md:justify-between">
                     <div className="flex items-start gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-400/10 dark:text-brand-200">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-100 text-brand-700 dark:bg-brand-400/12 dark:text-brand-100">
                         <step.icon size={20} />
                       </div>
                       <div className="space-y-1">
@@ -122,7 +122,7 @@ export const InterviewSetup: React.FC<InterviewSetupProps> = ({
                           <p className="text-sm font-semibold text-ink-900 dark:text-white">{index + 1}. {step.title}</p>
                           {ready ? <CheckCircle2 size={16} className="text-emerald-500" /> : null}
                         </div>
-                        <p className="text-sm text-ink-500 dark:text-ink-300">{step.body}</p>
+                        <p className="text-sm text-ink-600 dark:text-ink-200">{step.body}</p>
                       </div>
                     </div>
 
@@ -134,13 +134,13 @@ export const InterviewSetup: React.FC<InterviewSetupProps> = ({
               })}
             </div>
 
-            <div className="rounded-3xl border border-ink-200 bg-ink-50/80 p-5 dark:border-white/10 dark:bg-white/5">
+            <div className="rounded-3xl border border-ink-200 bg-ink-50/90 p-5 dark:border-white/10 dark:bg-white/6">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold text-ink-900 dark:text-white">Microphone activity</p>
                   <p className="text-xs text-ink-500 dark:text-ink-300">A healthy signal means the meter should rise while you speak.</p>
                 </div>
-                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-400 dark:text-ink-300">{micReady ? 'Ready' : 'Waiting'}</span>
+                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-500 dark:text-ink-300">{micReady ? 'Ready' : 'Waiting'}</span>
               </div>
 
               <div className="mt-4 flex items-end gap-1">
@@ -178,7 +178,7 @@ export const InterviewSetup: React.FC<InterviewSetupProps> = ({
 
             <div className="rounded-[1.75rem] border border-brand-200 bg-gradient-to-br from-brand-50 via-white to-accent-50 p-6 dark:border-brand-400/20 dark:from-brand-400/10 dark:via-ink-dark-surface dark:to-accent-400/10">
               <p className="page-eyebrow">Before you enter</p>
-              <ul className="mt-4 space-y-3 text-sm text-ink-600 dark:text-ink-300">
+              <ul className="mt-4 space-y-3 text-sm text-ink-700 dark:text-ink-200">
                 <li>Keep your face visible and your microphone unobstructed.</li>
                 <li>Share your entire screen and avoid switching away during the session.</li>
                 <li>When ready, Gravis will continue with a polished live interview experience.</li>

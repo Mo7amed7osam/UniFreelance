@@ -61,12 +61,12 @@ const SkillVerification: React.FC = () => {
               Icon: Sparkles,
             },
           ].map(({ title, body, Icon }) => (
-            <div key={title} className="rounded-2xl border border-white/10 bg-white/8 p-5">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10">
+            <div key={title} className="rounded-2xl border border-white/16 bg-white/12 p-5 shadow-soft">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/16">
                 <Icon size={20} />
               </div>
               <p className="mt-4 text-lg font-semibold text-white">{title}</p>
-              <p className="mt-2 text-sm leading-6 text-white/72">{body}</p>
+              <p className="mt-2 text-sm leading-6 text-white/84">{body}</p>
             </div>
           ))}
         </CardContent>
@@ -89,7 +89,7 @@ const SkillVerification: React.FC = () => {
                   <CardTitle className="text-2xl">{skill.name}</CardTitle>
                   <Badge variant="brand">AI interview</Badge>
                 </div>
-                <p className="text-sm text-ink-500 dark:text-ink-300">
+                <p className="text-sm text-ink-600 dark:text-ink-200">
                   {skill.description || 'No description provided.'}
                 </p>
               </CardHeader>
@@ -97,11 +97,11 @@ const SkillVerification: React.FC = () => {
               <CardContent className="space-y-5 p-6 pt-0">
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="muted-panel rounded-2xl p-3">
-                    <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">Interview mode</p>
+                    <p className="label-muted">Interview mode</p>
                     <p className="mt-2 text-sm font-semibold text-ink-900 dark:text-white">Live with Gravis</p>
                   </div>
                   <div className="muted-panel rounded-2xl p-3">
-                    <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">Outcome</p>
+                    <p className="label-muted">Outcome</p>
                     <p className="mt-2 text-sm font-semibold text-ink-900 dark:text-white">Verified skill badge</p>
                   </div>
                 </div>

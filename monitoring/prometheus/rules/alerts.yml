@@ -32,7 +32,8 @@ groups:
           severity: warning
         annotations:
           summary: Backend 5xx error rate is high
-          description: More than 5% of backend responses are failing with 5xx over the last 10 minutes.
+          description: More than 5% of backend responses are failing with 5xx over the
+            last 10 minutes.
 
       - alert: BackendHighLatencyP95
         expr: |
@@ -54,4 +55,5 @@ groups:
           severity: critical
         annotations:
           summary: MongoDB connection is not ready
-          description: Mongoose is reporting connection state {{ $value }} instead of connected.
+          description: Mongoose is reporting connection state {{ $value }} instead of
+            connected.

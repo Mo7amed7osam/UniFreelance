@@ -118,11 +118,11 @@ const ContractDetails: React.FC = () => {
         <CardContent className="space-y-5 p-6">
           <div className="grid gap-4 md:grid-cols-3">
             <div className="muted-panel rounded-2xl p-4">
-              <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">Agreed budget</p>
+              <p className="label-muted">Agreed budget</p>
               <p className="mt-2 text-lg font-semibold text-ink-900 dark:text-white">${contract.agreedBudget}</p>
             </div>
             <div className="muted-panel rounded-2xl p-4 md:col-span-2">
-              <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">Progress</p>
+              <p className="label-muted">Progress</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {steps.map((step) => (
                   <span
@@ -130,8 +130,8 @@ const ContractDetails: React.FC = () => {
                     className={[
                       'rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em]',
                       step.active
-                        ? 'bg-brand-50 text-brand-700 dark:bg-brand-400/10 dark:text-brand-200'
-                        : 'bg-ink-100 text-ink-400 dark:bg-white/5 dark:text-ink-300',
+                        ? 'bg-brand-50 text-brand-800 dark:bg-brand-400/12 dark:text-brand-100'
+                        : 'bg-ink-100 text-ink-600 dark:bg-white/8 dark:text-ink-200',
                     ].join(' ')}
                   >
                     {step.label}
@@ -162,7 +162,7 @@ const ContractDetails: React.FC = () => {
                       ))}
                     </div>
                   ) : null}
-                  <p className="mt-3 text-xs text-ink-400 dark:text-ink-300">
+                  <p className="mt-3 text-xs text-ink-500 dark:text-ink-300">
                     {submission.createdAt ? new Date(submission.createdAt).toLocaleString() : ''}
                   </p>
                 </div>

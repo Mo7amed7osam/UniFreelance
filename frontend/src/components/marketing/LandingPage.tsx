@@ -78,7 +78,7 @@ const LandingPage: React.FC = () => {
             <img src={logo} alt="Shaghalny" className="h-11 w-11 rounded-2xl object-contain" />
             <div>
               <p className="text-lg font-semibold text-ink-900 dark:text-white">Shaghalny</p>
-              <p className="text-xs uppercase tracking-[0.22em] text-ink-400 dark:text-ink-300">Student marketplace</p>
+              <p className="text-xs uppercase tracking-[0.22em] text-ink-500 dark:text-ink-300">Student marketplace</p>
             </div>
           </Link>
 
@@ -129,7 +129,7 @@ const LandingPage: React.FC = () => {
               {trustStats.map((item) => (
                 <div key={item.label} className="muted-panel rounded-2xl p-4">
                   <p className="text-sm font-semibold text-ink-900 dark:text-white">{item.value}</p>
-                  <p className="mt-1 text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">{item.label}</p>
+                  <p className="mt-1 text-xs uppercase tracking-[0.18em] text-ink-500 dark:text-ink-300">{item.label}</p>
                 </div>
               ))}
             </div>
@@ -140,14 +140,14 @@ const LandingPage: React.FC = () => {
               <div className="rounded-[1.75rem] bg-gradient-to-br from-ink-950 via-brand-900 to-accent-900 p-6 text-white shadow-glass">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.18em] text-white/60">AI verification</p>
+                    <p className="text-xs uppercase tracking-[0.18em] text-white/72">AI verification</p>
                     <p className="mt-2 text-2xl font-semibold text-white">Gravis interview layer</p>
                   </div>
                   <div className="rounded-2xl border border-white/15 bg-white/10 p-3">
                     <Video size={24} />
                   </div>
                 </div>
-                <p className="mt-4 text-sm leading-6 text-white/72">
+                <p className="mt-4 text-sm leading-6 text-white/84">
                   Students complete structured interviews before clients evaluate proposals, reducing noise and improving trust.
                 </p>
               </div>
@@ -155,12 +155,12 @@ const LandingPage: React.FC = () => {
               <div className="grid gap-3">
                 {productPillars.map((item) => (
                   <div key={item.title} className="muted-panel flex items-start gap-4 rounded-2xl p-4">
-                    <div className="rounded-2xl bg-brand-50 p-3 text-brand-600 dark:bg-brand-400/10 dark:text-brand-200">
+                    <div className="rounded-2xl bg-brand-100 p-3 text-brand-700 dark:bg-brand-400/12 dark:text-brand-100">
                       <item.icon size={20} />
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm font-semibold text-ink-900 dark:text-white">{item.title}</p>
-                      <p className="text-sm text-ink-500 dark:text-ink-300">{item.description}</p>
+                      <p className="text-sm text-ink-600 dark:text-ink-200">{item.description}</p>
                     </div>
                   </div>
                 ))}
@@ -206,7 +206,7 @@ const LandingPage: React.FC = () => {
                 ].map(([title, body]) => (
                   <div key={title} className="muted-panel rounded-2xl p-4">
                     <p className="text-sm font-semibold text-ink-900 dark:text-white">{title}</p>
-                    <p className="mt-2 text-sm text-ink-500 dark:text-ink-300">{body}</p>
+                    <p className="mt-2 text-sm text-ink-600 dark:text-ink-200">{body}</p>
                   </div>
                 ))}
               </div>
@@ -222,7 +222,7 @@ const LandingPage: React.FC = () => {
                   Production-ready hiring experience
                 </Badge>
                 <h2 className="text-4xl font-semibold text-white">Start with the right workflow for your role.</h2>
-                <p className="max-w-2xl text-base leading-7 text-white/72">
+                <p className="max-w-2xl text-base leading-7 text-white/84">
                   Whether you are a student proving capability or a client hiring verified talent, Shaghalny keeps the experience clear and dependable.
                 </p>
               </div>

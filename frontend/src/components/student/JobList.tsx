@@ -116,11 +116,11 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
       <div className="glass-panel flex flex-col gap-4 px-5 py-5 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-lg font-semibold text-ink-900 dark:text-white">Open opportunities</p>
-          <p className="text-sm text-ink-500 dark:text-ink-300">Search by title, skill, or project description.</p>
+          <p className="text-sm text-ink-600 dark:text-ink-200">Search by title, skill, or project description.</p>
         </div>
 
-        <label className="flex min-h-11 w-full items-center gap-3 rounded-2xl border border-white/70 bg-white/80 px-4 shadow-soft dark:border-white/10 dark:bg-white/5 md:max-w-sm">
-          <Search size={16} className="text-ink-400 dark:text-ink-300" />
+        <label className="flex min-h-11 w-full items-center gap-3 rounded-2xl border border-ink-200 bg-white/95 px-4 shadow-soft dark:border-ink-dark-border dark:bg-ink-dark-surface/88 md:max-w-sm">
+          <Search size={16} className="text-ink-500 dark:text-ink-300" />
           <Input
             placeholder="Search jobs"
             value={search}
@@ -164,7 +164,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="space-y-2">
                     <CardTitle className="text-2xl">{job.title}</CardTitle>
-                    <p className="text-sm text-ink-500 dark:text-ink-300">
+                    <p className="text-sm text-ink-600 dark:text-ink-200">
                       {job.description}
                     </p>
                   </div>
@@ -183,17 +183,17 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
               <CardContent className="space-y-5 p-6 pt-0">
                 <div className="grid gap-3 sm:grid-cols-3">
                   <div className="muted-panel rounded-2xl p-3">
-                    <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">Budget</p>
+                    <p className="label-muted">Budget</p>
                     <p className="mt-2 text-sm font-semibold text-ink-900 dark:text-white">
                       {job.budgetMin !== undefined || job.budgetMax !== undefined ? `${job.budgetMin ?? '—'} - ${job.budgetMax ?? '—'}` : 'Flexible'}
                     </p>
                   </div>
                   <div className="muted-panel rounded-2xl p-3">
-                    <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">Timeline</p>
+                    <p className="label-muted">Timeline</p>
                     <p className="mt-2 text-sm font-semibold text-ink-900 dark:text-white">{job.duration || 'Discuss on approval'}</p>
                   </div>
                   <div className="muted-panel rounded-2xl p-3">
-                    <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">Status</p>
+                    <p className="label-muted">Status</p>
                     <p className="mt-2 text-sm font-semibold text-ink-900 dark:text-white">{hasSubmitted ? 'Proposal sent' : 'Ready to apply'}</p>
                   </div>
                 </div>

@@ -8,17 +8,17 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          'border-ink-200 bg-white/80 text-ink-700 dark:border-ink-dark-border dark:bg-ink-dark-surface/85 dark:text-ink-200',
+          'border-ink-300 bg-white/96 text-ink-800 shadow-soft dark:border-ink-dark-border dark:bg-ink-dark-surface/92 dark:text-ink-100',
         subtle:
-          'border-transparent bg-ink-100 text-ink-600 dark:bg-white/10 dark:text-ink-200',
+          'border-ink-200 bg-ink-100 text-ink-700 dark:border-white/10 dark:bg-white/10 dark:text-ink-100',
         success:
-          'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200',
+          'border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-500/24 dark:bg-emerald-500/12 dark:text-emerald-100',
         warning:
-          'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200',
+          'border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-500/24 dark:bg-amber-500/12 dark:text-amber-100',
         danger:
-          'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-200',
+          'border-rose-300 bg-rose-50 text-rose-800 dark:border-rose-500/24 dark:bg-rose-500/12 dark:text-rose-100',
         brand:
-          'border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-400/25 dark:bg-brand-400/10 dark:text-brand-200',
+          'border-brand-300 bg-brand-50 text-brand-800 dark:border-brand-400/28 dark:bg-brand-400/14 dark:text-brand-100',
       },
     },
     defaultVariants: {

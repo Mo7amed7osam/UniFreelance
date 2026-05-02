@@ -10,8 +10,8 @@
     --page-gradient:
       radial-gradient(circle at top left, rgba(59, 130, 246, 0.16), transparent 28%),
       radial-gradient(circle at top right, rgba(6, 182, 212, 0.12), transparent 24%),
-      linear-gradient(180deg, #f8fbff 0%, #f7fafc 42%, #eef5ff 100%);
-    --surface-border: rgba(148, 163, 184, 0.18);
+      linear-gradient(180deg, #f8fbff 0%, #f5f8fd 42%, #eaf1fb 100%);
+    --surface-border: rgba(115, 133, 156, 0.28);
   }
 
   .dark {
@@ -20,7 +20,7 @@
       radial-gradient(circle at top left, rgba(56, 189, 248, 0.14), transparent 28%),
       radial-gradient(circle at top right, rgba(59, 130, 246, 0.18), transparent 22%),
       linear-gradient(180deg, #08111f 0%, #0b1424 56%, #0f1b2d 100%);
-    --surface-border: rgba(140, 163, 191, 0.18);
+    --surface-border: rgba(159, 177, 201, 0.24);
   }
 
   * {
@@ -52,7 +52,7 @@
   }
 
   p {
-    @apply leading-7 text-ink-600 dark:text-ink-300;
+    @apply leading-7 text-ink-600 dark:text-ink-200;
   }
 
   a {
@@ -80,20 +80,21 @@
   }
 
   .page-copy {
-    @apply max-w-3xl text-base text-ink-500 dark:text-ink-300;
+    @apply max-w-3xl text-base text-ink-600 dark:text-ink-200;
   }
 
   .page-eyebrow {
-    @apply text-xs font-semibold uppercase tracking-[0.26em] text-brand-600 dark:text-brand-300;
+    @apply text-xs font-semibold uppercase tracking-[0.26em] text-brand-700 dark:text-brand-300;
   }
 
   .glass-panel {
-    @apply rounded-3xl border border-white/70 shadow-card backdrop-blur-xl dark:border-white/10;
-    background-color: rgba(255, 255, 255, 0.8);
+    @apply rounded-3xl border shadow-card backdrop-blur-xl;
+    border-color: var(--surface-border);
+    background-color: rgba(255, 255, 255, 0.94);
   }
 
   .dark .glass-panel {
-    background-color: rgba(15, 27, 45, 0.8);
+    background-color: rgba(16, 32, 58, 0.92);
   }
 
   .card-surface {
@@ -101,12 +102,12 @@
   }
 
   .muted-panel {
-    @apply rounded-2xl border border-ink-200/80 backdrop-blur-sm dark:border-ink-dark-border;
-    background-color: rgba(255, 255, 255, 0.65);
+    @apply rounded-2xl border border-ink-200 shadow-soft backdrop-blur-sm dark:border-ink-dark-border;
+    background-color: rgba(248, 250, 252, 0.96);
   }
 
   .dark .muted-panel {
-    background-color: rgba(15, 27, 45, 0.65);
+    background-color: rgba(12, 25, 45, 0.86);
   }
 
   .kpi-card {
@@ -125,7 +126,27 @@
   }
 
   .surface-ring {
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.68);
+  }
+
+  .text-ui-primary {
+    @apply text-ink-900 dark:text-white;
+  }
+
+  .text-ui-secondary {
+    @apply text-ink-600 dark:text-ink-200;
+  }
+
+  .text-ui-muted {
+    @apply text-ink-500 dark:text-ink-300;
+  }
+
+  .text-ui-disabled {
+    @apply text-ink-400 dark:text-ink-dark-muted;
+  }
+
+  .label-muted {
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-ink-500 dark:text-ink-300;
   }
 }
 

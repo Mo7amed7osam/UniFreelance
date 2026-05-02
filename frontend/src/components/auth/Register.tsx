@@ -138,13 +138,13 @@ const Register: React.FC = () => {
             <div className="grid gap-4">
               {roleCards.map((item) => (
                 <div key={item.title} className="muted-panel flex items-start gap-4 rounded-2xl p-4">
-                  <div className="rounded-2xl bg-brand-50 p-3 text-brand-600 dark:bg-brand-400/10 dark:text-brand-200">
-                    <item.icon size={20} />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-semibold text-ink-900 dark:text-white">{item.title}</p>
-                    <p className="text-sm text-ink-500 dark:text-ink-300">{item.body}</p>
-                  </div>
+                    <div className="rounded-2xl bg-brand-100 p-3 text-brand-700 dark:bg-brand-400/12 dark:text-brand-100">
+                      <item.icon size={20} />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold text-ink-900 dark:text-white">{item.title}</p>
+                      <p className="text-sm text-ink-600 dark:text-ink-200">{item.body}</p>
+                    </div>
                 </div>
               ))}
             </div>

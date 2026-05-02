@@ -46,7 +46,7 @@ export const CardDescription = ({
 }: React.HTMLAttributes<HTMLParagraphElement>) => (
   <p
     className={cn(
-      'text-sm leading-6 text-ink-500 dark:text-ink-300',
+      'text-sm leading-6 text-ink-600 dark:text-ink-200',
       className
     )}
     {...props}

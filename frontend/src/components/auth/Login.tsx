@@ -63,7 +63,7 @@ const Login: React.FC = () => {
                 <h1 className="text-balance text-5xl font-semibold text-white">
                   Freelancing infrastructure built for students.
                 </h1>
-                <p className="max-w-xl text-base leading-7 text-white/72">
+                <p className="max-w-xl text-base leading-7 text-white/84">
                   Sign in to manage proposals, verified interviews, contracts, and hiring workflows from one polished workspace.
                 </p>
               </div>
@@ -71,11 +71,11 @@ const Login: React.FC = () => {
 
             <div className="space-y-4">
               {highlights.map((item) => (
-                <div key={item.text} className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/6 p-4">
+                <div key={item.text} className="flex items-start gap-3 rounded-2xl border border-white/14 bg-white/12 p-4">
                   <div className="rounded-2xl bg-white/10 p-3 text-white">
                     <item.icon size={18} />
                   </div>
-                  <p className="text-sm leading-6 text-white/78">{item.text}</p>
+                  <p className="text-sm leading-6 text-white/86">{item.text}</p>
                 </div>
               ))}
             </div>
@@ -114,9 +114,9 @@ const Login: React.FC = () => {
                 </Button>
               </form>
 
-              <div className="rounded-2xl border border-brand-100 bg-brand-50/70 p-4 dark:border-brand-400/15 dark:bg-brand-400/10">
+              <div className="rounded-2xl border border-brand-200 bg-brand-50/90 p-4 dark:border-brand-400/18 dark:bg-brand-400/12">
                 <p className="text-sm font-semibold text-ink-900 dark:text-white">New to the platform?</p>
-                <p className="mt-1 text-sm text-ink-500 dark:text-ink-300">
+                <p className="mt-1 text-sm text-ink-600 dark:text-ink-200">
                   Create an account as a student or client and start using the same verified marketplace workflow.
                 </p>
               </div>

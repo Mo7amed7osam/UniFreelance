@@ -153,11 +153,11 @@ const ViewProposals: React.FC = () => {
 
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="muted-panel rounded-2xl p-3">
-                      <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">Job</p>
+                      <p className="label-muted">Job</p>
                       <p className="mt-2 text-sm font-semibold text-ink-900 dark:text-white">{proposal.jobId?.title || 'Job'}</p>
                     </div>
                     <div className="muted-panel rounded-2xl p-3">
-                      <p className="text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">Proposed budget</p>
+                      <p className="label-muted">Proposed budget</p>
                       <p className="mt-2 text-sm font-semibold text-ink-900 dark:text-white">
                         {proposal.proposedBudget ? `$${proposal.proposedBudget}` : 'Not specified'}
                       </p>
@@ -180,7 +180,7 @@ const ViewProposals: React.FC = () => {
                   </div>
 
                   {proposal.details ? (
-                    <div className="rounded-2xl border border-dashed border-ink-200 p-4 text-sm text-ink-600 dark:border-white/10 dark:text-ink-300">
+                    <div className="rounded-2xl border border-dashed border-ink-200 bg-ink-50/80 p-4 text-sm text-ink-700 dark:border-white/10 dark:bg-white/5 dark:text-ink-200">
                       {proposal.details}
                     </div>
                   ) : null}

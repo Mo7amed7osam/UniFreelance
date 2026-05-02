@@ -14,11 +14,11 @@ export const buttonVariants = cva(
         secondary:
           'bg-ink-900 text-white shadow-soft hover:-translate-y-0.5 hover:bg-ink-800 dark:bg-white dark:text-ink-900 dark:hover:bg-ink-100',
         soft:
-          'border border-brand-200 bg-brand-50 text-brand-700 hover:border-brand-300 hover:bg-brand-100 dark:border-brand-400/20 dark:bg-brand-400/10 dark:text-brand-200 dark:hover:bg-brand-400/15',
+          'border border-brand-300 bg-brand-50 text-brand-800 shadow-soft hover:border-brand-400 hover:bg-brand-100 dark:border-brand-400/24 dark:bg-brand-400/12 dark:text-brand-100 dark:hover:bg-brand-400/18',
         outline:
-          'border border-ink-200 bg-white/75 text-ink-700 shadow-soft hover:-translate-y-0.5 hover:border-brand-200 hover:bg-brand-50 dark:border-ink-dark-border dark:bg-ink-dark-surface/85 dark:text-ink-100 dark:hover:border-brand-400/30 dark:hover:bg-brand-400/10',
+          'border border-ink-300 bg-white/96 text-ink-800 shadow-soft hover:-translate-y-0.5 hover:border-brand-300 hover:bg-brand-50 dark:border-ink-dark-border dark:bg-ink-dark-surface/92 dark:text-ink-100 dark:hover:border-brand-400/30 dark:hover:bg-brand-400/10',
         ghost:
-          'bg-transparent text-ink-700 hover:bg-white/70 hover:text-ink-900 dark:text-ink-200 dark:hover:bg-white/10 dark:hover:text-white',
+          'bg-transparent text-ink-700 hover:bg-ink-100 hover:text-ink-900 dark:text-ink-200 dark:hover:bg-white/10 dark:hover:text-white',
         danger:
           'bg-rose-600 text-white shadow-soft hover:-translate-y-0.5 hover:bg-rose-700',
         success:
