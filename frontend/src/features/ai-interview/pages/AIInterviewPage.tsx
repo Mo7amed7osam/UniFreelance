@@ -444,7 +444,7 @@ const AIInterviewPage: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <Badge variant="brand" className="border-white/14 bg-white/14 text-white">
+              <Badge variant="brand" className="border-white/20 bg-white/18 text-white">
                 {session.answers.length + 1} / {session.questions.length}
               </Badge>
               <Button

@@ -3,22 +3,22 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const badgeVariants = cva(
-  'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] transition',
+  'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] shadow-soft backdrop-blur-sm transition',
   {
     variants: {
       variant: {
         default:
           'border-ink-300 bg-white/96 text-ink-800 shadow-soft dark:border-ink-dark-border dark:bg-ink-dark-surface/92 dark:text-ink-100',
         subtle:
-          'border-ink-200 bg-ink-100 text-ink-700 dark:border-white/10 dark:bg-white/10 dark:text-ink-100',
+          'border-ink-200 bg-ink-100 text-ink-800 dark:border-white/12 dark:bg-white/12 dark:text-ink-100',
         success:
-          'border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-500/24 dark:bg-emerald-500/12 dark:text-emerald-100',
+          'border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-500/28 dark:bg-emerald-500/16 dark:text-emerald-50',
         warning:
-          'border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-500/24 dark:bg-amber-500/12 dark:text-amber-100',
+          'border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-500/28 dark:bg-amber-500/16 dark:text-amber-50',
         danger:
-          'border-rose-300 bg-rose-50 text-rose-800 dark:border-rose-500/24 dark:bg-rose-500/12 dark:text-rose-100',
+          'border-rose-300 bg-rose-50 text-rose-900 dark:border-rose-500/28 dark:bg-rose-500/16 dark:text-rose-50',
         brand:
-          'border-brand-300 bg-brand-50 text-brand-800 dark:border-brand-400/28 dark:bg-brand-400/14 dark:text-brand-100',
+          'border-brand-500/55 bg-gradient-to-r from-brand-700 via-brand-600 to-accent-600 text-white dark:border-brand-300/35 dark:from-brand-600 dark:via-brand-500 dark:to-accent-500 dark:text-white',
       },
     },
     defaultVariants: {

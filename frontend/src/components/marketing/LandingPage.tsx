@@ -218,7 +218,7 @@ const LandingPage: React.FC = () => {
           <Card className="overflow-hidden bg-ink-950 p-0 text-white dark:bg-[#07101d]">
             <CardContent className="flex flex-col gap-6 p-8 lg:flex-row lg:items-center lg:justify-between">
               <div className="space-y-3">
-                <Badge variant="subtle" className="border-white/10 bg-white/10 text-white">
+                <Badge variant="subtle" className="border-white/16 bg-white/16 text-white dark:border-white/16 dark:bg-white/16 dark:text-white">
                   Production-ready hiring experience
                 </Badge>
                 <h2 className="text-4xl font-semibold text-white">Start with the right workflow for your role.</h2>

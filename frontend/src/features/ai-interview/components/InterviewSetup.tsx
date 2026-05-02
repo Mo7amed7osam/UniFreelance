@@ -28,10 +28,10 @@ const setupSteps = [
 const StatusPill = ({ label, ready }: { label: string; ready: boolean }) => (
   <span
     className={[
-      'inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em]',
+      'inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] shadow-soft backdrop-blur-sm',
       ready
-        ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200'
-        : 'border-ink-200 bg-white/92 text-ink-600 dark:border-white/10 dark:bg-white/8 dark:text-ink-200',
+        ? 'border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-500/28 dark:bg-emerald-500/16 dark:text-emerald-50'
+        : 'border-ink-200 bg-white/95 text-ink-700 dark:border-white/12 dark:bg-white/12 dark:text-ink-100',
     ].join(' ')}
   >
     <span className={['h-2 w-2 rounded-full', ready ? 'bg-emerald-500' : 'bg-ink-400'].join(' ')} />
