@@ -28,9 +28,7 @@ There is no committed `.env.example` file, so create `.env` yourself.
 Minimum local values:
 
 ```env
-MONGO_USERNAME=admin
-MONGO_PASSWORD=password
-MONGO_URI=mongodb://admin:password@mongodb:27017/unifreelance?authSource=admin
+MONGO_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/<database>?retryWrites=true&w=majority
 JWT_SECRET=local-dev-secret
 BACKEND_PORT=5000
 NODE_ENV=production
@@ -54,7 +52,7 @@ Expected local endpoints:
 
 - Frontend: `http://localhost`
 - Backend: `http://localhost:5000`
-- MongoDB: `localhost:27017`
+- MongoDB: your Atlas cluster from `MONGO_URI`
 
 ## Manual Development
 

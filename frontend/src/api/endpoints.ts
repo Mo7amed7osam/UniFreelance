@@ -35,12 +35,12 @@ export const API = {
   },
   skills: {
     list: '/skills',
-    createInterview: (skillId: string) => `/skills/${skillId}/interviews`,
-    interviewDetails: (interviewId: string) => `/skills/interviews/${interviewId}`,
   },
-  interviews: {
-    uploadVideo: (interviewId: string) => `/interviews/${interviewId}/videos`,
-    submit: (interviewId: string) => `/interviews/${interviewId}/submit`,
+  interview: {
+    start: '/interview/start',
+    details: (sessionId: string) => `/interview/${sessionId}`,
+    answer: (sessionId: string) => `/interview/${sessionId}/answer`,
+    result: (sessionId: string) => `/interview/${sessionId}/result`,
   },
   admin: {
     interviews: '/admin/interviews',

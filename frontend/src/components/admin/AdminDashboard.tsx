@@ -148,18 +148,32 @@ const AdminDashboard: React.FC = () => {
             <TableRow>
               <TableHeaderCell>Student</TableHeaderCell>
               <TableHeaderCell>Skill</TableHeaderCell>
-              <TableHeaderCell>Status</TableHeaderCell>
+              <TableHeaderCell>AI result</TableHeaderCell>
+              <TableHeaderCell>Review</TableHeaderCell>
               <TableHeaderCell>Action</TableHeaderCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {(interviews || []).map((interview: any) => (
               <TableRow
-                key={interview._id}
+                key={interview.sessionId}
                 className="hover:bg-brand-50/40 dark:hover:bg-ink-700"
               >
-                <TableCell>{interview.studentId?.name}</TableCell>
-                <TableCell>{interview.skillId?.name}</TableCell>
+                <TableCell>{interview.user?.name || '-'}</TableCell>
+                <TableCell>{interview.skillRef?.name || interview.skill}</TableCell>
+                <TableCell>
+                  <Badge
+                    variant={
+                      interview.finalRecommendation === 'pass'
+                        ? 'success'
+                        : interview.finalRecommendation === 'fail'
+                        ? 'danger'
+                        : 'warning'
+                    }
+                  >
+                    {interview.finalRecommendation || 'needs_review'}
+                  </Badge>
+                </TableCell>
                 <TableCell>
                   <Badge
                     variant={
@@ -177,7 +191,7 @@ const AdminDashboard: React.FC = () => {
                   <Button
                     size="sm"
                     onClick={() =>
-                      navigate(`/admin/review-interview/${interview._id}`)
+                      navigate(`/admin/review-interview/${interview.sessionId}`)
                     }
                   >
                     Review

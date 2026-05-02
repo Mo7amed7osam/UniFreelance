@@ -1,7 +1,11 @@
-const Interview = require('../models/Interview');
 const User = require('../models/User');
 const Job = require('../models/Job');
 const Skill = require('../models/Skill');
+const {
+    getInterviewSession,
+    listCompletedInterviewsForAdmin,
+    reviewInterviewSession,
+} = require('../modules/ai-interview/interview.service');
 
 // Function to review an interview
 const reviewInterview = async (req, res) => {
@@ -9,41 +13,15 @@ const reviewInterview = async (req, res) => {
     const { score, status } = req.body;
 
     try {
-        // Find the interview by ID
-        const interview = await Interview.findById(interviewId);
-        if (!interview) {
-            return res.status(404).json({ message: 'Interview not found' });
-        }
-        if (!interview.isCompleted || !interview.isSubmitted) {
-            return res.status(400).json({ message: 'Interview is not submitted yet' });
-        }
-
-        if (!['pass', 'fail'].includes(status)) {
-            return res.status(400).json({ message: 'Status must be pass or fail' });
-        }
-
-        // Update the interview with the score and status
-        interview.score = Number(score);
-        interview.reviewStatus = status;
-        await interview.save();
-
-        // If the interview is passed, update the student's verified skills
-        if (status === 'pass') {
-            const student = await User.findById(interview.studentId);
-            if (student) {
-                const alreadyVerified = student.verifiedSkills.some(
-                    verified => verified.skill.toString() === interview.skillId.toString()
-                );
-                if (!alreadyVerified) {
-                    student.verifiedSkills.push({ skill: interview.skillId, score, verifiedAt: new Date() });
-                }
-                await student.save();
-            }
-        }
-
-        return res.status(200).json({ message: 'Interview reviewed successfully', interview });
+        const result = await reviewInterviewSession({
+            sessionId: interviewId,
+            reviewerId: req.user?.id,
+            score,
+            status,
+        });
+        return res.status(200).json(result);
     } catch (error) {
-        return res.status(500).json({ message: 'Server error', error });
+        return res.status(error.status || 500).json({ success: false, message: error.message || 'Server error' });
     }
 };
 
@@ -51,21 +29,10 @@ const reviewInterview = async (req, res) => {
 const getSubmittedInterviews = async (req, res) => {
     try {
         const status = (req.query.status || '').toString().toUpperCase();
-        let query = { isCompleted: true, isSubmitted: true, reviewStatus: 'pending' };
-        if (status === 'SUBMITTED') {
-            query = { isCompleted: true, isSubmitted: true, reviewStatus: 'pending' };
-        } else if (status === 'PASSED') {
-            query = { isCompleted: true, isSubmitted: true, reviewStatus: 'pass' };
-        } else if (status === 'FAILED') {
-            query = { isCompleted: true, isSubmitted: true, reviewStatus: 'fail' };
-        }
-
-        const interviews = await Interview.find(query)
-            .populate('studentId', 'name email')
-            .populate('skillId', 'name');
+        const interviews = await listCompletedInterviewsForAdmin(status);
         return res.status(200).json(interviews);
     } catch (error) {
-        return res.status(500).json({ message: 'Server error', error });
+        return res.status(error.status || 500).json({ success: false, message: error.message || 'Server error' });
     }
 };
 
@@ -74,13 +41,10 @@ const getInterviewById = async (req, res) => {
     const { interviewId } = req.params;
 
     try {
-        const interview = await Interview.findById(interviewId).populate('studentId skillId');
-        if (!interview) {
-            return res.status(404).json({ message: 'Interview not found' });
-        }
-        return res.status(200).json(interview);
+        const result = await getInterviewSession(interviewId, { id: req.user?.id, role: 'Admin' });
+        return res.status(200).json(result.session);
     } catch (error) {
-        return res.status(500).json({ message: 'Server error', error });
+        return res.status(error.status || 500).json({ success: false, message: error.message || 'Server error' });
     }
 };
 

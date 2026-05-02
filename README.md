@@ -98,7 +98,7 @@ There is no committed `.env.example` file in this repository. Create your own `.
 Minimum backend variables:
 
 ```env
-MONGO_URI=mongodb://admin:password@mongodb:27017/unifreelance?authSource=admin
+MONGO_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/<database>?retryWrites=true&w=majority
 JWT_SECRET=change-this-in-real-environments
 PORT=5000
 ```
@@ -112,8 +112,19 @@ Additional backend variables used by optional features:
 - `SMTP_USER`
 - `SMTP_PASS`
 - `SMTP_FROM`
-- `GEMINI_API_URL`
-- `GEMINI_API_KEY`
+- `OPENROUTER_API_KEY` or `ANTHROPIC_API_KEY`
+- `OPENROUTER_MODEL` or `ANTHROPIC_MODEL`
+- `GROQ_API_KEY`
+- `GROQ_STT_MODEL`
+- `FFMPEG_PATH` optional override for local audio extraction binary
+
+AI interview processing notes:
+
+- Main app stores original uploaded video.
+- Backend extracts temporary WAV audio locally with FFmpeg before sending audio to Groq STT.
+- `ffmpeg-static` is used by default in Node environments that support its bundled binary.
+- If your deployment image already has FFmpeg installed, set `FFMPEG_PATH` to that binary path.
+- If audio extraction, STT, or AI evaluation fails, interview answer is stored with `needs_review` and a clear processing note instead of a fake score.
 
 Frontend build-time variable:
 

@@ -15,7 +15,7 @@ const ReviewInterview: React.FC = () => {
   const { interviewId } = useParams();
   const navigate = useNavigate();
 
-  const [score, setScore] = useState<number>(0);
+  const [score, setScore] = useState<string>('');
   const [status, setStatus] = useState<string>('pass');
 
   const { data: interview, isLoading, isError } = useQuery({
@@ -26,7 +26,11 @@ const ReviewInterview: React.FC = () => {
 
   useEffect(() => {
     if (interview) {
-      setScore(interview.score ?? 0);
+      setScore(
+        interview.finalScore === null || interview.finalScore === undefined
+          ? ''
+          : String(interview.finalScore)
+      );
       setStatus(
         interview.reviewStatus === 'pass' || interview.reviewStatus === 'fail'
           ? interview.reviewStatus
@@ -37,7 +41,10 @@ const ReviewInterview: React.FC = () => {
 
   const reviewMutation = useMutation({
     mutationFn: () =>
-      reviewInterview(interviewId as string, { score, status }),
+      reviewInterview(interviewId as string, {
+        status,
+        score: score === '' ? undefined : Number(score),
+      }),
     onSuccess: () => {
       toast.success('Interview reviewed successfully.');
       navigate('/admin/dashboard');
@@ -86,9 +93,9 @@ const ReviewInterview: React.FC = () => {
             Interview Review
           </p>
           <h1 className="text-2xl font-semibold text-ink-900 dark:text-white">
-            {interview.studentId?.name} ·{' '}
+            {interview.user?.name} ·{' '}
             <span className="text-brand-600 dark:text-brand-400">
-              {interview.skillId?.name}
+              {interview.skillRef?.name || interview.skill}
             </span>
           </h1>
         </div>
@@ -115,8 +122,8 @@ const ReviewInterview: React.FC = () => {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {(interview.responses || []).map((response: any, index: number) => (
-            <div key={index} className="space-y-3">
+          {(interview.answers || []).map((response: any, index: number) => (
+            <div key={response.answerId || index} className="space-y-3 rounded-xl border border-ink-200 p-4 dark:border-ink-700">
               <p className="text-sm font-semibold text-ink-700 dark:text-ink-300">
                 Question {index + 1}: {response.question}
               </p>
@@ -126,6 +133,47 @@ const ReviewInterview: React.FC = () => {
                 controls
                 src={toAbsoluteUrl(response.videoUrl)}
               />
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <p className="text-xs uppercase tracking-wide text-ink-500 dark:text-ink-400">AI score</p>
+                  <p className="text-sm text-ink-800 dark:text-ink-200">
+                    {response.score ?? 'Pending manual review'}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs uppercase tracking-wide text-ink-500 dark:text-ink-400">AI recommendation</p>
+                  <Badge
+                    variant={
+                      response.recommendation === 'pass'
+                        ? 'success'
+                        : response.recommendation === 'fail'
+                        ? 'danger'
+                        : 'warning'
+                    }
+                  >
+                    {response.recommendation}
+                  </Badge>
+                </div>
+              </div>
+
+              <p className="text-sm text-ink-600 dark:text-ink-300">{response.feedback}</p>
+
+              <div className="space-y-2">
+                <p className="text-xs uppercase tracking-wide text-ink-500 dark:text-ink-400">Transcript</p>
+                <p className="rounded-xl border border-dashed border-ink-200 p-3 text-sm text-ink-600 dark:border-ink-700 dark:text-ink-300">
+                  {response.transcript || 'Transcript unavailable. Manual review required.'}
+                </p>
+              </div>
+
+              {response.processingError ? (
+                <div className="space-y-2">
+                  <p className="text-xs uppercase tracking-wide text-rose-500 dark:text-rose-300">Processing note</p>
+                  <p className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-300">
+                    {response.processingError}
+                  </p>
+                </div>
+              ) : null}
             </div>
           ))}
         </CardContent>
@@ -150,7 +198,7 @@ const ReviewInterview: React.FC = () => {
               min="0"
               max="100"
               value={score}
-              onChange={(e) => setScore(Number(e.target.value))}
+              onChange={(e) => setScore(e.target.value)}
             />
           </div>
 
@@ -169,18 +217,21 @@ const ReviewInterview: React.FC = () => {
           </div>
 
           <div className="md:col-span-2 space-y-2">
+            <p className="text-sm text-ink-500 dark:text-ink-400">
+              AI final recommendation: {interview.finalRecommendation || 'needs_review'}
+            </p>
             <Button
               onClick={() => reviewMutation.mutate()}
-              disabled={reviewMutation.isPending || !interview.isSubmitted}
+              disabled={reviewMutation.isPending || interview.status !== 'completed'}
             >
               {reviewMutation.isPending
                 ? 'Submitting...'
                 : 'Submit decision'}
             </Button>
 
-            {!interview.isSubmitted && (
+            {interview.status !== 'completed' && (
               <p className="text-xs text-ink-500 dark:text-ink-400">
-                This interview has not been submitted yet.
+                This interview is not completed yet.
               </p>
             )}
           </div>

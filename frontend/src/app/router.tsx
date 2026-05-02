@@ -7,7 +7,6 @@ import StudentProfile from '@/components/student/StudentProfile';
 import StudentPublicProfile from '@/components/student/StudentPublicProfile';
 import JobList from '@/components/student/JobList';
 import SkillVerification from '@/components/student/SkillVerification';
-import VideoInterview from '@/components/student/VideoInterview';
 import StudentContracts from '@/components/student/StudentContracts';
 import StudentWallet from '@/components/student/StudentWallet';
 import ClientDashboard from '@/components/client/ClientDashboard';
@@ -21,6 +20,8 @@ import AdminPayments from '@/components/admin/AdminPayments';
 import ProtectedRoute from '@/auth/ProtectedRoute';
 import { AppShell } from '@/components/layout/AppShell';
 import ContractDetails from '@/components/contracts/ContractDetails';
+import AIInterviewPage from '@/features/ai-interview/pages/AIInterviewPage';
+import AIInterviewResultPage from '@/features/ai-interview/pages/AIInterviewResultPage';
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -100,11 +101,21 @@ export const AppRouter = () => (
         }
       />
       <Route
-        path="/student/video-interview/:interviewId"
+        path="/student/ai-interview/:sessionId"
         element={
           <ProtectedRoute roles={['Student']}>
             <AppShell>
-              <VideoInterview />
+              <AIInterviewPage />
+            </AppShell>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/student/ai-interview/:sessionId/result"
+        element={
+          <ProtectedRoute roles={['Student']}>
+            <AppShell>
+              <AIInterviewResultPage />
             </AppShell>
           </ProtectedRoute>
         }

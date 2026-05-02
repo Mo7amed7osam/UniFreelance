@@ -55,8 +55,18 @@ Optional feature variables:
 - `SMTP_USER`
 - `SMTP_PASS`
 - `SMTP_FROM`
-- `GEMINI_API_URL`
-- `GEMINI_API_KEY`
+- `OPENROUTER_API_KEY` or `ANTHROPIC_API_KEY`
+- `OPENROUTER_MODEL` or `ANTHROPIC_MODEL`
+- `GROQ_API_KEY`
+- `GROQ_STT_MODEL`
+- `FFMPEG_PATH` optional override if deployment uses system ffmpeg instead of bundled `ffmpeg-static`
+
+AI interview deployment notes:
+
+- Backend extracts audio locally from uploaded interview video before calling Groq STT.
+- Default implementation uses bundled `ffmpeg-static` binary.
+- On platforms where bundled binary is unsupported, install FFmpeg in image and set `FFMPEG_PATH`.
+- Original video remains stored even when extraction/STT/evaluation fails.
 
 ## Build and Push Images
 
@@ -173,7 +183,7 @@ Do not set the frontend to call the Azure backend HTTP URL directly in the brows
 
 ## Docker Compose Deployment
 
-For a local or VM-based deployment, use:
+For a local or VM-based deployment that uses MongoDB Atlas, create a root `.env` with `MONGO_URI` and then run:
 
 ```bash
 docker compose up -d --build
@@ -181,9 +191,10 @@ docker compose up -d --build
 
 This starts:
 
-- `mongo:7.0`
 - backend on host `${BACKEND_PORT:-5000}`
 - frontend on host `80`
+
+The backend connects to the MongoDB cluster defined in `MONGO_URI`.
 
 ## Monitoring
 

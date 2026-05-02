@@ -1,16 +1,16 @@
 import React from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { getSkills, startInterview } from '@/services/api';
+import { getSkills } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { startInterviewSession } from '@/features/ai-interview/services/interviewApi';
 
 const SkillVerification: React.FC = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const { data: skills, isLoading } = useQuery({
     queryKey: ['skills'],
@@ -18,23 +18,13 @@ const SkillVerification: React.FC = () => {
   });
 
   const { mutateAsync: beginInterview, isPending } = useMutation({
-    mutationFn: startInterview,
-    onSuccess: (data, skillId) => {
-      const skill = (skills || []).find((item: any) => item._id === skillId);
-      queryClient.setQueryData(['interview', data.interviewId], {
-        _id: data.interviewId,
-        skillId,
-        skill,
-        questions: data.questions || [],
-        responses: [],
-      });
-    },
+    mutationFn: (payload: { skill: string; skillId: string }) => startInterviewSession(payload),
   });
 
-  const handleStartInterview = async (skillId: string) => {
+  const handleStartInterview = async (skill: { _id: string; name: string }) => {
     try {
-      const response = await beginInterview(skillId);
-      navigate(`/student/video-interview/${response.interviewId}`);
+      const response = await beginInterview({ skill: skill.name, skillId: skill._id });
+      navigate(`/student/ai-interview/${response.sessionId}`);
     } catch {
       toast.error('Failed to start interview. Please try again.');
     }
@@ -95,7 +85,7 @@ const SkillVerification: React.FC = () => {
                 <Button
                   type="button"
                   className="w-full bg-gradient-to-r from-brand-600 to-brand-700 transition hover:opacity-90"
-                  onClick={() => handleStartInterview(skill._id)}
+                  onClick={() => handleStartInterview(skill)}
                   disabled={isPending}
                 >
                   {isPending ? 'Starting interview…' : 'Start interview'}

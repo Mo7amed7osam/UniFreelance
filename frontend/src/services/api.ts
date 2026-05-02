@@ -29,42 +29,6 @@ export const getSkills = async () => {
   return response.data;
 };
 
-export const startInterview = async (skillId: string) => {
-  const response = await http.post(API.skills.createInterview(skillId));
-  return response.data;
-};
-
-export const uploadInterviewVideo = async (
-  interviewId: string,
-  questionIndex: number,
-  videoBlob: Blob,
-  onProgress?: (progress: number) => void
-) => {
-  const formData = new FormData();
-  formData.append('video', videoBlob);
-  formData.append('questionIndex', String(questionIndex));
-
-  const response = await http.post(API.interviews.uploadVideo(interviewId), formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-    onUploadProgress: (event) => {
-      if (!onProgress || !event.total) return;
-      const percent = Math.round((event.loaded / event.total) * 100);
-      onProgress(percent);
-    },
-  });
-  return response.data;
-};
-
-export const submitInterview = async (interviewId: string) => {
-  const response = await http.post(API.interviews.submit(interviewId));
-  return response.data;
-};
-
-export const getInterviewDetails = async (interviewId: string) => {
-  const response = await http.get(API.skills.interviewDetails(interviewId));
-  return response.data;
-};
-
 export const postJob = async (jobData: any) => {
   const response = await http.post(API.jobs.create, jobData);
   return response.data;
