@@ -33,13 +33,22 @@ type StopState = {
   screenFile: File | null;
 };
 
+const attachTrackEndedHandler = (track: MediaStreamTrack | null | undefined, handler: () => void) => {
+  if (!track) return;
+  track.onended = handler;
+};
+
 export const useVideoRecorder = () => {
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const [hasScreenShare, setHasScreenShare] = useState(false);
-  const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+  const [screenStream, setScreenStream] = useState<MediaStream | null>(null);
+  const [cameraReady, setCameraReady] = useState(false);
+  const [screenReady, setScreenReady] = useState(false);
+  const [micReady, setMicReady] = useState(false);
+  const [micLevel, setMicLevel] = useState(0);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
   const [isStartingCamera, setIsStartingCamera] = useState(false);
   const [isStartingScreenShare, setIsStartingScreenShare] = useState(false);
+  const [isTestingMicrophone, setIsTestingMicrophone] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,17 +64,92 @@ export const useVideoRecorder = () => {
   const mimeTypeRef = useRef<string>(getSupportedMimeType());
   const cameraStreamRef = useRef<MediaStream | null>(null);
   const screenStreamRef = useRef<MediaStream | null>(null);
+  const micStreamRef = useRef<MediaStream | null>(null);
   const screenRecordingStreamRef = useRef<MediaStream | null>(null);
   const recordedUrlRef = useRef<string | null>(null);
-  const isRecordingRef = useRef(false);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const meterAnimationRef = useRef<number | null>(null);
+  const sourceNodeRef = useRef<MediaStreamAudioSourceNode | null>(null);
+
+  useEffect(() => {
+    cameraStreamRef.current = cameraStream;
+  }, [cameraStream]);
+
+  useEffect(() => {
+    screenStreamRef.current = screenStream;
+  }, [screenStream]);
 
   useEffect(() => {
     recordedUrlRef.current = recordedUrl;
   }, [recordedUrl]);
 
-  useEffect(() => {
-    isRecordingRef.current = isRecording;
-  }, [isRecording]);
+  const stopMicMeter = useCallback(() => {
+    if (meterAnimationRef.current !== null) {
+      window.cancelAnimationFrame(meterAnimationRef.current);
+      meterAnimationRef.current = null;
+    }
+
+    sourceNodeRef.current?.disconnect();
+    analyserRef.current?.disconnect();
+    sourceNodeRef.current = null;
+    analyserRef.current = null;
+
+    if (audioContextRef.current) {
+      void audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
+
+    setMicLevel(0);
+  }, []);
+
+  const startMicMeter = useCallback(
+    async (inputStream: MediaStream) => {
+      stopMicMeter();
+
+      const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!AudioContextCtor) {
+        setMicLevel(1);
+        return;
+      }
+
+      const audioContext = new AudioContextCtor();
+      if (audioContext.state === 'suspended') {
+        await audioContext.resume().catch(() => undefined);
+      }
+
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 2048;
+      analyser.smoothingTimeConstant = 0.35;
+
+      const sourceNode = audioContext.createMediaStreamSource(inputStream);
+      sourceNode.connect(analyser);
+
+      audioContextRef.current = audioContext;
+      analyserRef.current = analyser;
+      sourceNodeRef.current = sourceNode;
+
+      const buffer = new Float32Array(analyser.fftSize);
+
+      const sample = () => {
+        if (!analyserRef.current) return;
+        analyserRef.current.getFloatTimeDomainData(buffer);
+        let sumSquares = 0;
+        for (let index = 0; index < buffer.length; index += 1) {
+          const sampleValue = buffer[index];
+          sumSquares += sampleValue * sampleValue;
+        }
+
+        const rms = Math.sqrt(sumSquares / buffer.length);
+        const normalizedLevel = Math.min(1, rms * 4.5);
+        setMicLevel(normalizedLevel);
+        meterAnimationRef.current = window.requestAnimationFrame(sample);
+      };
+
+      sample();
+    },
+    [stopMicMeter]
+  );
 
   const getExtensionFromMimeType = (mimeType: string) => {
     if (mimeType.includes('mp4')) return 'mp4';
@@ -87,16 +171,29 @@ export const useVideoRecorder = () => {
     resolver({ cameraFile, screenFile });
   }, []);
 
+  const resetRecording = useCallback(() => {
+    if (recordedUrlRef.current) {
+      URL.revokeObjectURL(recordedUrlRef.current);
+      recordedUrlRef.current = null;
+    }
+    cameraChunksRef.current = [];
+    screenChunksRef.current = [];
+    setRecordedUrl(null);
+  }, []);
+
   const cleanup = useCallback(() => {
     if (recordedUrlRef.current) {
       URL.revokeObjectURL(recordedUrlRef.current);
       recordedUrlRef.current = null;
     }
 
+    stopMicMeter();
     setRecordedUrl(null);
-    setRecordedBlob(null);
     setIsRecording(false);
-    setHasScreenShare(false);
+    setCameraReady(false);
+    setScreenReady(false);
+    setMicReady(false);
+    setError(null);
 
     if (cameraRecorderRef.current && cameraRecorderRef.current.state !== 'inactive') {
       cameraRecorderRef.current.stop();
@@ -111,25 +208,18 @@ export const useVideoRecorder = () => {
     stopStream(screenRecordingStreamRef.current);
     stopStream(screenStreamRef.current);
     stopStream(cameraStreamRef.current);
+    stopStream(micStreamRef.current);
 
     screenRecordingStreamRef.current = null;
     screenStreamRef.current = null;
     cameraStreamRef.current = null;
-    setStream(null);
-  }, []);
+    micStreamRef.current = null;
+
+    setCameraStream(null);
+    setScreenStream(null);
+  }, [stopMicMeter]);
 
   useEffect(() => () => cleanup(), [cleanup]);
-
-  const resetRecording = useCallback(() => {
-    if (recordedUrlRef.current) {
-      URL.revokeObjectURL(recordedUrlRef.current);
-      recordedUrlRef.current = null;
-    }
-    cameraChunksRef.current = [];
-    screenChunksRef.current = [];
-    setRecordedBlob(null);
-    setRecordedUrl(null);
-  }, []);
 
   const startCamera = useCallback(async () => {
     setError(null);
@@ -153,22 +243,37 @@ export const useVideoRecorder = () => {
     setIsStartingCamera(true);
 
     try {
-      let cameraStream: MediaStream;
+      let nextCameraStream: MediaStream;
       try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({
+        nextCameraStream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: 'user' },
           audio: true,
         });
       } catch {
-        cameraStream = await navigator.mediaDevices.getUserMedia({
+        nextCameraStream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: 'user' },
           audio: false,
         });
       }
 
-      cameraStreamRef.current = cameraStream;
-      setStream(cameraStream);
-      return cameraStream;
+      attachTrackEndedHandler(nextCameraStream.getVideoTracks()[0], () => {
+        setCameraReady(false);
+        setCameraStream(null);
+        cameraStreamRef.current = null;
+      });
+
+      attachTrackEndedHandler(nextCameraStream.getAudioTracks()[0], () => {
+        setMicReady(false);
+        if (!micStreamRef.current) {
+          stopMicMeter();
+        }
+      });
+
+      cameraStreamRef.current = nextCameraStream;
+      setCameraStream(nextCameraStream);
+      setCameraReady(true);
+
+      return nextCameraStream;
     } catch (cameraError) {
       const errorMessage =
         cameraError instanceof Error && cameraError.message
@@ -180,7 +285,7 @@ export const useVideoRecorder = () => {
     } finally {
       setIsStartingCamera(false);
     }
-  }, []);
+  }, [stopMicMeter]);
 
   const startScreenShare = useCallback(async () => {
     setError(null);
@@ -220,29 +325,32 @@ export const useVideoRecorder = () => {
       }
 
       screenTrack.onended = () => {
-        setHasScreenShare(false);
+        setScreenReady(false);
+        setScreenStream(null);
         setError('Screen sharing ended. Share your entire screen again to continue.');
-
-        if (isRecordingRef.current) {
-          cameraRecorderRef.current?.stop();
-          screenRecorderRef.current?.stop();
-          setIsRecording(false);
-        }
-
         stopStream(screenRecordingStreamRef.current);
-        stopStream(screenStreamRef.current);
         screenRecordingStreamRef.current = null;
         screenStreamRef.current = null;
+
+        if (cameraRecorderRef.current?.state === 'recording') {
+          cameraRecorderRef.current.stop();
+        }
+        if (screenRecorderRef.current?.state === 'recording') {
+          screenRecorderRef.current.stop();
+        }
+        setIsRecording(false);
       };
 
       screenStreamRef.current = displayStream;
-      setHasScreenShare(true);
+      setScreenStream(displayStream);
+      setScreenReady(true);
       return displayStream;
     } catch (screenShareError) {
       stopStream(screenStreamRef.current);
       screenRecordingStreamRef.current = null;
       screenStreamRef.current = null;
-      setHasScreenShare(false);
+      setScreenReady(false);
+      setScreenStream(null);
 
       const errorMessage =
         screenShareError instanceof Error && screenShareError.message
@@ -256,6 +364,55 @@ export const useVideoRecorder = () => {
     }
   }, []);
 
+  const testMicrophone = useCallback(async () => {
+    setError(null);
+    setIsTestingMicrophone(true);
+
+    try {
+      const existingAudioTrack = cameraStreamRef.current?.getAudioTracks()[0];
+      if (existingAudioTrack) {
+        await startMicMeter(new MediaStream([existingAudioTrack]));
+        setMicReady(true);
+        return true;
+      }
+
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error('Microphone access is not available in this browser.');
+      }
+
+      if (!micStreamRef.current) {
+        const audioOnlyStream = await navigator.mediaDevices.getUserMedia({
+          video: false,
+          audio: true,
+        });
+
+        attachTrackEndedHandler(audioOnlyStream.getAudioTracks()[0], () => {
+          setMicReady(false);
+          stopMicMeter();
+          stopStream(micStreamRef.current);
+          micStreamRef.current = null;
+        });
+
+        micStreamRef.current = audioOnlyStream;
+      }
+
+      await startMicMeter(micStreamRef.current);
+      setMicReady(true);
+      return true;
+    } catch (microphoneError) {
+      const errorMessage =
+        microphoneError instanceof Error && microphoneError.message
+          ? microphoneError.message
+          : 'Unable to access microphone.';
+      const message = `Microphone test failed: ${errorMessage}`;
+      setError(message);
+      setMicReady(false);
+      throw microphoneError instanceof Error ? microphoneError : new Error(message);
+    } finally {
+      setIsTestingMicrophone(false);
+    }
+  }, [startMicMeter, stopMicMeter]);
+
   const startRecording = useCallback(() => {
     if (!cameraStreamRef.current) {
       const message = 'Open camera first.';
@@ -265,6 +422,29 @@ export const useVideoRecorder = () => {
 
     if (!screenStreamRef.current) {
       const message = 'Share your entire screen first.';
+      setError(message);
+      throw new Error(message);
+    }
+
+    const cameraVideoTrack = cameraStreamRef.current.getVideoTracks()[0];
+    if (!cameraVideoTrack) {
+      const message = 'Camera video track is unavailable.';
+      setError(message);
+      throw new Error(message);
+    }
+
+    const micTrack =
+      cameraStreamRef.current.getAudioTracks()[0] || micStreamRef.current?.getAudioTracks()[0] || null;
+
+    if (!micTrack) {
+      const message = 'Test microphone first.';
+      setError(message);
+      throw new Error(message);
+    }
+
+    const screenTrack = screenStreamRef.current.getVideoTracks()[0];
+    if (!screenTrack) {
+      const message = 'Missing screen sharing track.';
       setError(message);
       throw new Error(message);
     }
@@ -280,8 +460,9 @@ export const useVideoRecorder = () => {
       };
 
       const recorderOptions = mimeTypeRef.current ? { mimeType: mimeTypeRef.current } : undefined;
+      const cameraRecordingStream = new MediaStream([cameraVideoTrack, micTrack.clone()]);
 
-      const cameraRecorder = new MediaRecorder(cameraStreamRef.current, recorderOptions);
+      const cameraRecorder = new MediaRecorder(cameraRecordingStream, recorderOptions);
       cameraRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           cameraChunksRef.current.push(event.data);
@@ -299,7 +480,6 @@ export const useVideoRecorder = () => {
           : null;
 
         cameraChunksRef.current = [];
-        setRecordedBlob(blob);
 
         if (recordedUrlRef.current) {
           URL.revokeObjectURL(recordedUrlRef.current);
@@ -313,15 +493,7 @@ export const useVideoRecorder = () => {
         resolveStopIfReady();
       };
 
-      const screenTrack = screenStreamRef.current.getVideoTracks()[0];
-      if (!screenTrack) {
-        throw new Error('Missing screen sharing track.');
-      }
-
-      const screenRecordingStream = new MediaStream([screenTrack]);
-      cameraStreamRef.current.getAudioTracks().forEach((track) => {
-        screenRecordingStream.addTrack(track.clone());
-      });
+      const screenRecordingStream = new MediaStream([screenTrack, micTrack.clone()]);
       screenRecordingStreamRef.current = screenRecordingStream;
 
       const screenRecorder = new MediaRecorder(screenRecordingStream, recorderOptions);
@@ -348,7 +520,6 @@ export const useVideoRecorder = () => {
 
       cameraRecorderRef.current = cameraRecorder;
       screenRecorderRef.current = screenRecorder;
-
       cameraRecorder.start();
       screenRecorder.start();
       setIsRecording(true);
@@ -389,18 +560,25 @@ export const useVideoRecorder = () => {
   }, []);
 
   return {
+    cameraReady,
+    cameraStream,
+    cleanup,
     error,
-    hasScreenShare,
+    hasScreenShare: screenReady,
     isRecording,
     isStartingCamera,
     isStartingScreenShare,
-    recordedBlob,
+    isTestingMicrophone,
+    micLevel,
+    micReady,
     recordedUrl,
     resetRecording,
+    screenReady,
+    screenStream,
     startCamera,
     startRecording,
     startScreenShare,
     stopRecording,
-    stream,
+    testMicrophone,
   };
 };
