@@ -35,15 +35,15 @@ const SkillVerification: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <PageHeader
         eyebrow="Mandatory verification"
         title="Skill verification interviews"
         description="Complete short AI-guided interviews to validate your strongest skills and improve hiring confidence for clients."
       />
 
-      <Card className="overflow-hidden bg-gradient-to-r from-ink-950 via-brand-900 to-accent-900 p-0 text-white dark:bg-gradient-to-r dark:from-[#07101d] dark:via-brand-900 dark:to-accent-900">
-        <CardContent className="grid gap-4 p-8 md:grid-cols-3">
+      <section className="feature-highlight text-white">
+        <CardContent className="relative grid gap-5 p-8 md:grid-cols-3 lg:p-10">
           {[
             {
               title: 'AI-guided interview',
@@ -61,19 +61,19 @@ const SkillVerification: React.FC = () => {
               Icon: Sparkles,
             },
           ].map(({ title, body, Icon }) => (
-            <div key={title} className="rounded-2xl border border-white/16 bg-white/12 p-5 shadow-soft">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/16">
+            <div key={title} className="rounded-3xl border border-white/16 bg-white/14 p-6 shadow-soft backdrop-blur-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/18">
                 <Icon size={20} />
               </div>
-              <p className="mt-4 text-lg font-semibold text-white">{title}</p>
+              <p className="mt-5 text-xl font-semibold text-white">{title}</p>
               <p className="mt-2 text-sm leading-6 text-white/84">{body}</p>
             </div>
           ))}
         </CardContent>
-      </Card>
+      </section>
 
       {isLoading ? (
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-72 w-full rounded-3xl" />
           ))}
@@ -81,9 +81,9 @@ const SkillVerification: React.FC = () => {
       ) : (skills || []).length === 0 ? (
         <EmptyState title="No skills available" description="Verification tracks will appear here once the skill library is ready." />
       ) : (
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {(skills || []).map((skill: any) => (
-            <Card key={skill._id} className="overflow-hidden p-0">
+            <Card key={skill._id} className="interactive-card overflow-hidden p-0">
               <CardHeader className="space-y-4 p-6">
                 <div className="flex items-start justify-between gap-3">
                   <CardTitle className="text-2xl">{skill.name}</CardTitle>

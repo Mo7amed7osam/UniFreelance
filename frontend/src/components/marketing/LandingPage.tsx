@@ -96,7 +96,7 @@ const LandingPage: React.FC = () => {
       </header>
 
       <main className="page-container pb-20 pt-8">
-        <section className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+        <section className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div className="space-y-7">
             <div className="space-y-4">
               <Badge variant="brand" className="w-fit">
@@ -137,13 +137,13 @@ const LandingPage: React.FC = () => {
 
           <Card className="overflow-hidden p-0">
             <CardContent className="space-y-6 p-7">
-              <div className="rounded-[1.75rem] bg-gradient-to-br from-ink-950 via-brand-900 to-accent-900 p-6 text-white shadow-glass">
+              <div className="feature-highlight p-6 text-white">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-xs uppercase tracking-[0.18em] text-white/72">AI verification</p>
                     <p className="mt-2 text-2xl font-semibold text-white">Gravis interview layer</p>
                   </div>
-                  <div className="rounded-2xl border border-white/15 bg-white/10 p-3">
+                  <div className="rounded-2xl border border-white/18 bg-white/12 p-3">
                     <Video size={24} />
                   </div>
                 </div>
@@ -169,9 +169,9 @@ const LandingPage: React.FC = () => {
           </Card>
         </section>
 
-        <section className="mt-16 grid gap-5 lg:grid-cols-3">
+        <section className="mt-20 grid gap-6 lg:grid-cols-3">
           {roleHighlights.map((item) => (
-            <Card key={item.title}>
+            <Card key={item.title} className="interactive-card">
               <CardContent className="space-y-5">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-400/10 dark:text-brand-200">
                   <item.icon size={22} />

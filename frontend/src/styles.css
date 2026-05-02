@@ -8,17 +8,17 @@
   :root {
     color-scheme: light;
     --page-gradient:
-      radial-gradient(circle at top left, rgba(59, 130, 246, 0.16), transparent 28%),
-      radial-gradient(circle at top right, rgba(6, 182, 212, 0.12), transparent 24%),
-      linear-gradient(180deg, #f8fbff 0%, #f5f8fd 42%, #eaf1fb 100%);
+      radial-gradient(circle at top left, rgba(59, 130, 246, 0.1), transparent 24%),
+      radial-gradient(circle at top right, rgba(6, 182, 212, 0.07), transparent 20%),
+      linear-gradient(180deg, #f9fbfe 0%, #f5f8fc 44%, #edf3fa 100%);
     --surface-border: rgba(115, 133, 156, 0.28);
   }
 
   .dark {
     color-scheme: dark;
     --page-gradient:
-      radial-gradient(circle at top left, rgba(56, 189, 248, 0.14), transparent 28%),
-      radial-gradient(circle at top right, rgba(59, 130, 246, 0.18), transparent 22%),
+      radial-gradient(circle at top left, rgba(56, 189, 248, 0.1), transparent 24%),
+      radial-gradient(circle at top right, rgba(59, 130, 246, 0.12), transparent 20%),
       linear-gradient(180deg, #08111f 0%, #0b1424 56%, #0f1b2d 100%);
     --surface-border: rgba(159, 177, 201, 0.24);
   }
@@ -88,17 +88,24 @@
   }
 
   .glass-panel {
-    @apply rounded-3xl border shadow-card backdrop-blur-xl;
+    @apply rounded-3xl border shadow-soft backdrop-blur-xl;
     border-color: var(--surface-border);
-    background-color: rgba(255, 255, 255, 0.94);
+    background-color: rgba(255, 255, 255, 0.9);
   }
 
   .dark .glass-panel {
-    background-color: rgba(16, 32, 58, 0.92);
+    background-color: rgba(15, 29, 51, 0.88);
   }
 
   .card-surface {
-    @apply glass-panel;
+    @apply rounded-3xl border shadow-card;
+    border-color: rgba(115, 133, 156, 0.34);
+    background-color: rgba(255, 255, 255, 0.98);
+  }
+
+  .dark .card-surface {
+    border-color: rgba(159, 177, 201, 0.22);
+    background-color: rgba(18, 34, 58, 0.96);
   }
 
   .muted-panel {
@@ -117,6 +124,36 @@
   .kpi-card::before {
     content: '';
     @apply pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-500 via-accent-400 to-brand-300;
+  }
+
+  .feature-highlight {
+    @apply relative overflow-hidden rounded-[2rem] border shadow-glass;
+    border-color: rgba(148, 163, 184, 0.22);
+    background-image:
+      radial-gradient(circle at top left, rgba(96, 165, 250, 0.16), transparent 32%),
+      radial-gradient(circle at bottom right, rgba(34, 211, 238, 0.14), transparent 28%),
+      linear-gradient(135deg, #0f172a 0%, #1d4ed8 52%, #155e75 100%);
+  }
+
+  .feature-highlight::after {
+    content: '';
+    @apply pointer-events-none absolute inset-0;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+
+  .interactive-card {
+    @apply transition-all duration-200;
+  }
+
+  .interactive-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 34px 78px -36px rgba(15, 23, 42, 0.34), 0 18px 32px -24px rgba(37, 99, 235, 0.2);
+    border-color: rgba(59, 130, 246, 0.34);
+  }
+
+  .dark .interactive-card:hover {
+    box-shadow: 0 34px 78px -36px rgba(2, 8, 23, 0.62), 0 18px 36px -24px rgba(34, 211, 238, 0.2);
+    border-color: rgba(96, 165, 250, 0.28);
   }
 }
 
