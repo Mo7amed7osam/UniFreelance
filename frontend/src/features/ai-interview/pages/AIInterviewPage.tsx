@@ -134,7 +134,6 @@ const AIInterviewPage: React.FC = () => {
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="space-y-4">
             <CameraRecorder
-              key={nextQuestion.id}
               disabled={answerMutation.isPending}
               questionKey={nextQuestion.id}
               onVideoReady={setSelectedRecording}

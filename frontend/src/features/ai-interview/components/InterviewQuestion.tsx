@@ -14,7 +14,7 @@ export const InterviewQuestion: React.FC<InterviewQuestionProps> = ({ question }
       </p>
       <p className="text-base font-medium text-ink-900 dark:text-white">{question.text}</p>
       <p className="text-sm text-ink-500 dark:text-ink-400">
-        Share your entire screen, keep your camera on, and record one clear answer. Audio from the recording is used for AI evaluation.
+        Open your camera and share your entire screen once, then record each answer. Camera video is shown to you, while screen recording is kept for admin review.
       </p>
     </div>
   );

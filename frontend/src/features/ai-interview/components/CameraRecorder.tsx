@@ -23,11 +23,13 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({
     error,
     hasScreenShare,
     isRecording,
-    isStartingCapture,
+    isStartingCamera,
+    isStartingScreenShare,
     recordedUrl,
     resetRecording,
-    startCapture,
+    startCamera,
     startRecording,
+    startScreenShare,
     stopRecording,
     stream,
   } = useVideoRecorder();
@@ -71,9 +73,18 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({
     });
   }, [isRecording, onVideoReady, seconds, stopRecording]);
 
-  const handleRequestCapture = async () => {
+  const handleOpenCamera = async () => {
     try {
-      const activeStream = await startCapture();
+      const activeStream = await startCamera();
+      return activeStream;
+    } catch {
+      return null;
+    }
+  };
+
+  const handleShareScreen = async () => {
+    try {
+      const activeStream = await startScreenShare();
       setCaptureRequested(true);
       return activeStream;
     } catch {
@@ -83,13 +94,6 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({
   };
 
   const handleStartRecording = async () => {
-    if (!stream || !hasScreenShare) {
-      const capture = await handleRequestCapture();
-      if (!capture) {
-        return;
-      }
-    }
-
     setSeconds(0);
     try {
       startRecording();
@@ -136,10 +140,10 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({
         ) : (
           <p className="text-sm text-ink-500 dark:text-ink-400">
             {stream && hasScreenShare
-              ? 'Camera preview is ready. Entire screen is also being shared for admin review.'
+              ? 'Camera and entire screen are ready. You only need to enable them once.'
               : captureRequested
-                ? 'Trying to open camera and entire screen share...'
-                : 'Allow camera and share your entire screen before recording.'}
+                ? 'Waiting for both camera and entire screen share...'
+                : 'Open camera and share your entire screen once, then answer all questions.'}
           </p>
         )}
 
@@ -147,20 +151,29 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({
           <Button
             type="button"
             variant="secondary"
-            onClick={handleRequestCapture}
-            disabled={disabled || isStartingCapture || (Boolean(stream) && hasScreenShare)}
+            onClick={handleOpenCamera}
+            disabled={disabled || isStartingCamera || Boolean(stream)}
           >
-            {isStartingCapture
-              ? 'Opening camera + screen share...'
-              : stream && hasScreenShare
-                ? 'Camera + screen ready'
-                : 'Enable camera + screen'}
+            {isStartingCamera ? 'Opening camera...' : stream ? 'Camera ready' : 'Open camera'}
+          </Button>
+
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleShareScreen}
+            disabled={disabled || isStartingScreenShare || hasScreenShare}
+          >
+            {isStartingScreenShare
+              ? 'Sharing screen...'
+              : hasScreenShare
+                ? 'Entire screen ready'
+                : 'Share entire screen'}
           </Button>
 
           <Button
             type="button"
             onClick={handleStartRecording}
-            disabled={disabled || isRecording || isStartingCapture}
+            disabled={disabled || isRecording || isStartingCamera || isStartingScreenShare || !stream || !hasScreenShare}
           >
             Start recording
           </Button>

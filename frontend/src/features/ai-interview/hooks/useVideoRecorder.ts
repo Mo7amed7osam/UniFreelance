@@ -38,7 +38,8 @@ export const useVideoRecorder = () => {
   const [hasScreenShare, setHasScreenShare] = useState(false);
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
-  const [isStartingCapture, setIsStartingCapture] = useState(false);
+  const [isStartingCamera, setIsStartingCamera] = useState(false);
+  const [isStartingScreenShare, setIsStartingScreenShare] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,19 +53,19 @@ export const useVideoRecorder = () => {
     screenFile: null,
   });
   const mimeTypeRef = useRef<string>(getSupportedMimeType());
-  const previewStreamRef = useRef<MediaStream | null>(null);
   const cameraStreamRef = useRef<MediaStream | null>(null);
   const screenStreamRef = useRef<MediaStream | null>(null);
   const screenRecordingStreamRef = useRef<MediaStream | null>(null);
   const recordedUrlRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    previewStreamRef.current = stream;
-  }, [stream]);
+  const isRecordingRef = useRef(false);
 
   useEffect(() => {
     recordedUrlRef.current = recordedUrl;
   }, [recordedUrl]);
+
+  useEffect(() => {
+    isRecordingRef.current = isRecording;
+  }, [isRecording]);
 
   const getExtensionFromMimeType = (mimeType: string) => {
     if (mimeType.includes('mp4')) return 'mp4';
@@ -130,14 +131,11 @@ export const useVideoRecorder = () => {
     setRecordedUrl(null);
   }, []);
 
-  const startCapture = useCallback(async () => {
+  const startCamera = useCallback(async () => {
     setError(null);
 
-    if (cameraStreamRef.current && screenStreamRef.current && previewStreamRef.current) {
-      return {
-        cameraStream: previewStreamRef.current,
-        screenStream: screenStreamRef.current,
-      };
+    if (cameraStreamRef.current) {
+      return cameraStreamRef.current;
     }
 
     if (!canUseMediaRecorder) {
@@ -146,13 +144,64 @@ export const useVideoRecorder = () => {
       throw new Error(message);
     }
 
-    if (!navigator.mediaDevices?.getDisplayMedia || !navigator.mediaDevices?.getUserMedia) {
-      const message = 'Camera and screen sharing are not available in this browser.';
+    if (!navigator.mediaDevices?.getUserMedia) {
+      const message = 'Camera access is not available in this browser.';
       setError(message);
       throw new Error(message);
     }
 
-    setIsStartingCapture(true);
+    setIsStartingCamera(true);
+
+    try {
+      let cameraStream: MediaStream;
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user' },
+          audio: true,
+        });
+      } catch {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user' },
+          audio: false,
+        });
+      }
+
+      cameraStreamRef.current = cameraStream;
+      setStream(cameraStream);
+      return cameraStream;
+    } catch (cameraError) {
+      const errorMessage =
+        cameraError instanceof Error && cameraError.message
+          ? cameraError.message
+          : 'Unable to access camera.';
+      const message = `Camera start failed: ${errorMessage}`;
+      setError(message);
+      throw cameraError instanceof Error ? cameraError : new Error(message);
+    } finally {
+      setIsStartingCamera(false);
+    }
+  }, []);
+
+  const startScreenShare = useCallback(async () => {
+    setError(null);
+
+    if (screenStreamRef.current) {
+      return screenStreamRef.current;
+    }
+
+    if (!canUseMediaRecorder) {
+      const message = 'Browser does not support video recording.';
+      setError(message);
+      throw new Error(message);
+    }
+
+    if (!navigator.mediaDevices?.getDisplayMedia) {
+      const message = 'Screen sharing is not available in this browser.';
+      setError(message);
+      throw new Error(message);
+    }
+
+    setIsStartingScreenShare(true);
 
     try {
       const displayStream = await navigator.mediaDevices.getDisplayMedia({
@@ -170,60 +219,52 @@ export const useVideoRecorder = () => {
         throw new Error(message);
       }
 
-      let cameraStream: MediaStream;
-      try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user' },
-          audio: true,
-        });
-      } catch {
-        cameraStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user' },
-          audio: false,
-        });
-      }
-
       screenTrack.onended = () => {
         setHasScreenShare(false);
         setError('Screen sharing ended. Share your entire screen again to continue.');
-        if (isRecording) {
+
+        if (isRecordingRef.current) {
           cameraRecorderRef.current?.stop();
           screenRecorderRef.current?.stop();
+          setIsRecording(false);
         }
+
+        stopStream(screenRecordingStreamRef.current);
+        stopStream(screenStreamRef.current);
+        screenRecordingStreamRef.current = null;
+        screenStreamRef.current = null;
       };
 
       screenStreamRef.current = displayStream;
-      cameraStreamRef.current = cameraStream;
-      setStream(cameraStream);
       setHasScreenShare(true);
-
-      return {
-        cameraStream,
-        screenStream: displayStream,
-      };
-    } catch (captureError) {
+      return displayStream;
+    } catch (screenShareError) {
       stopStream(screenStreamRef.current);
-      stopStream(cameraStreamRef.current);
+      screenRecordingStreamRef.current = null;
       screenStreamRef.current = null;
-      cameraStreamRef.current = null;
-      setStream(null);
       setHasScreenShare(false);
 
       const errorMessage =
-        captureError instanceof Error && captureError.message
-          ? captureError.message
-          : 'Unable to access camera and screen share.';
-      const message = `Capture start failed: ${errorMessage}`;
+        screenShareError instanceof Error && screenShareError.message
+          ? screenShareError.message
+          : 'Unable to share screen.';
+      const message = `Screen sharing failed: ${errorMessage}`;
       setError(message);
-      throw captureError instanceof Error ? captureError : new Error(message);
+      throw screenShareError instanceof Error ? screenShareError : new Error(message);
     } finally {
-      setIsStartingCapture(false);
+      setIsStartingScreenShare(false);
     }
-  }, [isRecording]);
+  }, []);
 
   const startRecording = useCallback(() => {
-    if (!cameraStreamRef.current || !screenStreamRef.current) {
-      const message = 'Camera and entire screen must both be ready before recording.';
+    if (!cameraStreamRef.current) {
+      const message = 'Open camera first.';
+      setError(message);
+      throw new Error(message);
+    }
+
+    if (!screenStreamRef.current) {
+      const message = 'Share your entire screen first.';
       setError(message);
       throw new Error(message);
     }
@@ -348,16 +389,17 @@ export const useVideoRecorder = () => {
   }, []);
 
   return {
-    cleanup,
     error,
     hasScreenShare,
     isRecording,
-    isStartingCapture,
+    isStartingCamera,
+    isStartingScreenShare,
     recordedBlob,
     recordedUrl,
     resetRecording,
-    startCapture,
+    startCamera,
     startRecording,
+    startScreenShare,
     stopRecording,
     stream,
   };
