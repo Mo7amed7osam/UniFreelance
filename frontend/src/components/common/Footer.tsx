@@ -5,7 +5,7 @@ const Footer: React.FC = () => (
     <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-6 py-6 text-center text-sm text-ink-500 md:flex-row md:justify-between md:text-left">
       <p>
         © {new Date().getFullYear()}{' '}
-        <span className="font-semibold text-ink-700">UniFreelance</span>. All
+        <span className="font-semibold text-ink-700">Shaghalny</span>. All
         rights reserved.
       </p>
 

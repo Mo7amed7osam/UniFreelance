@@ -68,19 +68,19 @@ docker compose -f docker-compose.monitoring.yml config
 If backend image behavior changed:
 
 ```bash
-docker build -t unifreelance-backend:test ./backend
+docker build -t shaghalny-backend:test ./backend
 docker run --rm -p 5000:5000 \
   -e PORT=5000 \
   -e MONGO_URI='your-mongo-uri' \
   -e JWT_SECRET='test-secret' \
-  unifreelance-backend:test
+  shaghalny-backend:test
 ```
 
 If frontend image behavior changed:
 
 ```bash
-docker build -t unifreelance-frontend:test ./frontend
-docker run --rm -p 8080:80 unifreelance-frontend:test
+docker build -t shaghalny-frontend:test ./frontend
+docker run --rm -p 8080:80 shaghalny-frontend:test
 ```
 
 ## Manual Smoke Test Checklist

@@ -359,7 +359,7 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "unifreelance_backend_mongodb_connection_state{job=\"backend-cloud\"}",
+          "expr": "shaghalny_backend_mongodb_connection_state{job=\"backend-cloud\"}",
           "instant": true,
           "legendFormat": "",
           "range": false,
@@ -453,7 +453,7 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(rate(unifreelance_backend_http_requests_total{job=\"backend-cloud\"}[5m]))",
+          "expr": "sum(rate(shaghalny_backend_http_requests_total{job=\"backend-cloud\"}[5m]))",
           "legendFormat": "Requests/sec",
           "range": true,
           "refId": "A"
@@ -550,7 +550,7 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(rate(unifreelance_backend_http_request_errors_total{job=\"backend-cloud\"}[5m]))",
+          "expr": "sum(rate(shaghalny_backend_http_request_errors_total{job=\"backend-cloud\"}[5m]))",
           "legendFormat": "Errors/sec",
           "range": true,
           "refId": "A"
@@ -677,7 +677,7 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.5, sum by (le) (rate(unifreelance_backend_http_request_duration_seconds_bucket{job=\"backend-cloud\"}[5m])))",
+          "expr": "histogram_quantile(0.5, sum by (le) (rate(shaghalny_backend_http_request_duration_seconds_bucket{job=\"backend-cloud\"}[5m])))",
           "legendFormat": "p50",
           "range": true,
           "refId": "A"
@@ -685,7 +685,7 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(unifreelance_backend_http_request_duration_seconds_bucket{job=\"backend-cloud\"}[5m])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(shaghalny_backend_http_request_duration_seconds_bucket{job=\"backend-cloud\"}[5m])))",
           "legendFormat": "p95",
           "range": true,
           "refId": "B"
@@ -818,7 +818,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "{container=\"unifreelance-backend\"}",
+          "expr": "{container=\"shaghalny-backend\"}",
           "queryType": "range",
           "refId": "A"
         }
@@ -877,7 +877,7 @@
   "schemaVersion": 41,
   "style": "dark",
   "tags": [
-    "unifreelance",
+    "shaghalny",
     "monitoring",
     "observability"
   ],
@@ -903,8 +903,8 @@
     ]
   },
   "timezone": "browser",
-  "title": "UniFreelance Monitoring",
-  "uid": "unifreelance-monitoring",
+  "title": "Shaghalny Monitoring",
+  "uid": "shaghalny-monitoring",
   "version": 2,
   "weekStart": ""
 }

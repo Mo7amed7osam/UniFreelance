@@ -1,6 +1,6 @@
 # Quick Start
 
-This guide gets UniFreelance running locally with the smallest possible setup.
+This guide gets Shaghalny running locally with the smallest possible setup.
 
 ## Prerequisites
 
@@ -17,8 +17,8 @@ Optional for manual development:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/Mo7amed7osam/UniFreelance.git
-cd UniFreelance
+git clone https://github.com/Mo7amed7osam/UniFreelance.git Shaghalny
+cd Shaghalny
 ```
 
 ### 2. Create a Root `.env`

@@ -72,7 +72,7 @@ const Register: React.FC = () => {
             <CardHeader className="space-y-3">
               <div className="page-eyebrow">Create account</div>
               <div className="space-y-2">
-                <CardTitle className="text-3xl">Join the UniFreelance marketplace</CardTitle>
+                <CardTitle className="text-3xl">Join the Shaghalny marketplace</CardTitle>
                 <CardDescription>
                   Create a student or client account. The workflow stays the same, but the dashboard adapts to your role.
                 </CardDescription>
@@ -89,7 +89,7 @@ const Register: React.FC = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="alex@unifreelance.com" {...register('email')} />
+                  <Input id="email" type="email" placeholder="alex@shaghalny.com" {...register('email')} />
                   {errors.email ? <p className="text-sm text-rose-600 dark:text-rose-300">{errors.email.message}</p> : null}
                 </div>
 
@@ -128,7 +128,7 @@ const Register: React.FC = () => {
         <Card className="order-1 overflow-hidden bg-gradient-to-br from-white/88 via-brand-50/80 to-accent-50/70 p-0 lg:order-2 dark:bg-gradient-to-br dark:from-ink-dark-surface/84 dark:via-brand-400/10 dark:to-accent-400/10">
           <CardContent className="flex h-full flex-col justify-between gap-8 p-10">
             <div className="space-y-4">
-              <p className="page-eyebrow">Why UniFreelance</p>
+              <p className="page-eyebrow">Why Shaghalny</p>
               <h1 className="text-balance text-5xl font-semibold">A cleaner path from student potential to paid work.</h1>
               <p className="page-copy">
                 The platform is built to reduce uncertainty for both sides: students can prove capability, and clients can hire with clearer signals.

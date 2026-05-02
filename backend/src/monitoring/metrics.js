@@ -5,31 +5,31 @@ const register = new client.Registry();
 
 client.collectDefaultMetrics({
   register,
-  prefix: 'unifreelance_backend_',
+  prefix: 'shaghalny_backend_',
 });
 
 const httpRequestsInFlight = new client.Gauge({
-  name: 'unifreelance_backend_http_requests_in_flight',
+  name: 'shaghalny_backend_http_requests_in_flight',
   help: 'Current number of in-flight HTTP requests.',
   registers: [register],
 });
 
 const httpRequestsTotal = new client.Counter({
-  name: 'unifreelance_backend_http_requests_total',
+  name: 'shaghalny_backend_http_requests_total',
   help: 'Total number of HTTP requests handled by the backend.',
   labelNames: ['method', 'route', 'status_code'],
   registers: [register],
 });
 
 const httpRequestErrorsTotal = new client.Counter({
-  name: 'unifreelance_backend_http_request_errors_total',
+  name: 'shaghalny_backend_http_request_errors_total',
   help: 'Total number of HTTP requests that completed with 5xx responses.',
   labelNames: ['method', 'route', 'status_code'],
   registers: [register],
 });
 
 const httpRequestDurationSeconds = new client.Histogram({
-  name: 'unifreelance_backend_http_request_duration_seconds',
+  name: 'shaghalny_backend_http_request_duration_seconds',
   help: 'Duration of HTTP requests in seconds.',
   labelNames: ['method', 'route', 'status_code'],
   buckets: [0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
@@ -37,7 +37,7 @@ const httpRequestDurationSeconds = new client.Histogram({
 });
 
 const mongoConnectionState = new client.Gauge({
-  name: 'unifreelance_backend_mongodb_connection_state',
+  name: 'shaghalny_backend_mongodb_connection_state',
   help: 'MongoDB connection state reported by Mongoose. 0=disconnected, 1=connected, 2=connecting, 3=disconnecting.',
   registers: [register],
   collect() {

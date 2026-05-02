@@ -29,7 +29,7 @@ const uploadInterviewVideo = async ({ filePath, publicId, folder }) => {
         return null;
     }
 
-    const targetFolder = (folder || process.env.CLOUDINARY_UPLOAD_FOLDER || 'unifreelance/interviews').replace(/\/$/, '');
+    const targetFolder = (folder || process.env.CLOUDINARY_UPLOAD_FOLDER || 'shaghalny/interviews').replace(/\/$/, '');
 
     const result = await cloudinary.uploader.upload(filePath, {
         resource_type: 'video',

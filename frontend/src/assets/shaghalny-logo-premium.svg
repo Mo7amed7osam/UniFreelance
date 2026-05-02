@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#7c3aed" />
+      <stop offset="1" stop-color="#06b6d4" />
+    </linearGradient>
+    <style>
+      .word { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 48px; }
+      .mark { fill: url(#g); }
+    </style>
+  </defs>
+  <rect width="100%" height="100%" fill="none" />
+  <g transform="translate(30,30)">
+    <g transform="translate(0,10)">
+      <circle cx="60" cy="40" r="36" class="mark" />
+      <g transform="translate(36,18)" fill="#fff">
+        <rect x="0" y="0" width="8" height="32" rx="2" />
+        <rect x="12" y="0" width="8" height="32" rx="2" transform="rotate(22 16 16)" />
+      </g>
+    </g>
+    <text x="130" y="72" class="word" fill="#0f172a">Shaghalny</text>
+  </g>
+</svg>

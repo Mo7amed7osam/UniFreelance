@@ -1,6 +1,6 @@
 # AI Interview Tooling
 
-This folder contains the standalone Python AI interview tooling that was added separately from the main UniFreelance marketplace stack.
+This folder contains the standalone Python AI interview tooling that was added separately from the main Shaghalny marketplace stack.
 
 ## Contents
 

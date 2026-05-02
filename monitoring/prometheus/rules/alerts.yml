@@ -23,9 +23,9 @@ groups:
     rules:
       - alert: BackendHigh5xxRate
         expr: |
-          sum(rate(unifreelance_backend_http_requests_total{job="backend-cloud",status_code=~"5.."}[5m]))
+          sum(rate(shaghalny_backend_http_requests_total{job="backend-cloud",status_code=~"5.."}[5m]))
           /
-          clamp_min(sum(rate(unifreelance_backend_http_requests_total{job="backend-cloud"}[5m])), 0.001)
+          clamp_min(sum(rate(shaghalny_backend_http_requests_total{job="backend-cloud"}[5m])), 0.001)
           > 0.05
         for: 10m
         labels:
@@ -38,7 +38,7 @@ groups:
         expr: |
           histogram_quantile(
             0.95,
-            sum by (le) (rate(unifreelance_backend_http_request_duration_seconds_bucket{job="backend-cloud"}[5m]))
+            sum by (le) (rate(shaghalny_backend_http_request_duration_seconds_bucket{job="backend-cloud"}[5m]))
           ) > 1
         for: 10m
         labels:
@@ -48,7 +48,7 @@ groups:
           description: Backend p95 latency is above 1 second for the last 10 minutes.
 
       - alert: MongoConnectionNotReady
-        expr: unifreelance_backend_mongodb_connection_state{job="backend-cloud"} != 1
+        expr: shaghalny_backend_mongodb_connection_state{job="backend-cloud"} != 1
         for: 2m
         labels:
           severity: critical

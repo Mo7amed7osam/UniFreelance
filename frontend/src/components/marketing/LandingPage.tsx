@@ -12,7 +12,7 @@ import {
   Video,
 } from 'lucide-react';
 
-import logo from '@/assets/logo.png';
+import logo from '@/assets/shaghalny-logo-premium.svg';
 import useAuth from '@/hooks/useAuth';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -75,9 +75,9 @@ const LandingPage: React.FC = () => {
       <header className="page-container pt-5">
         <div className="glass-panel flex items-center justify-between gap-4 px-5 py-4 sm:px-6">
           <Link to="/" className="flex items-center gap-3 text-ink-900 no-underline dark:text-white">
-            <img src={logo} alt="UniFreelance" className="h-11 w-11 rounded-2xl object-contain" />
+            <img src={logo} alt="Shaghalny" className="h-11 w-11 rounded-2xl object-contain" />
             <div>
-              <p className="text-lg font-semibold text-ink-900 dark:text-white">UniFreelance</p>
+              <p className="text-lg font-semibold text-ink-900 dark:text-white">Shaghalny</p>
               <p className="text-xs uppercase tracking-[0.22em] text-ink-400 dark:text-ink-300">Student marketplace</p>
             </div>
           </Link>
@@ -107,7 +107,7 @@ const LandingPage: React.FC = () => {
                   Hire verified student talent without the usual trust gap.
                 </h1>
                 <p className="page-copy text-lg">
-                  UniFreelance helps students prove their skills, helps clients screen faster, and keeps proposals,
+                  Shaghalny helps students prove their skills, helps clients screen faster, and keeps proposals,
                   contracts, and payments inside one professional marketplace.
                 </p>
               </div>
@@ -116,7 +116,7 @@ const LandingPage: React.FC = () => {
             <div className="flex flex-wrap gap-3">
               <Button asChild size="xl">
                 <Link to={isAuthenticated && dashboardPath ? dashboardPath : '/register'}>
-                  {isAuthenticated ? 'Go to workspace' : 'Join UniFreelance'}
+                  {isAuthenticated ? 'Go to workspace' : 'Join Shaghalny'}
                   <ArrowRight size={18} />
                 </Link>
               </Button>
@@ -192,7 +192,7 @@ const LandingPage: React.FC = () => {
                 <p className="page-eyebrow">How it works</p>
                 <h2 className="text-4xl font-semibold">Professional workflow without the clutter.</h2>
                 <p className="page-copy">
-                  UniFreelance keeps the product simple: discover work, verify capability, shortlist credible talent,
+                  Shaghalny keeps the product simple: discover work, verify capability, shortlist credible talent,
                   then move into contracts and payments with fewer manual steps.
                 </p>
               </div>
@@ -223,7 +223,7 @@ const LandingPage: React.FC = () => {
                 </Badge>
                 <h2 className="text-4xl font-semibold text-white">Start with the right workflow for your role.</h2>
                 <p className="max-w-2xl text-base leading-7 text-white/72">
-                  Whether you are a student proving capability or a client hiring verified talent, UniFreelance keeps the experience clear and dependable.
+                  Whether you are a student proving capability or a client hiring verified talent, Shaghalny keeps the experience clear and dependable.
                 </p>
               </div>
 
@@ -246,7 +246,7 @@ const LandingPage: React.FC = () => {
         </section>
 
         <footer className="flex flex-col items-center justify-between gap-4 px-2 pt-12 text-sm text-ink-500 md:flex-row dark:text-ink-300">
-          <p>© {new Date().getFullYear()} UniFreelance. Verified student talent, clearer hiring.</p>
+          <p>© {new Date().getFullYear()} Shaghalny. Verified student talent, clearer hiring.</p>
           <div className="flex items-center gap-5">
             <Link to="/login">Sign in</Link>
             <Link to="/register">Register</Link>

@@ -50,7 +50,7 @@ export const AIInterviewerAvatar: React.FC<AIInterviewerAvatarProps> = ({
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/45">UniFreelance AI interviewer</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/45">Shaghalny AI interviewer</p>
             <h2 className="text-4xl font-semibold tracking-tight text-white md:text-5xl">Gravis</h2>
             <p className="mx-auto max-w-2xl text-sm text-white/60">
               {questionText

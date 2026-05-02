@@ -1,6 +1,6 @@
 # CI/CD Summary
 
-This is the short operational summary of the UniFreelance pipeline.
+This is the short operational summary of the Shaghalny pipeline.
 
 ## Current State
 

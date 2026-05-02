@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for contributing to UniFreelance.
+Thank you for contributing to Shaghalny.
 
 This document explains how to work on the repository without fighting the current project setup.
 
@@ -16,8 +16,8 @@ This document explains how to work on the repository without fighting the curren
 Clone the repository:
 
 ```bash
-git clone https://github.com/Mo7amed7osam/UniFreelance.git
-cd UniFreelance
+git clone https://github.com/Mo7amed7osam/UniFreelance.git Shaghalny
+cd Shaghalny
 ```
 
 There is no committed `.env.example` file. Create your own root `.env` with the values required for the services you want to run.

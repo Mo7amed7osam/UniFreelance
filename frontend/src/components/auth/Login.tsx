@@ -57,7 +57,7 @@ const Login: React.FC = () => {
             <div className="space-y-5">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-white/75">
                 <Sparkles size={14} />
-                UniFreelance
+                Shaghalny
               </div>
               <div className="space-y-4">
                 <h1 className="text-balance text-5xl font-semibold text-white">
@@ -87,7 +87,7 @@ const Login: React.FC = () => {
             <CardHeader className="space-y-3">
               <div className="page-eyebrow">Sign in</div>
               <div className="space-y-2">
-                <CardTitle className="text-3xl">Welcome back to UniFreelance</CardTitle>
+                <CardTitle className="text-3xl">Welcome back to Shaghalny</CardTitle>
                 <CardDescription>
                   Access your dashboard, proposals, interviews, and contracts without leaving the same workspace.
                 </CardDescription>
@@ -98,7 +98,7 @@ const Login: React.FC = () => {
               <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="you@unifreelance.com" {...register('email')} />
+                  <Input id="email" type="email" placeholder="you@shaghalny.com" {...register('email')} />
                   {errors.email ? <p className="text-sm text-rose-600 dark:text-rose-300">{errors.email.message}</p> : null}
                 </div>
 

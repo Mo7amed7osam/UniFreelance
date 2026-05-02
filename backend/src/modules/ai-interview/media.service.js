@@ -129,7 +129,7 @@ const extractAudioFromVideo = async (videoPath) => {
   let downloadedTempDir = null;
 
   if (/^https?:\/\//i.test(videoPath)) {
-    downloadedTempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'unifreelance-ai-video-'));
+    downloadedTempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'shaghalny-ai-video-'));
     localVideoPath = path.join(downloadedTempDir, 'remote_video');
     const writer = fs.createWriteStream(localVideoPath);
     const resp = await axios({ method: 'get', url: videoPath, responseType: 'stream', timeout: 20000 });
@@ -148,7 +148,7 @@ const extractAudioFromVideo = async (videoPath) => {
     throw new Error('Video file is not accessible for audio extraction.');
   }
 
-  const tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'unifreelance-ai-audio-'));
+  const tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'shaghalny-ai-audio-'));
   const audioPath = path.join(tempDir, 'answer.wav');
 
   // Ensure tempDir is writable
@@ -202,7 +202,7 @@ const extractAudioFromVideo = async (videoPath) => {
 
 const persistInterviewVideo = async ({ filePath, sessionId, questionId, kind }) => {
   const publicId = `${sessionId}/${questionId}/${kind}`;
-  const folder = process.env.CLOUDINARY_UPLOAD_FOLDER || `unifreelance/interviews/${sessionId}/${questionId}`;
+  const folder = process.env.CLOUDINARY_UPLOAD_FOLDER || `shaghalny/interviews/${sessionId}/${questionId}`;
   const cloudinaryResult = await uploadInterviewVideo({
     filePath,
     publicId,

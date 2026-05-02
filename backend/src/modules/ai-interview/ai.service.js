@@ -99,7 +99,7 @@ const callOpenRouter = async (prompt) => {
         Authorization: `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': process.env.OPENROUTER_HTTP_REFERER || 'http://localhost',
-        'X-Title': process.env.OPENROUTER_APP_TITLE || 'UniFreelance',
+        'X-Title': process.env.OPENROUTER_APP_TITLE || 'Shaghalny',
       },
       timeout: 45000,
     }

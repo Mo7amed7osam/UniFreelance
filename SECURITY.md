@@ -1,6 +1,6 @@
 # Security Guide
 
-This document describes the current security posture of UniFreelance, the expected secret-handling process, and the gaps that still require hardening.
+This document describes the current security posture of Shaghalny, the expected secret-handling process, and the gaps that still require hardening.
 
 ## Reporting a Security Issue
 

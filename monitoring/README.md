@@ -1,6 +1,6 @@
 # Monitoring Stack
 
-This repository includes a local observability stack for UniFreelance using Grafana, Prometheus, Alertmanager, Loki, Promtail, and Blackbox Exporter.
+This repository includes a local observability stack for Shaghalny using Grafana, Prometheus, Alertmanager, Loki, Promtail, and Blackbox Exporter.
 
 ## What It Monitors
 
@@ -68,7 +68,7 @@ export GRAFANA_PORT=3001
 
 Provisioned dashboard:
 
-- `UniFreelance Monitoring`
+- `Shaghalny Monitoring`
 
 ## Validation Commands
 
@@ -119,13 +119,13 @@ az container logs --resource-group gradproject-rg --name gradproject-back
 - Loki may reject very old historical container logs on first bootstrap; new logs still ingest correctly
 - if the Azure backend hostname or Vercel URL changes, update:
   - `monitoring/prometheus/prometheus.yml`
-  - `monitoring/grafana/dashboards/unifreelance-monitoring.json`
+  - `monitoring/grafana/dashboards/shaghalny-monitoring.json`
 
 ## Key Files
 
 - [`docker-compose.monitoring.yml`](../docker-compose.monitoring.yml)
 - [`monitoring/prometheus/prometheus.yml`](prometheus/prometheus.yml)
 - [`monitoring/prometheus/rules/alerts.yml`](prometheus/rules/alerts.yml)
-- [`monitoring/grafana/dashboards/unifreelance-monitoring.json`](grafana/dashboards/unifreelance-monitoring.json)
+- [`monitoring/grafana/dashboards/shaghalny-monitoring.json`](grafana/dashboards/shaghalny-monitoring.json)
 - [`monitoring/loki/config.yml`](loki/config.yml)
 - [`monitoring/promtail/config.yml`](promtail/config.yml)

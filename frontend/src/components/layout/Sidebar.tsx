@@ -10,7 +10,7 @@ import {
   Wallet,
 } from 'lucide-react';
 
-import logo from '@/assets/logo.png';
+import logo from '@/assets/shaghalny-logo-premium.svg';
 import { Badge } from '@/components/ui/badge';
 import useAuth from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
@@ -51,9 +51,9 @@ export const Sidebar = () => {
     <aside className="fixed inset-y-4 left-4 hidden w-72 md:block">
       <div className="glass-panel flex h-full flex-col px-5 py-5">
         <div className="flex items-center gap-3 rounded-2xl border border-white/50 bg-white/60 p-3 dark:border-white/10 dark:bg-white/5">
-          <img src={logo} alt="UniFreelance" className="h-12 w-12 rounded-2xl object-contain" />
+          <img src={logo} alt="Shaghalny" className="h-12 w-12 rounded-2xl object-contain" />
           <div className="min-w-0">
-            <p className="truncate text-lg font-semibold text-ink-900 dark:text-white">UniFreelance</p>
+            <p className="truncate text-lg font-semibold text-ink-900 dark:text-white">Shaghalny</p>
             <p className="truncate text-xs uppercase tracking-[0.18em] text-ink-400 dark:text-ink-300">
               {user ? roleLabel[user.role as keyof typeof roleLabel] : 'Workspace'}
             </p>
