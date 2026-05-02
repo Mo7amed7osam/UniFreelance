@@ -18,23 +18,48 @@ const getSupportedMimeType = () =>
     ? supportedMimeTypes.find((mimeType) => MediaRecorder.isTypeSupported(mimeType)) || ''
     : '';
 
+const stopStream = (mediaStream: MediaStream | null) => {
+  mediaStream?.getTracks().forEach((track) => track.stop());
+};
+
+type RecordedCapture = {
+  cameraFile: File;
+  screenFile: File;
+};
+
+type StopState = {
+  resolver: ((files: RecordedCapture | null) => void) | null;
+  cameraFile: File | null;
+  screenFile: File | null;
+};
+
 export const useVideoRecorder = () => {
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [hasScreenShare, setHasScreenShare] = useState(false);
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
-  const [isStartingScreenShare, setIsStartingScreenShare] = useState(false);
+  const [isStartingCapture, setIsStartingCapture] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  const stopResolverRef = useRef<((file: File | null) => void) | null>(null);
+  const cameraRecorderRef = useRef<MediaRecorder | null>(null);
+  const screenRecorderRef = useRef<MediaRecorder | null>(null);
+  const cameraChunksRef = useRef<Blob[]>([]);
+  const screenChunksRef = useRef<Blob[]>([]);
+  const stopStateRef = useRef<StopState>({
+    resolver: null,
+    cameraFile: null,
+    screenFile: null,
+  });
   const mimeTypeRef = useRef<string>(getSupportedMimeType());
-  const streamRef = useRef<MediaStream | null>(null);
+  const previewStreamRef = useRef<MediaStream | null>(null);
+  const cameraStreamRef = useRef<MediaStream | null>(null);
+  const screenStreamRef = useRef<MediaStream | null>(null);
+  const screenRecordingStreamRef = useRef<MediaStream | null>(null);
   const recordedUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
-    streamRef.current = stream;
+    previewStreamRef.current = stream;
   }, [stream]);
 
   useEffect(() => {
@@ -47,25 +72,48 @@ export const useVideoRecorder = () => {
     return 'webm';
   };
 
+  const resolveStopIfReady = useCallback(() => {
+    const { resolver, cameraFile, screenFile } = stopStateRef.current;
+    if (!resolver || !cameraFile || !screenFile) {
+      return;
+    }
+
+    stopStateRef.current = {
+      resolver: null,
+      cameraFile: null,
+      screenFile: null,
+    };
+    resolver({ cameraFile, screenFile });
+  }, []);
+
   const cleanup = useCallback(() => {
     if (recordedUrlRef.current) {
       URL.revokeObjectURL(recordedUrlRef.current);
       recordedUrlRef.current = null;
     }
+
     setRecordedUrl(null);
     setRecordedBlob(null);
     setIsRecording(false);
+    setHasScreenShare(false);
 
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      mediaRecorderRef.current.stop();
+    if (cameraRecorderRef.current && cameraRecorderRef.current.state !== 'inactive') {
+      cameraRecorderRef.current.stop();
+    }
+    if (screenRecorderRef.current && screenRecorderRef.current.state !== 'inactive') {
+      screenRecorderRef.current.stop();
     }
 
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
+    cameraRecorderRef.current = null;
+    screenRecorderRef.current = null;
 
-    mediaRecorderRef.current = null;
+    stopStream(screenRecordingStreamRef.current);
+    stopStream(screenStreamRef.current);
+    stopStream(cameraStreamRef.current);
+
+    screenRecordingStreamRef.current = null;
+    screenStreamRef.current = null;
+    cameraStreamRef.current = null;
     setStream(null);
   }, []);
 
@@ -76,16 +124,20 @@ export const useVideoRecorder = () => {
       URL.revokeObjectURL(recordedUrlRef.current);
       recordedUrlRef.current = null;
     }
-    chunksRef.current = [];
+    cameraChunksRef.current = [];
+    screenChunksRef.current = [];
     setRecordedBlob(null);
     setRecordedUrl(null);
   }, []);
 
-  const startScreenShare = useCallback(async () => {
+  const startCapture = useCallback(async () => {
     setError(null);
 
-    if (streamRef.current) {
-      return streamRef.current;
+    if (cameraStreamRef.current && screenStreamRef.current && previewStreamRef.current) {
+      return {
+        cameraStream: previewStreamRef.current,
+        screenStream: screenStreamRef.current,
+      };
     }
 
     if (!canUseMediaRecorder) {
@@ -94,13 +146,13 @@ export const useVideoRecorder = () => {
       throw new Error(message);
     }
 
-    if (!navigator.mediaDevices?.getDisplayMedia) {
-      const message = 'Screen sharing is not available in this browser.';
+    if (!navigator.mediaDevices?.getDisplayMedia || !navigator.mediaDevices?.getUserMedia) {
+      const message = 'Camera and screen sharing are not available in this browser.';
       setError(message);
       throw new Error(message);
     }
 
-    setIsStartingScreenShare(true);
+    setIsStartingCapture(true);
 
     try {
       const displayStream = await navigator.mediaDevices.getDisplayMedia({
@@ -118,33 +170,94 @@ export const useVideoRecorder = () => {
         throw new Error(message);
       }
 
-      let audioTracks: MediaStreamTrack[] = [];
+      let cameraStream: MediaStream;
       try {
-        const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-        audioTracks = audioStream.getAudioTracks();
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user' },
+          audio: true,
+        });
       } catch {
-        audioTracks = [];
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user' },
+          audio: false,
+        });
       }
 
-      const mediaStream = new MediaStream([screenTrack, ...audioTracks]);
-      const recorderOptions = mimeTypeRef.current ? { mimeType: mimeTypeRef.current } : undefined;
-      const mediaRecorder = new MediaRecorder(mediaStream, recorderOptions);
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunksRef.current.push(event.data);
+      screenTrack.onended = () => {
+        setHasScreenShare(false);
+        setError('Screen sharing ended. Share your entire screen again to continue.');
+        if (isRecording) {
+          cameraRecorderRef.current?.stop();
+          screenRecorderRef.current?.stop();
         }
       };
 
-      mediaRecorder.onstop = () => {
-        const mimeType = mimeTypeRef.current || mediaRecorder.mimeType || 'video/webm';
+      screenStreamRef.current = displayStream;
+      cameraStreamRef.current = cameraStream;
+      setStream(cameraStream);
+      setHasScreenShare(true);
+
+      return {
+        cameraStream,
+        screenStream: displayStream,
+      };
+    } catch (captureError) {
+      stopStream(screenStreamRef.current);
+      stopStream(cameraStreamRef.current);
+      screenStreamRef.current = null;
+      cameraStreamRef.current = null;
+      setStream(null);
+      setHasScreenShare(false);
+
+      const errorMessage =
+        captureError instanceof Error && captureError.message
+          ? captureError.message
+          : 'Unable to access camera and screen share.';
+      const message = `Capture start failed: ${errorMessage}`;
+      setError(message);
+      throw captureError instanceof Error ? captureError : new Error(message);
+    } finally {
+      setIsStartingCapture(false);
+    }
+  }, [isRecording]);
+
+  const startRecording = useCallback(() => {
+    if (!cameraStreamRef.current || !screenStreamRef.current) {
+      const message = 'Camera and entire screen must both be ready before recording.';
+      setError(message);
+      throw new Error(message);
+    }
+
+    try {
+      resetRecording();
+      cameraChunksRef.current = [];
+      screenChunksRef.current = [];
+      stopStateRef.current = {
+        resolver: null,
+        cameraFile: null,
+        screenFile: null,
+      };
+
+      const recorderOptions = mimeTypeRef.current ? { mimeType: mimeTypeRef.current } : undefined;
+
+      const cameraRecorder = new MediaRecorder(cameraStreamRef.current, recorderOptions);
+      cameraRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          cameraChunksRef.current.push(event.data);
+        }
+      };
+
+      cameraRecorder.onstop = () => {
+        const mimeType = mimeTypeRef.current || cameraRecorder.mimeType || 'video/webm';
         const extension = getExtensionFromMimeType(mimeType);
-        const blob = chunksRef.current.length ? new Blob(chunksRef.current, { type: mimeType }) : null;
+        const blob = cameraChunksRef.current.length
+          ? new Blob(cameraChunksRef.current, { type: mimeType })
+          : null;
         const file = blob
-          ? new File([blob], `answer-${Date.now()}.${extension}`, { type: mimeType })
+          ? new File([blob], `camera-answer-${Date.now()}.${extension}`, { type: mimeType })
           : null;
 
-        chunksRef.current = [];
+        cameraChunksRef.current = [];
         setRecordedBlob(blob);
 
         if (recordedUrlRef.current) {
@@ -154,41 +267,49 @@ export const useVideoRecorder = () => {
         const nextUrl = blob ? URL.createObjectURL(blob) : null;
         recordedUrlRef.current = nextUrl;
         setRecordedUrl(nextUrl);
-        setIsRecording(false);
 
-        if (stopResolverRef.current) {
-          stopResolverRef.current(file);
-          stopResolverRef.current = null;
+        stopStateRef.current.cameraFile = file;
+        resolveStopIfReady();
+      };
+
+      const screenTrack = screenStreamRef.current.getVideoTracks()[0];
+      if (!screenTrack) {
+        throw new Error('Missing screen sharing track.');
+      }
+
+      const screenRecordingStream = new MediaStream([screenTrack]);
+      cameraStreamRef.current.getAudioTracks().forEach((track) => {
+        screenRecordingStream.addTrack(track.clone());
+      });
+      screenRecordingStreamRef.current = screenRecordingStream;
+
+      const screenRecorder = new MediaRecorder(screenRecordingStream, recorderOptions);
+      screenRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          screenChunksRef.current.push(event.data);
         }
       };
 
-      mediaRecorderRef.current = mediaRecorder;
-      setStream(mediaStream);
-      return mediaStream;
-    } catch (screenShareError) {
-      const errorMessage =
-        screenShareError instanceof Error && screenShareError.message
-          ? screenShareError.message
-          : 'Unable to share screen.';
-      const message = `Screen sharing failed: ${errorMessage}`;
-      setError(message);
-      throw screenShareError instanceof Error ? screenShareError : new Error(message);
-    } finally {
-      setIsStartingScreenShare(false);
-    }
-  }, []);
+      screenRecorder.onstop = () => {
+        const mimeType = mimeTypeRef.current || screenRecorder.mimeType || 'video/webm';
+        const extension = getExtensionFromMimeType(mimeType);
+        const blob = screenChunksRef.current.length
+          ? new Blob(screenChunksRef.current, { type: mimeType })
+          : null;
+        const file = blob
+          ? new File([blob], `screen-answer-${Date.now()}.${extension}`, { type: mimeType })
+          : null;
 
-  const startRecording = useCallback(() => {
-    if (!mediaRecorderRef.current) {
-      const message = 'Entire screen is not ready.';
-      setError(message);
-      throw new Error(message);
-    }
+        screenChunksRef.current = [];
+        stopStateRef.current.screenFile = file;
+        resolveStopIfReady();
+      };
 
-    try {
-      resetRecording();
-      chunksRef.current = [];
-      mediaRecorderRef.current.start();
+      cameraRecorderRef.current = cameraRecorder;
+      screenRecorderRef.current = screenRecorder;
+
+      cameraRecorder.start();
+      screenRecorder.start();
       setIsRecording(true);
       setError(null);
     } catch (recordingError) {
@@ -199,30 +320,43 @@ export const useVideoRecorder = () => {
       setError(`Recording failed: ${message}`);
       throw recordingError instanceof Error ? recordingError : new Error(message);
     }
-  }, [resetRecording]);
+  }, [resetRecording, resolveStopIfReady]);
 
   const stopRecording = useCallback(() => {
-    return new Promise<File | null>((resolve) => {
-      if (!mediaRecorderRef.current || mediaRecorderRef.current.state === 'inactive') {
+    return new Promise<RecordedCapture | null>((resolve) => {
+      if (
+        !cameraRecorderRef.current ||
+        cameraRecorderRef.current.state === 'inactive' ||
+        !screenRecorderRef.current ||
+        screenRecorderRef.current.state === 'inactive'
+      ) {
         setIsRecording(false);
         resolve(null);
         return;
       }
 
-      stopResolverRef.current = resolve;
-      mediaRecorderRef.current.stop();
+      stopStateRef.current = {
+        resolver: resolve,
+        cameraFile: null,
+        screenFile: null,
+      };
+
+      setIsRecording(false);
+      cameraRecorderRef.current.stop();
+      screenRecorderRef.current.stop();
     });
   }, []);
 
   return {
     cleanup,
     error,
+    hasScreenShare,
     isRecording,
-    isStartingScreenShare,
+    isStartingCapture,
     recordedBlob,
     recordedUrl,
     resetRecording,
-    startScreenShare,
+    startCapture,
     startRecording,
     stopRecording,
     stream,

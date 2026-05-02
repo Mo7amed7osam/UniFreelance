@@ -13,6 +13,8 @@ export interface InterviewAnswer {
   questionId: string;
   question: string;
   videoUrl: string;
+  cameraVideoUrl?: string | null;
+  screenVideoUrl?: string | null;
   transcript: string | null;
   processingError?: string | null;
   score: number | null;
@@ -55,7 +57,10 @@ export interface InterviewSessionResponse {
 export interface SubmitInterviewAnswerResponse {
   success: true;
   answerId: string;
-  evaluation: Omit<InterviewAnswer, 'answerId' | 'questionId' | 'question' | 'videoUrl'>;
+  evaluation: Omit<
+    InterviewAnswer,
+    'answerId' | 'questionId' | 'question' | 'videoUrl' | 'cameraVideoUrl' | 'screenVideoUrl'
+  >;
   completed: boolean;
   finalScore: number | null;
   finalRecommendation: InterviewRecommendation | null;

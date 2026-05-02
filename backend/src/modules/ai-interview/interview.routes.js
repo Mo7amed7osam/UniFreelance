@@ -16,7 +16,10 @@ router.post(
   '/:sessionId/answer',
   authenticate,
   checkRole(['Student']),
-  upload.single('video'),
+  upload.fields([
+    { name: 'cameraVideo', maxCount: 1 },
+    { name: 'screenVideo', maxCount: 1 },
+  ]),
   submitInterviewAnswer
 );
 router.get('/:sessionId/result', authenticate, checkRole(['Student', 'Admin']), getInterviewResult);

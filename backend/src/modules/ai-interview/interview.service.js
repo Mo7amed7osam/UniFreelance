@@ -73,7 +73,9 @@ const serializeSession = (session) => ({
     answerId: String(answer._id),
     questionId: answer.questionId,
     question: answer.questionText,
-    videoUrl: answer.videoUrl,
+    videoUrl: answer.cameraVideoUrl || answer.videoUrl,
+    cameraVideoUrl: answer.cameraVideoUrl || answer.videoUrl,
+    screenVideoUrl: answer.screenVideoUrl || null,
     transcript: answer.transcript,
     processingError: answer.processingError,
     score: answer.score,
@@ -254,9 +256,12 @@ const updateVerifiedSkill = async (session, score) => {
   await student.save();
 };
 
-const submitAnswer = async ({ sessionId, user, questionId, file }) => {
-  if (!file) {
-    throw buildError(400, 'Video file is required.');
+const submitAnswer = async ({ sessionId, user, questionId, cameraFile, screenFile }) => {
+  if (!cameraFile) {
+    throw buildError(400, 'Camera video file is required.');
+  }
+  if (!screenFile) {
+    throw buildError(400, 'Screen recording file is required.');
   }
   if (!isValidId(sessionId)) {
     throw buildError(400, 'Invalid sessionId.');
@@ -292,16 +297,18 @@ const submitAnswer = async ({ sessionId, user, questionId, file }) => {
   const evaluation = await evaluateVideoAnswer({
     skill: session.skill,
     question: question.text,
-    filePath: toAbsolutePath(file),
-    mimeType: file.mimetype,
-    originalName: file.originalname,
+    filePath: toAbsolutePath(cameraFile),
+    mimeType: cameraFile.mimetype,
+    originalName: cameraFile.originalname,
   });
 
   session.answers.push({
     questionId: question.questionId,
     questionText: question.text,
-    videoUrl: toPublicUploadUrl(file),
-    mimeType: file.mimetype,
+    videoUrl: toPublicUploadUrl(cameraFile),
+    cameraVideoUrl: toPublicUploadUrl(cameraFile),
+    screenVideoUrl: toPublicUploadUrl(screenFile),
+    mimeType: cameraFile.mimetype,
     transcript: evaluation.transcript,
     processingError: evaluation.processingError || null,
     score: evaluation.score,
@@ -370,7 +377,9 @@ const getInterviewResult = async (sessionId, user) => {
       answerId: String(answer._id),
       questionId: answer.questionId,
       question: answer.questionText,
-      videoUrl: answer.videoUrl,
+      videoUrl: answer.cameraVideoUrl || answer.videoUrl,
+      cameraVideoUrl: answer.cameraVideoUrl || answer.videoUrl,
+      screenVideoUrl: answer.screenVideoUrl || null,
       transcript: answer.transcript,
       processingError: answer.processingError,
       score: answer.score,

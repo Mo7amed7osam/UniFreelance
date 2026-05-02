@@ -8,7 +8,7 @@ import { useVideoRecorder } from '../hooks/useVideoRecorder';
 interface CameraRecorderProps {
   disabled?: boolean;
   questionKey: string;
-  onVideoReady: (file: File) => void;
+  onVideoReady: (files: { cameraFile: File; screenFile: File }) => void;
 }
 
 export const CameraRecorder: React.FC<CameraRecorderProps> = ({
@@ -18,15 +18,15 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({
 }) => {
   const previewRef = useRef<HTMLVideoElement | null>(null);
   const [seconds, setSeconds] = useState(0);
-  const [screenRequested, setScreenRequested] = useState(false);
+  const [captureRequested, setCaptureRequested] = useState(false);
   const {
-    cleanup,
     error,
+    hasScreenShare,
     isRecording,
-    isStartingScreenShare,
+    isStartingCapture,
     recordedUrl,
     resetRecording,
-    startScreenShare,
+    startCapture,
     startRecording,
     stopRecording,
     stream,
@@ -71,22 +71,21 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({
     });
   }, [isRecording, onVideoReady, seconds, stopRecording]);
 
-  const handleRequestScreenShare = async () => {
+  const handleRequestCapture = async () => {
     try {
-      const activeStream = await startScreenShare();
-      setScreenRequested(true);
+      const activeStream = await startCapture();
+      setCaptureRequested(true);
       return activeStream;
     } catch {
-      setScreenRequested(false);
+      setCaptureRequested(false);
       return null;
     }
   };
 
   const handleStartRecording = async () => {
-    let activeStream = stream;
-    if (!activeStream) {
-      activeStream = await handleRequestScreenShare();
-      if (!activeStream) {
+    if (!stream || !hasScreenShare) {
+      const capture = await handleRequestCapture();
+      if (!capture) {
         return;
       }
     }
@@ -136,11 +135,11 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({
           <p className="text-sm text-ink-500 dark:text-ink-400">Preview ready. Upload to continue.</p>
         ) : (
           <p className="text-sm text-ink-500 dark:text-ink-400">
-            {stream
-              ? 'Entire screen ready.'
-              : screenRequested
-                ? 'Trying to share entire screen...'
-                : 'Share your entire screen and allow microphone access before recording.'}
+            {stream && hasScreenShare
+              ? 'Camera preview is ready. Entire screen is also being shared for admin review.'
+              : captureRequested
+                ? 'Trying to open camera and entire screen share...'
+                : 'Allow camera and share your entire screen before recording.'}
           </p>
         )}
 
@@ -148,16 +147,20 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({
           <Button
             type="button"
             variant="secondary"
-            onClick={handleRequestScreenShare}
-            disabled={disabled || isStartingScreenShare || Boolean(stream)}
+            onClick={handleRequestCapture}
+            disabled={disabled || isStartingCapture || (Boolean(stream) && hasScreenShare)}
           >
-            {isStartingScreenShare ? 'Opening screen share...' : stream ? 'Screen ready' : 'Share entire screen'}
+            {isStartingCapture
+              ? 'Opening camera + screen share...'
+              : stream && hasScreenShare
+                ? 'Camera + screen ready'
+                : 'Enable camera + screen'}
           </Button>
 
           <Button
             type="button"
             onClick={handleStartRecording}
-            disabled={disabled || isRecording || isStartingScreenShare}
+            disabled={disabled || isRecording || isStartingCapture}
           >
             Start recording
           </Button>

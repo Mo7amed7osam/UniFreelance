@@ -28,11 +28,14 @@ const getInterviewSession = async (req, res) => {
 
 const submitInterviewAnswer = async (req, res) => {
   try {
+    const cameraFile = req.files?.cameraVideo?.[0] || null;
+    const screenFile = req.files?.screenVideo?.[0] || null;
     const result = await interviewService.submitAnswer({
       sessionId: req.params.sessionId,
       user: req.user,
       questionId: req.body?.questionId,
-      file: req.file,
+      cameraFile,
+      screenFile,
     });
     return res.status(200).json(result);
   } catch (error) {

@@ -22,11 +22,12 @@ export const getInterviewSession = async (sessionId: string) => {
 export const submitInterviewAnswer = async (
   sessionId: string,
   questionId: string,
-  videoFile: File
+  files: { cameraFile: File; screenFile: File }
 ) => {
   const formData = new FormData();
   formData.append('questionId', questionId);
-  formData.append('video', videoFile);
+  formData.append('cameraVideo', files.cameraFile);
+  formData.append('screenVideo', files.screenFile);
 
   const response = await http.post<SubmitInterviewAnswerResponse>(
     API.interview.answer(sessionId),

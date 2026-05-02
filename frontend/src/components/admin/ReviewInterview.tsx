@@ -131,8 +131,21 @@ const ReviewInterview: React.FC = () => {
               <video
                 className="aspect-video w-full rounded-2xl border border-ink-200 dark:border-ink-700"
                 controls
-                src={toAbsoluteUrl(response.videoUrl)}
+                src={toAbsoluteUrl(response.screenVideoUrl || response.videoUrl)}
               />
+
+              {response.cameraVideoUrl ? (
+                <div className="space-y-2">
+                  <p className="text-xs uppercase tracking-wide text-ink-500 dark:text-ink-400">
+                    Camera video
+                  </p>
+                  <video
+                    className="aspect-video w-full rounded-2xl border border-ink-200 dark:border-ink-700"
+                    controls
+                    src={toAbsoluteUrl(response.cameraVideoUrl)}
+                  />
+                </div>
+              ) : null}
 
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">

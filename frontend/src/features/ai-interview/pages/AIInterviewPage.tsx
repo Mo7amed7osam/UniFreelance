@@ -21,7 +21,10 @@ const AIInterviewPage: React.FC = () => {
   const { sessionId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
+  const [selectedRecording, setSelectedRecording] = useState<{
+    cameraFile: File;
+    screenFile: File;
+  } | null>(null);
 
   const { data: session, isLoading, isError } = useQuery({
     queryKey: ['ai-interview', sessionId],
@@ -31,14 +34,14 @@ const AIInterviewPage: React.FC = () => {
 
   const answerMutation = useMutation({
     mutationFn: async (questionId: string) => {
-      if (!sessionId || !selectedVideo) {
+      if (!sessionId || !selectedRecording) {
         throw new Error('Video answer missing.');
       }
-      return submitInterviewAnswer(sessionId, questionId, selectedVideo);
+      return submitInterviewAnswer(sessionId, questionId, selectedRecording);
     },
     onSuccess: async (response) => {
       toast.success('Answer uploaded.');
-      setSelectedVideo(null);
+      setSelectedRecording(null);
       await queryClient.invalidateQueries({ queryKey: ['ai-interview', sessionId] });
       if (response.completed) {
         navigate(`/student/ai-interview/${sessionId}/result`);
@@ -57,7 +60,7 @@ const AIInterviewPage: React.FC = () => {
 
   const handleSubmitAnswer = async () => {
     if (!nextQuestion) return;
-    if (!selectedVideo) {
+    if (!selectedRecording) {
       toast.error('Record video first.');
       return;
     }
@@ -134,14 +137,14 @@ const AIInterviewPage: React.FC = () => {
               key={nextQuestion.id}
               disabled={answerMutation.isPending}
               questionKey={nextQuestion.id}
-              onVideoReady={setSelectedVideo}
+              onVideoReady={setSelectedRecording}
             />
 
             <Button
               type="button"
               className="w-full"
               onClick={handleSubmitAnswer}
-              disabled={!selectedVideo || answerMutation.isPending}
+              disabled={!selectedRecording || answerMutation.isPending}
             >
               {answerMutation.isPending ? 'Evaluating answer...' : 'Upload answer'}
             </Button>
@@ -165,7 +168,11 @@ const AIInterviewPage: React.FC = () => {
                         {answer.recommendation}
                       </Badge>
                     </div>
-                    <video className="aspect-video w-full rounded-lg" controls src={toAbsoluteMediaUrl(answer.videoUrl)} />
+                    <video
+                      className="aspect-video w-full rounded-lg"
+                      controls
+                      src={toAbsoluteMediaUrl(answer.cameraVideoUrl || answer.videoUrl)}
+                    />
                     <p className="text-sm text-ink-500 dark:text-ink-400">{answer.feedback}</p>
                   </div>
                 ))
