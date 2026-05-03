@@ -157,26 +157,34 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
         {filteredJobs.map((job: any) => {
           const jobKey = job._id || job.id;
           const hasSubmitted = submittedJobIds.has(jobKey);
+          const skills = job.requiredSkills || [];
 
           return (
-            <Card key={jobKey} className="overflow-hidden p-0">
-              <CardHeader className="space-y-4 p-6">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="space-y-2">
-                    <CardTitle className="text-2xl">{job.title}</CardTitle>
-                    <p className="text-sm text-ink-600 dark:text-ink-200">
-                      {job.description}
-                    </p>
+            <Card key={jobKey} className="interactive-card overflow-hidden p-0">
+              <CardHeader className="space-y-5 p-6">
+                <div className="space-y-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <CardTitle className="max-w-3xl text-2xl">{job.title}</CardTitle>
+                    <Badge variant={hasSubmitted ? 'success' : 'brand'}>{hasSubmitted ? 'Applied' : 'Open'}</Badge>
                   </div>
-                  <Badge variant={hasSubmitted ? 'success' : 'brand'}>{hasSubmitted ? 'Applied' : 'Open'}</Badge>
-                </div>
 
-                <div className="flex flex-wrap gap-2">
-                  {(job.requiredSkills || []).map((skill: any) => (
-                    <Badge key={skill._id || skill} variant="subtle">
-                      {skill.name || skill}
-                    </Badge>
-                  ))}
+                  {skills.length ? (
+                    <div className="flex flex-wrap gap-2">
+                      {skills.map((skill: any) => (
+                        <Badge
+                          key={skill._id || skill}
+                          variant="subtle"
+                          className="dark:border-brand-300/18 dark:bg-brand-400/12 dark:text-white"
+                        >
+                          {skill.name || skill}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  <p className="max-w-3xl text-sm text-ink-600 dark:text-ink-200">
+                    {job.description}
+                  </p>
                 </div>
               </CardHeader>
 

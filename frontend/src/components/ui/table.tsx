@@ -7,7 +7,7 @@ export const Table = ({
 }: React.TableHTMLAttributes<HTMLTableElement>) => (
   <div
     className={cn(
-      'w-full overflow-x-auto rounded-3xl border bg-white/96 shadow-card backdrop-blur-xl dark:border-ink-dark-border dark:bg-ink-dark-surface/90'
+      'w-full overflow-x-auto rounded-3xl border bg-white/96 shadow-card backdrop-blur-xl dark:border-[#334866] dark:bg-[#0f1d33]'
     )}
   >
     <table
@@ -24,7 +24,7 @@ export const TableHead = ({
   <thead
     className={cn(
       'text-left text-xs uppercase tracking-[0.18em] text-ink-600 dark:text-ink-200',
-      'bg-ink-100/90 dark:bg-white/8',
+      'bg-ink-100/90 dark:bg-[#142742]',
       className
     )}
     {...props}
@@ -37,7 +37,7 @@ export const TableBody = ({
 }: React.HTMLAttributes<HTMLTableSectionElement>) => (
   <tbody
     className={cn(
-      'divide-y divide-ink-200 dark:divide-white/10',
+      'divide-y divide-ink-200 dark:divide-[#253854]',
       className
     )}
     {...props}
@@ -50,7 +50,7 @@ export const TableRow = ({
 }: React.HTMLAttributes<HTMLTableRowElement>) => (
   <tr
     className={cn(
-      'transition-colors hover:bg-brand-50/80 dark:hover:bg-white/6',
+      'transition-colors hover:bg-brand-50/80 dark:hover:bg-[#152a46]',
       className
     )}
     {...props}

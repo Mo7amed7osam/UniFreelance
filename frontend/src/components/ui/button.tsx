@@ -12,7 +12,7 @@ export const buttonVariants = cva(
         primary:
           'bg-gradient-to-r from-brand-600 via-brand-500 to-accent-500 text-white shadow-soft hover:-translate-y-0.5 hover:shadow-glass',
         secondary:
-          'bg-ink-900 text-white shadow-soft hover:-translate-y-0.5 hover:bg-ink-800 dark:bg-white dark:text-ink-900 dark:hover:bg-ink-100',
+          'bg-ink-900 text-white shadow-soft hover:-translate-y-0.5 hover:bg-ink-800 dark:border dark:border-brand-300/20 dark:bg-[#142742] dark:text-ink-50 dark:hover:bg-[#19314f]',
         soft:
           'border border-brand-300 bg-brand-50 text-brand-800 shadow-soft hover:border-brand-400 hover:bg-brand-100 dark:border-brand-400/24 dark:bg-brand-400/12 dark:text-brand-100 dark:hover:bg-brand-400/18',
         outline:
