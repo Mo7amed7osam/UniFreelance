@@ -444,13 +444,13 @@ const AIInterviewPage: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <Badge variant="brand" className="border-white/20 bg-white/18 text-white">
+              <Badge variant="brand" className="border-brand-300/22 bg-[#142742]/92 text-ink-50">
                 {session.answers.length + 1} / {session.questions.length}
               </Badge>
               <Button
                 type="button"
                 variant="ghost"
-                className="border border-white/14 bg-white/12 text-white hover:bg-white/18 hover:text-white"
+                className="border border-brand-300/18 bg-[#142742]/88 text-ink-50 hover:bg-[#19314f] hover:text-white"
                 onClick={handleBackToSkills}
               >
                 Leave

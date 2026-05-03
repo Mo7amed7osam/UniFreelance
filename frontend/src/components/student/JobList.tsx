@@ -174,7 +174,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                         <Badge
                           key={skill._id || skill}
                           variant="subtle"
-                          className="dark:border-brand-300/18 dark:bg-brand-400/12 dark:text-white"
+                          className="dark:border-brand-300/18 dark:bg-[#142742] dark:text-ink-50"
                         >
                           {skill.name || skill}
                         </Badge>
