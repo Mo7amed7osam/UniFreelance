@@ -78,7 +78,7 @@ export const AIInterviewerAvatar: React.FC<AIInterviewerAvatarProps> = ({
           </div>
 
           <div className="flex justify-center">
-            <span className="rounded-full border border-white/10 bg-white/[0.06] px-4 py-1.5 text-xs font-medium text-white/82">
+            <span className="rounded-full border border-white/10 bg-white/[0.06] px-4 py-1.5 text-xs font-medium text-white/80">
               {statusLabelMap[status]}
             </span>
           </div>

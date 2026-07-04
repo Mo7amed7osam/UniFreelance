@@ -5,7 +5,7 @@ export const Table = ({
   className,
   ...props
 }: React.TableHTMLAttributes<HTMLTableElement>) => (
-  <div className="max-h-[70vh] w-full overflow-auto rounded-xl border border-ink-200 bg-white shadow-soft dark:border-ink-dark-border dark:bg-ink-dark-surface">
+  <div className="max-h-[70vh] w-full overflow-auto rounded-2xl border border-white/70 bg-white/90 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/90">
     <table className={cn('min-w-full border-collapse text-sm', className)} {...props} />
   </div>
 );
@@ -16,7 +16,7 @@ export const TableHead = ({
 }: React.HTMLAttributes<HTMLTableSectionElement>) => (
   <thead
     className={cn(
-      'sticky top-0 z-10 bg-ink-50 text-left text-xs uppercase tracking-[0.14em] text-ink-500 shadow-[inset_0_-1px_0_0_theme(colors.ink.200)] dark:bg-[#181628] dark:text-ink-dark-muted dark:shadow-[inset_0_-1px_0_0_theme(colors.ink.dark.border)]',
+      'sticky top-0 z-10 bg-ink-50/95 text-left text-xs uppercase tracking-[0.14em] text-ink-500 shadow-[inset_0_-1px_0_0_theme(colors.ink.200)] backdrop-blur dark:bg-[#181628]/95 dark:text-ink-dark-muted dark:shadow-[inset_0_-1px_0_0_theme(colors.ink.dark.border)]',
       className
     )}
     {...props}

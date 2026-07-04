@@ -54,12 +54,14 @@ const Login: React.FC = () => {
   return (
     <div className="flex min-h-screen bg-ink-50 dark:bg-ink-dark-bg">
       {/* Left: brand panel */}
-      <div className="hidden w-[42%] shrink-0 flex-col justify-between bg-brand-700 p-10 lg:flex">
-        <Link to="/" className="flex items-center text-white no-underline" aria-label="Shaghalny home">
+      <div className="relative hidden w-[42%] shrink-0 flex-col justify-between overflow-hidden bg-brand-700 p-10 lg:flex">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_8%,rgba(255,255,255,0.22),transparent_23rem),linear-gradient(180deg,rgba(255,255,255,0.08),transparent_48%)]" />
+        <div className="pointer-events-none absolute inset-x-10 top-24 h-px bg-white/18" />
+        <Link to="/" className="relative flex items-center text-white no-underline" aria-label="Shaghalny home">
           <Logo tone="inverted" />
         </Link>
 
-        <div className="space-y-8">
+        <div className="relative space-y-8">
           <div className="space-y-4">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-brand-100">
               <Sparkles size={12} />
@@ -75,15 +77,15 @@ const Login: React.FC = () => {
 
           <div className="space-y-3">
             {highlights.map((item) => (
-              <div key={item.text} className="flex items-center gap-3 rounded-lg border border-white/20 bg-white/15 px-4 py-3">
-                <item.icon size={16} className="shrink-0 text-brand-200" />
+              <div key={item.text} className="flex items-center gap-3 rounded-2xl border border-white/18 bg-white/[0.12] px-4 py-3 shadow-[0_1px_0_rgba(255,255,255,0.12)_inset] backdrop-blur">
+                <item.icon size={16} className="shrink-0 text-brand-100" />
                 <p className="text-sm text-white">{item.text}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <p className="text-xs text-brand-200">© {new Date().getFullYear()} Shaghalny</p>
+        <p className="relative text-xs text-brand-200">© {new Date().getFullYear()} Shaghalny</p>
       </div>
 
       {/* Right: form */}
@@ -95,7 +97,7 @@ const Login: React.FC = () => {
             </Link>
           </div>
 
-          <Card>
+          <Card className="border-white/80 bg-white/90 shadow-elevated">
             <CardHeader>
               <div className="page-eyebrow mb-1">Sign in</div>
               <CardTitle className="text-2xl">Welcome back</CardTitle>
@@ -106,13 +108,13 @@ const Login: React.FC = () => {
 
             <CardContent className="space-y-5">
               <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="you@example.com" {...register('email')} />
+                  <Input id="email" type="email" placeholder="you@example.com" autoComplete="email" aria-invalid={!!errors.email} {...register('email')} />
                   {errors.email ? <p className="text-xs text-rose-600 dark:text-rose-400">{errors.email.message}</p> : null}
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
                   <div className="relative">
                     <Input
@@ -120,12 +122,14 @@ const Login: React.FC = () => {
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Enter your password"
                       className="pr-10"
+                      autoComplete="current-password"
+                      aria-invalid={!!errors.password}
                       {...register('password')}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600 dark:text-ink-dark-muted dark:hover:text-white"
+                      className="absolute right-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg text-ink-400 transition-colors hover:bg-ink-100 hover:text-ink-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:text-ink-dark-muted dark:hover:bg-white/10 dark:hover:text-white"
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -141,7 +145,7 @@ const Login: React.FC = () => {
                 </Button>
               </form>
 
-              <div className="rounded-lg border border-ink-100 bg-ink-50 px-4 py-3 dark:border-ink-dark-border dark:bg-white/5">
+              <div className="rounded-xl border border-ink-100 bg-ink-50/80 px-4 py-3 dark:border-white/10 dark:bg-white/5">
                 <p className="text-xs text-ink-500 dark:text-ink-dark-muted">
                   New to the platform?{' '}
                   <Link className="font-semibold text-brand-600 dark:text-brand-400" to="/register">

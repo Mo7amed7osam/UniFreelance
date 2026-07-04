@@ -342,10 +342,10 @@ const AIInterviewPage: React.FC = () => {
 const aiProcessingSteps = useMemo(() => {
     if (callPhase !== 'processingAnswer') return null;
     return [
-      '🎙️ Analyzing your answer...',
-      '🧠 Evaluating technical knowledge...',
-      '💬 Assessing communication quality...',
-      '⚡ Generating AI feedback...',
+      'Analyzing your answer...',
+      'Evaluating technical knowledge...',
+      'Assessing communication quality...',
+      'Generating AI feedback...',
     ];
   }, [callPhase]);
   const avatarStatus = useMemo(() => {
@@ -513,11 +513,11 @@ const aiProcessingSteps = useMemo(() => {
 
     return (
       <div className="fixed inset-0 z-50 flex h-screen w-screen flex-col overflow-hidden bg-[#05070d] text-white">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(58,118,255,0.18),transparent_28%),radial-gradient(circle_at_bottom,rgba(18,27,44,0.72),transparent_42%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_-8%,rgba(58,118,255,0.22),transparent_30%),radial-gradient(circle_at_18%_90%,rgba(16,185,129,0.12),transparent_32%),radial-gradient(circle_at_bottom,rgba(18,27,44,0.72),transparent_42%)]" />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent_16%,transparent_84%,rgba(255,255,255,0.03))]" />
 
         {/* Top bar */}
-        <header className="relative z-20 flex h-16 shrink-0 items-center justify-between gap-4 border-b border-white/10 bg-white/[0.03] px-4 backdrop-blur-md md:px-6">
+        <header className="relative z-20 flex h-[4.5rem] shrink-0 items-center justify-between gap-4 border-b border-white/10 bg-white/[0.045] px-4 shadow-[0_18px_50px_-34px_rgba(0,0,0,0.9)] backdrop-blur-xl md:px-6">
           <div className="flex min-w-0 items-center gap-3">
             <span className="relative flex h-2.5 w-2.5 shrink-0" aria-hidden="true">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-60" />
@@ -547,7 +547,10 @@ const aiProcessingSteps = useMemo(() => {
           </div>
 
           <div className="flex shrink-0 items-center gap-3">
-            <Badge variant="brand" className="border-brand-300/22 bg-[#142742]/92 text-ink-50 md:hidden">
+            <span className="hidden rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 font-mono text-xs tabular-nums text-white/70 md:inline-flex">
+              {isRecordingPhase ? formatDuration(recordingSeconds) : '00:00'}
+            </span>
+            <Badge variant="brand" className="border-brand-300/20 bg-[#142742]/90 text-ink-50 md:hidden">
               {currentNumber} / {totalQuestions}
             </Badge>
             <Button
@@ -563,35 +566,45 @@ const aiProcessingSteps = useMemo(() => {
         </header>
 
         {/* Main area: question card + session panel */}
-        <div className="relative z-10 flex min-h-0 flex-1 gap-6 px-4 py-5 md:px-6">
-          <section className="relative flex min-w-0 flex-1 items-center justify-center">
-            <div className="pointer-events-none absolute inset-x-0 top-[14%] mx-auto h-64 max-w-3xl rounded-full bg-brand-500/10 blur-3xl" />
+        <div className="relative z-10 grid min-h-0 flex-1 gap-5 px-4 py-5 md:px-6 lg:grid-cols-[minmax(0,1fr)_19rem]">
+          <section className="relative flex min-w-0 items-center justify-center">
+            <div className="pointer-events-none absolute inset-x-0 top-[12%] mx-auto h-72 max-w-4xl rounded-full bg-brand-500/12 blur-3xl" />
 
             <div
               key={nextQuestion.id}
-              className="animate-fade-up relative w-full max-w-2xl rounded-3xl border border-white/10 bg-white/[0.05] px-6 py-8 text-center shadow-[0_30px_90px_rgba(3,7,18,0.55)] backdrop-blur-xl md:px-10 md:py-10"
+              className="animate-fade-up relative w-full max-w-4xl rounded-[2rem] border border-white/12 bg-white/[0.065] px-6 py-7 shadow-[0_34px_100px_rgba(3,7,18,0.58),0_1px_0_rgba(255,255,255,0.12)_inset] backdrop-blur-2xl md:px-9 md:py-9"
             >
-              <div className="mx-auto mb-6 inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.06] py-1.5 pl-2 pr-4">
-                <span
-                  className={[
-                    'flex h-7 w-7 items-center justify-center rounded-full bg-[radial-gradient(circle_at_30%_25%,#ffffff_0%,#dbeafe_35%,#7dd3fc_60%,#1e3a8a_100%)]',
-                    callPhase === 'speakingQuestion' ? 'animate-[pulse_1.6s_ease-in-out_infinite]' : '',
-                  ].join(' ')}
-                >
-                  <Bot size={15} className="text-ink-950" />
+              <div className="mb-7 flex flex-wrap items-center justify-between gap-3">
+                <div className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.06] py-1.5 pl-2 pr-4">
+                  <span
+                    className={[
+                      'flex h-7 w-7 items-center justify-center rounded-full bg-[radial-gradient(circle_at_30%_25%,#ffffff_0%,#dbeafe_35%,#7dd3fc_60%,#1e3a8a_100%)]',
+                      callPhase === 'speakingQuestion' ? 'animate-[pulse_1.6s_ease-in-out_infinite]' : '',
+                    ].join(' ')}
+                  >
+                    <Bot size={15} className="text-ink-950" />
+                  </span>
+                  <span className="text-xs font-medium text-white/80">Gravis · {aiStatusLabel}</span>
+                </div>
+                <span className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs font-medium text-white/64">
+                  {session.skill}
                 </span>
-                <span className="text-xs font-medium text-white/80">Gravis · {aiStatusLabel}</span>
               </div>
 
               <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/45">
                 Question {nextQuestion.order}
               </p>
-              <h1 className="mt-3 text-balance text-2xl font-semibold leading-snug tracking-tight text-white md:text-3xl">
+              <h1 className="mt-3 text-balance text-3xl font-semibold leading-tight tracking-tight text-white md:text-5xl">
                 {nextQuestion.text}
               </h1>
-              <p className="mt-4 text-sm text-white/55">
-                Listen to the question, then answer clearly in 1–2 minutes.
-              </p>
+
+              <div className="mt-7 grid gap-3 text-left md:grid-cols-3">
+                {['Answer directly first', 'Use one concrete example', 'Keep it under two minutes'].map((tip) => (
+                  <div key={tip} className="rounded-2xl border border-white/10 bg-black/18 px-4 py-3">
+                    <p className="text-xs font-semibold text-white/78">{tip}</p>
+                  </div>
+                ))}
+              </div>
 
               <div className="mt-6 space-y-2">
                 <p className="text-sm font-medium text-white/85">{statusText}</p>
@@ -607,9 +620,9 @@ const aiProcessingSteps = useMemo(() => {
                 ) : null}
                 {statusError ? <p className="text-sm text-rose-300">{statusError}</p> : null}
                 {aiProcessingSteps ? (
-                  <div className="space-y-1 pt-1">
+                  <div className="mx-auto max-w-md space-y-1 pt-1">
                     {aiProcessingSteps.map((step, i) => (
-                      <p key={i} className="animate-pulse text-xs text-white/60">{step}</p>
+                      <p key={i} className="animate-pulse rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-white/60">{step}</p>
                     ))}
                   </div>
                 ) : null}
@@ -629,7 +642,7 @@ const aiProcessingSteps = useMemo(() => {
           </section>
 
           {/* Right panel: camera + session status */}
-          <aside className="hidden w-72 shrink-0 flex-col gap-4 overflow-y-auto lg:flex">
+          <aside className="hidden min-h-0 flex-col gap-4 overflow-y-auto lg:flex">
             <CameraRecorder
               cameraStream={cameraStream}
               isRecording={isRecording}
@@ -708,8 +721,8 @@ const aiProcessingSteps = useMemo(() => {
         </div>
 
         {/* Bottom controls */}
-        <footer className="relative z-20 shrink-0 border-t border-white/10 bg-white/[0.03] px-4 py-4 backdrop-blur-md md:px-6">
-          <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-3">
+        <footer className="relative z-20 shrink-0 border-t border-white/10 bg-white/[0.045] px-4 py-4 backdrop-blur-xl md:px-6">
+          <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-3 rounded-[1.5rem] border border-white/10 bg-black/24 px-4 py-3 shadow-[0_24px_70px_-44px_rgba(0,0,0,0.95)]">
             <div className="flex min-h-11 flex-wrap items-center justify-center gap-4">
               {isRecordingPhase ? (
                 <div className="flex items-center gap-3" aria-live="polite">

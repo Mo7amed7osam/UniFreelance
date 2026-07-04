@@ -44,6 +44,3 @@ export const navByRole: Record<string, NavItem[]> = {
     { label: 'Events', to: '/admin/events', icon: CalendarDays },
   ],
 };
-
-/** How many nav items render inline in the top navigation before overflowing into "More". */
-export const MAX_INLINE_NAV_ITEMS = 6;

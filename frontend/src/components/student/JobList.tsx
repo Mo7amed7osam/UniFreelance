@@ -187,7 +187,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
       )}
 
       {/* Search bar */}
-      <div className="flex items-center gap-3 rounded-xl border border-ink-200 bg-white px-4 py-3 shadow-soft dark:border-ink-dark-border dark:bg-ink-dark-surface">
+      <div className="flex items-center gap-3 rounded-2xl border border-white/70 bg-white/90 px-4 py-3 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/90">
         <Search size={16} className="shrink-0 text-ink-400" />
         <Input
           placeholder="Search by title, skill, or keyword..."
@@ -196,7 +196,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
           className="min-h-0 border-0 bg-transparent p-0 text-sm shadow-none focus:ring-0 dark:bg-transparent"
         />
         {search && (
-          <button onClick={() => setSearch('')} className="shrink-0 text-ink-400 hover:text-ink-600">
+          <button onClick={() => setSearch('')} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-ink-400 transition-colors hover:bg-ink-100 hover:text-ink-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:hover:bg-white/10">
             <X size={14} />
           </button>
         )}
@@ -242,12 +242,12 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
 
               return (
                 <motion.div key={jobKey} variants={fadeUp} layout>
-                  <Card className="group flex flex-col gap-0 overflow-hidden p-0 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card">
+                  <Card className="group flex flex-col gap-0 overflow-hidden p-0 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-200/80 hover:shadow-elevated dark:hover:border-brand-500/25">
                     {/* Card header section */}
                     <CardHeader className="gap-0 space-y-3 p-5 pb-4">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex min-w-0 items-start gap-3">
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100 dark:bg-brand-900/30 dark:text-brand-400 dark:ring-brand-700/30">
                             <Briefcase size={18} />
                           </div>
                           <div className="min-w-0">
@@ -286,7 +286,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                     <Separator />
 
                     {/* Meta row */}
-                    <CardContent className="flex flex-wrap items-center gap-4 px-5 py-3">
+                    <CardContent className="flex flex-wrap items-center gap-4 bg-ink-50/40 px-5 py-3 dark:bg-white/[0.025]">
                       {(job.budgetMin !== undefined || job.budgetMax !== undefined) && (
                         <span className="flex items-center gap-1.5 text-sm text-ink-600 dark:text-ink-300">
                           <Wallet size={13} className="text-ink-400" />
@@ -321,7 +321,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                             Apply for this role
                           </Button>
                           {!canApply && (
-                            <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-700/30 dark:bg-amber-900/10">
+                            <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-700/30 dark:bg-amber-900/10">
                               <ShieldAlert size={15} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-300" />
                               <p className="text-sm text-amber-700 dark:text-amber-200">
                                 Verify these skills first: {missingSkills.map((skill: any) => skill.name || skill).join(', ')}
@@ -341,7 +341,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
 
       {/* Proposal Sheet */}
       <Sheet open={!!activeJobId} onOpenChange={(open) => { if (!open) setActiveJobId(null); }}>
-        <SheetContent side="right" className="flex flex-col overflow-y-auto sm:max-w-lg">
+        <SheetContent side="right" className="flex flex-col overflow-y-auto border-white/70 bg-white/95 shadow-elevated backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/95 sm:max-w-lg">
           <SheetHeader>
             <SheetTitle className="pr-6">{activeJob?.title || 'Apply for this role'}</SheetTitle>
             <SheetDescription>

@@ -7,7 +7,7 @@ export const Card = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      'rounded-xl border border-ink-200 bg-white p-6 text-ink-900 shadow-soft transition-all duration-200 dark:border-ink-dark-border dark:bg-ink-dark-surface dark:text-ink-dark-text',
+      'rounded-2xl border border-white/70 bg-white/90 p-5 text-ink-900 shadow-card backdrop-blur-xl transition-all duration-200 dark:border-white/10 dark:bg-ink-dark-surface/90 dark:text-ink-dark-text sm:p-6',
       className
     )}
     {...props}
@@ -26,7 +26,7 @@ export const CardTitle = ({
   ...props
 }: React.HTMLAttributes<HTMLHeadingElement>) => (
   <h3
-    className={cn('text-lg font-semibold tracking-tight text-ink-900 dark:text-ink-dark-text', className)}
+    className={cn('text-base font-semibold tracking-tight text-ink-900 dark:text-ink-dark-text sm:text-lg', className)}
     {...props}
   />
 );

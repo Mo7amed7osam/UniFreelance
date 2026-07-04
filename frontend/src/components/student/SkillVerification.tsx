@@ -92,7 +92,7 @@ const SkillVerification: React.FC = () => {
       /></motion.div>
 
       <motion.div variants={fadeUp}>
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-700/30 dark:bg-amber-900/15 dark:text-amber-200">
+        <div className="rounded-2xl border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-sm font-medium text-amber-800 shadow-soft backdrop-blur dark:border-amber-700/30 dark:bg-amber-900/15 dark:text-amber-200">
           Start the live interview from a desktop or laptop. The verification flow needs camera, microphone, and entire-screen sharing.
         </div>
       </motion.div>
@@ -116,8 +116,8 @@ const SkillVerification: React.FC = () => {
               Icon: Sparkles,
             },
           ].map(({ title, body, Icon }) => (
-            <div key={title} className="rounded-xl border border-white/15 bg-white/10 p-6">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/15">
+            <div key={title} className="rounded-2xl border border-white/15 bg-white/10 p-6 shadow-[0_1px_0_rgba(255,255,255,0.12)_inset] backdrop-blur">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15">
                 <Icon size={20} />
               </div>
               <p className="mt-5 text-xl font-semibold text-white">{title}</p>
@@ -139,7 +139,7 @@ const SkillVerification: React.FC = () => {
         <motion.div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3" variants={stagger} initial="hidden" animate="visible">
           {(skills || []).map((skill: any) => (
             <motion.div key={skill._id} variants={fadeUp}>
-            <Card className="interactive-card overflow-hidden p-0">
+            <Card className="interactive-card overflow-hidden p-0 hover:border-brand-200/80 dark:hover:border-brand-500/25">
               <CardHeader className="space-y-4 p-6">
                 <div className="flex items-start justify-between gap-3">
                   <CardTitle className="text-2xl">{skill.name}</CardTitle>
@@ -152,11 +152,11 @@ const SkillVerification: React.FC = () => {
 
               <CardContent className="space-y-5 p-6 pt-0">
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="muted-panel rounded-lg p-3">
+                  <div className="muted-panel p-3">
                     <p className="label-muted">Interview mode</p>
                     <p className="mt-2 text-sm font-semibold text-ink-900 dark:text-white">Live with Gravis</p>
                   </div>
-                  <div className="muted-panel rounded-lg p-3">
+                  <div className="muted-panel p-3">
                     <p className="label-muted">Outcome</p>
                     <p className="mt-2 text-sm font-semibold text-ink-900 dark:text-white">Verified skill badge</p>
                   </div>
@@ -164,7 +164,7 @@ const SkillVerification: React.FC = () => {
 
                 {verifiedSkillIds.has(String(skill._id)) ? (
                   <div className="space-y-3">
-                    <div className="muted-panel rounded-lg p-3 text-center">
+                    <div className="muted-panel p-3 text-center">
                       <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
                         Verified — Score: {getVerifiedScore(String(skill._id)) ?? '—'}
                       </p>

@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
   ArrowRight, BookOpen, Briefcase, CheckCircle2,
-  Clock, Wallet, FileText, Shield, Sparkles, TrendingUp,
+  Clock, Wallet, FileText, Shield, Sparkles, TrendingUp, CalendarDays,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -62,11 +62,15 @@ const StatItem: React.FC<{
   accent?: boolean;
 }> = ({ icon, label, value, sub, accent }) => (
   <motion.div variants={fadeUp}>
-    <Card className={`flex flex-col gap-3 ${accent ? 'border-brand-200 bg-brand-50 dark:border-brand-700/40 dark:bg-brand-900/20' : ''}`}>
-      <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${accent ? 'bg-brand-100 text-brand-600 dark:bg-brand-800/50 dark:text-brand-300' : 'bg-ink-100 text-ink-500 dark:bg-white/10 dark:text-ink-400'}`}>
-        {icon}
+    <Card className={`group relative min-h-[9.25rem] overflow-hidden ${accent ? 'border-brand-200/80 bg-brand-50/80 dark:border-brand-700/40 dark:bg-brand-900/20' : ''}`}>
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
+      <div className="flex items-start justify-between gap-3">
+        <div className={`flex h-10 w-10 items-center justify-center rounded-xl ring-1 ring-inset ${accent ? 'bg-brand-100 text-brand-600 ring-brand-200 dark:bg-brand-800/50 dark:text-brand-300 dark:ring-brand-700/40' : 'bg-ink-100/80 text-ink-500 ring-ink-200/70 dark:bg-white/10 dark:text-ink-400 dark:ring-white/10'}`}>
+          {icon}
+        </div>
+        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-ink-300 transition-colors group-hover:bg-brand-500 dark:bg-white/20" />
       </div>
-      <div>
+      <div className="mt-4">
         <p className="text-xs font-semibold uppercase tracking-[0.1em] text-ink-500 dark:text-ink-400">{label}</p>
         <p className={`mt-1 text-2xl font-bold tracking-tight ${accent ? 'text-brand-700 dark:text-brand-300' : 'text-ink-900 dark:text-white'}`}>{value}</p>
         {sub && <p className="mt-0.5 text-xs text-ink-400 dark:text-ink-500">{sub}</p>}
@@ -110,30 +114,33 @@ const StudentDashboard: React.FC = () => {
   const { pct: completionPct, missing: completionMissing } = getProfileCompletion(profile, verifiedSkillsCount);
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const recentActivity = proposalList.slice(0, 3);
 
   return (
     <motion.div className="space-y-8" initial="hidden" animate="visible" variants={staggerContainer}>
       {/* Welcome header */}
-      <motion.div variants={fadeUp} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-4">
-          <Avatar className="h-14 w-14 ring-2 ring-brand-100 dark:ring-brand-900/40">
-            <AvatarFallback className="text-lg">{getInitials(user?.name)}</AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600 dark:text-brand-400">Student dashboard</p>
-            <h1 className="text-2xl font-bold tracking-tight text-ink-900 dark:text-white">
-              Welcome back, {user?.name?.split(' ')[0]}
-            </h1>
-            <p className="text-sm text-ink-500 dark:text-ink-400">{today}</p>
+      <motion.div variants={fadeUp} className="glass-panel p-4 sm:p-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-14 w-14 ring-2 ring-white shadow-soft dark:ring-white/10">
+              <AvatarFallback className="text-lg">{getInitials(user?.name)}</AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600 dark:text-brand-400">Student dashboard</p>
+              <h1 className="text-2xl font-bold tracking-tight text-ink-900 dark:text-white">
+                Welcome back, {user?.name?.split(' ')[0]}
+              </h1>
+              <p className="text-sm text-ink-500 dark:text-ink-400">{today}</p>
+            </div>
           </div>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => navigate('/student/profile')}>
-            View profile
-          </Button>
-          <Button size="sm" onClick={() => navigate('/student/jobs')}>
-            Browse jobs <ArrowRight size={14} />
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => navigate('/student/profile')}>
+              View profile
+            </Button>
+            <Button size="sm" onClick={() => navigate('/student/jobs')}>
+              Browse jobs <ArrowRight size={14} />
+            </Button>
+          </div>
         </div>
       </motion.div>
 
@@ -167,11 +174,11 @@ const StudentDashboard: React.FC = () => {
       </motion.div>
 
       {/* Middle row: profile completion + quick actions */}
-      <motion.div variants={staggerContainer} className="grid gap-4 xl:grid-cols-[1fr_320px]">
+      <motion.div variants={staggerContainer} className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
         <motion.div variants={fadeUp}>
-          <Card>
+          <Card className="h-full">
             <CardHeader className="mb-0">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-4">
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp size={16} className="text-brand-500" />
                   Profile completion
@@ -208,7 +215,8 @@ const StudentDashboard: React.FC = () => {
         </motion.div>
 
         <motion.div variants={fadeUp}>
-          <Card className="h-full">
+          <div className="grid h-full gap-4">
+          <Card>
             <CardHeader className="mb-0">
               <CardTitle className="flex items-center gap-2">
                 <Briefcase size={16} className="text-brand-500" />
@@ -225,9 +233,9 @@ const StudentDashboard: React.FC = () => {
                 <button
                   key={action.path}
                   onClick={() => navigate(action.path)}
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-50 hover:text-ink-900 dark:text-ink-300 dark:hover:bg-white/5 dark:hover:text-white"
+                  className="group flex w-full items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-semibold text-ink-700 transition-colors hover:border-ink-200/70 hover:bg-white/70 hover:text-ink-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:text-ink-300 dark:hover:border-white/10 dark:hover:bg-white/5 dark:hover:text-white"
                 >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-ink-100 text-ink-500 dark:bg-white/10 dark:text-ink-400">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ink-100 text-ink-500 transition-colors group-hover:bg-brand-50 group-hover:text-brand-600 dark:bg-white/10 dark:text-ink-400 dark:group-hover:bg-brand-900/30 dark:group-hover:text-brand-300">
                     {action.icon}
                   </span>
                   {action.label}
@@ -236,6 +244,24 @@ const StudentDashboard: React.FC = () => {
               ))}
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader className="mb-0">
+              <CardTitle className="flex items-center gap-2">
+                <CalendarDays size={16} className="text-brand-500" />
+                Upcoming interviews
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="mt-3">
+              <div className="rounded-xl border border-dashed border-ink-200/80 bg-ink-50/70 px-4 py-5 text-center dark:border-white/10 dark:bg-white/[0.035]">
+                <p className="text-sm font-semibold text-ink-900 dark:text-white">No interviews scheduled</p>
+                <p className="mt-1 text-xs leading-5 text-ink-500 dark:text-ink-dark-muted">
+                  New interview invitations will appear here when a client schedules one.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          </div>
         </motion.div>
       </motion.div>
 
@@ -297,6 +323,29 @@ const StudentDashboard: React.FC = () => {
 
       {/* Recommended jobs */}
       <motion.div variants={fadeUp}>
+        <Card className="mb-4">
+          <CardHeader className="mb-0">
+            <CardTitle>Recent activity</CardTitle>
+          </CardHeader>
+          <CardContent className="mt-3 space-y-2">
+            {recentActivity.length === 0 ? (
+              <p className="rounded-xl border border-dashed border-ink-200/80 bg-ink-50/70 px-4 py-5 text-center text-sm text-ink-500 dark:border-white/10 dark:bg-white/[0.035] dark:text-ink-dark-muted">
+                Activity will appear here after you apply to jobs.
+              </p>
+            ) : (
+              recentActivity.map((proposal: any) => (
+                <div key={proposal._id} className="flex items-center gap-3 rounded-xl px-2 py-2">
+                  <span className="h-2 w-2 rounded-full bg-brand-500" />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-ink-900 dark:text-white">{proposal.jobId?.title || 'Job application'}</p>
+                    <p className="text-xs text-ink-500 dark:text-ink-dark-muted">Application status: {proposal.status || 'submitted'}</p>
+                  </div>
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader className="mb-0">
             <div className="flex items-center justify-between">

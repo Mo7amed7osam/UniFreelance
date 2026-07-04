@@ -27,7 +27,7 @@ export const InterviewQuestion: React.FC<InterviewQuestionProps> = ({
       <p
         className={cn(
           'text-[11px] font-semibold uppercase tracking-[0.22em]',
-          isOverlay ? 'text-white/72' : 'text-ink-600 dark:text-ink-300'
+          isOverlay ? 'text-white/70' : 'text-ink-600 dark:text-ink-300'
         )}
       >
         Question {question.order}
@@ -43,7 +43,7 @@ export const InterviewQuestion: React.FC<InterviewQuestionProps> = ({
       <p
         className={cn(
           'text-sm',
-          isOverlay ? 'text-white/82' : 'text-ink-600 dark:text-ink-300'
+          isOverlay ? 'text-white/80' : 'text-ink-600 dark:text-ink-300'
         )}
       >
         Listen, then answer clearly in 1-2 minutes.

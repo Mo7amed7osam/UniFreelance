@@ -5,7 +5,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 
 import { Logo } from '@/components/brand/Logo';
 import { NotificationBell } from '@/components/layout/NotificationBell';
-import { MAX_INLINE_NAV_ITEMS, navByRole } from '@/components/layout/nav-config';
+import { navByRole } from '@/components/layout/nav-config';
 import { StudentPwaInstallButton } from '@/components/pwa/StudentPwaInstallButton';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -31,9 +31,6 @@ export const TopNav = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const items = user ? navByRole[user.role] || [] : [];
-  const inlineItems = items.slice(0, MAX_INLINE_NAV_ITEMS);
-  const overflowItems = items.slice(MAX_INLINE_NAV_ITEMS);
-  const isOverflowActive = overflowItems.some((item) => location.pathname.startsWith(item.to));
 
   const roleCopy = user?.role === 'Admin' ? 'Admin' : user?.role === 'Client' ? 'Client' : 'Student';
 
@@ -80,106 +77,62 @@ export const TopNav = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-ink-200 bg-white/85 backdrop-blur-md supports-[backdrop-filter]:bg-white/75 dark:border-ink-dark-border dark:bg-ink-dark-surface/85 dark:supports-[backdrop-filter]:bg-ink-dark-surface/75">
-        <div className="mx-auto flex h-14 w-full max-w-screen-2xl items-center gap-3 px-4 sm:px-6 lg:px-8">
-          {/* Mobile: hamburger */}
-          <button
-            type="button"
-            onClick={() => setDrawerOpen(true)}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-600 transition-colors hover:bg-ink-100 hover:text-ink-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 md:hidden dark:text-ink-400 dark:hover:bg-white/10 dark:hover:text-white"
-            aria-label="Open navigation menu"
-            aria-expanded={drawerOpen}
-          >
-            <Menu size={18} />
-          </button>
+      <header className="sticky top-0 z-40 border-b border-white/60 bg-white/70 shadow-[0_1px_0_rgba(15,23,42,0.035),0_18px_44px_-32px_rgba(15,23,42,0.42)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/70 dark:border-white/10 dark:bg-ink-dark-surface/70 dark:supports-[backdrop-filter]:bg-ink-dark-surface/70">
+        <div className="mx-auto grid h-[4.25rem] w-full max-w-screen-2xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 px-4 sm:px-6 lg:px-8">
+          <div className="flex min-w-0 items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(true)}
+              className="flex h-10 w-10 items-center justify-center rounded-xl text-ink-600 transition-colors hover:bg-ink-100 hover:text-ink-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 xl:hidden dark:text-ink-400 dark:hover:bg-white/10 dark:hover:text-white"
+              aria-label="Open navigation menu"
+              aria-expanded={drawerOpen}
+            >
+              <Menu size={18} />
+            </button>
 
-          {/* Logo */}
-          <NavLink to={homePath} className="flex shrink-0 items-center no-underline" aria-label="Go to dashboard">
-            <Logo className="gap-2" markClassName="h-7 w-7" />
-          </NavLink>
+            <NavLink to={homePath} className="flex shrink-0 items-center rounded-xl no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" aria-label="Go to dashboard">
+              <Logo className="gap-2" markClassName="h-7 w-7" />
+            </NavLink>
+          </div>
 
-          {/* Desktop nav links */}
-          <nav className="ml-4 hidden min-w-0 flex-1 items-center gap-0.5 md:flex" aria-label="Primary">
-            {inlineItems.map((item) => (
+          <nav className="hidden min-w-0 items-center justify-center gap-1 rounded-2xl border border-ink-200/60 bg-white/70 p-1 shadow-soft backdrop-blur-xl xl:flex dark:border-white/10 dark:bg-white/[0.045]" aria-label="Primary">
+            {items.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
                   cn(
-                    'relative rounded-lg px-3 py-1.5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500',
+                    'relative isolate rounded-xl px-2.5 py-2 text-[13px] font-semibold leading-none no-underline transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 2xl:px-3',
                     isActive
-                      ? 'text-ink-900 dark:text-white'
-                      : 'text-ink-500 no-underline hover:bg-ink-100 hover:text-ink-900 dark:text-ink-dark-muted dark:hover:bg-white/10 dark:hover:text-white'
+                      ? 'text-ink-950 dark:text-white'
+                      : 'text-ink-500 hover:text-ink-900 dark:text-ink-dark-muted dark:hover:text-white'
                   )
                 }
               >
                 {({ isActive }) => (
                   <>
-                    <span className="whitespace-nowrap">{item.label}</span>
                     {isActive ? (
                       <motion.span
                         layoutId="topnav-active"
-                        className="absolute inset-x-2 -bottom-[9px] h-0.5 rounded-full bg-brand-600 dark:bg-brand-400"
+                        className="absolute inset-0 -z-10 rounded-xl border border-ink-200/80 bg-white shadow-[0_8px_20px_-14px_rgba(15,23,42,0.45),0_1px_0_rgba(255,255,255,0.9)_inset] dark:border-white/10 dark:bg-white/10"
                         transition={{ type: 'spring', stiffness: 420, damping: 34 }}
                       />
-                    ) : null}
+                    ) : (
+                      <span className="absolute inset-0 -z-10 rounded-xl opacity-0 transition-opacity duration-150 hover:opacity-100 hover:bg-ink-100/70 dark:hover:bg-white/10" />
+                    )}
+                    <span className="whitespace-nowrap">{item.label}</span>
                   </>
                 )}
               </NavLink>
             ))}
-
-            {overflowItems.length > 0 ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    type="button"
-                    className={cn(
-                      'relative flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500',
-                      isOverflowActive
-                        ? 'text-ink-900 dark:text-white'
-                        : 'text-ink-500 hover:bg-ink-100 hover:text-ink-900 dark:text-ink-dark-muted dark:hover:bg-white/10 dark:hover:text-white'
-                    )}
-                  >
-                    More
-                    <ChevronDown size={13} className="mt-px" />
-                    {isOverflowActive ? (
-                      <motion.span
-                        layoutId="topnav-active"
-                        className="absolute inset-x-2 -bottom-[9px] h-0.5 rounded-full bg-brand-600 dark:bg-brand-400"
-                        transition={{ type: 'spring', stiffness: 420, damping: 34 }}
-                      />
-                    ) : null}
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56">
-                  {overflowItems.map((item) => {
-                    const Icon = item.icon;
-                    const active = location.pathname.startsWith(item.to);
-                    return (
-                      <DropdownMenuItem
-                        key={item.to}
-                        onClick={() => navigate(item.to)}
-                        className={active ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300' : undefined}
-                      >
-                        <Icon size={14} />
-                        {item.label}
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : null}
           </nav>
 
-          <div className="flex-1 md:hidden" />
-
-          {/* Right actions */}
-          <div className="flex shrink-0 items-center gap-1.5">
-            <label className="hidden h-8 items-center gap-2 rounded-lg border border-ink-200 bg-ink-50 px-2.5 text-sm transition-colors focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-100 xl:flex dark:border-ink-dark-border dark:bg-white/5 dark:focus-within:border-brand-500 dark:focus-within:ring-brand-500/20">
+          <div className="flex min-w-0 shrink-0 items-center justify-end gap-1.5">
+            <label className="hidden h-10 items-center gap-2 rounded-2xl border border-ink-200/70 bg-white/70 px-3 text-sm shadow-soft backdrop-blur transition-colors focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-100 2xl:flex dark:border-white/10 dark:bg-white/[0.045] dark:focus-within:border-brand-500 dark:focus-within:ring-brand-500/20">
               <Search size={13} className="shrink-0 text-ink-400 dark:text-ink-dark-muted" />
               <input
                 type="search"
-                placeholder="Search..."
+                placeholder="Search"
                 aria-label="Search"
                 className="w-36 bg-transparent text-sm text-ink-800 outline-none placeholder:text-ink-400 dark:text-ink-dark-text dark:placeholder:text-ink-dark-muted"
               />
@@ -188,7 +141,7 @@ export const TopNav = () => {
             {user?.role === 'Student' ? <StudentPwaInstallButton /> : null}
             {user?.role === 'Student' ? <NotificationBell /> : null}
 
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={toggleTheme} aria-label="Toggle theme">
+            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl" onClick={toggleTheme} aria-label="Toggle theme">
               {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
             </Button>
 
@@ -196,10 +149,10 @@ export const TopNav = () => {
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  className="flex items-center gap-2 rounded-full p-0.5 pr-1 transition-colors hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:hover:bg-white/10"
+                  className="flex items-center gap-2 rounded-2xl border border-transparent p-1 pr-2 transition-colors hover:border-ink-200/70 hover:bg-white/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:hover:border-white/10 dark:hover:bg-white/10"
                   aria-label="Open account menu"
                 >
-                  <Avatar className="h-7 w-7">
+                  <Avatar className="h-8 w-8">
                     <AvatarFallback className="text-[10px]">{getInitials(user?.name)}</AvatarFallback>
                   </Avatar>
                   <ChevronDown size={12} className="hidden text-ink-400 sm:block dark:text-ink-dark-muted" />
@@ -235,7 +188,7 @@ export const TopNav = () => {
           <>
             <motion.div
               key="drawer-backdrop"
-              className="fixed inset-0 z-40 bg-ink-950/40 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-40 bg-ink-950/40 backdrop-blur-sm xl:hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -245,7 +198,7 @@ export const TopNav = () => {
             />
             <motion.aside
               key="drawer-panel"
-              className="fixed inset-y-0 left-0 z-50 flex w-[19rem] max-w-[85vw] flex-col border-r border-ink-200 bg-white shadow-elevated md:hidden dark:border-ink-dark-border dark:bg-ink-dark-surface"
+              className="fixed inset-y-0 left-0 z-50 flex w-[19rem] max-w-[85vw] flex-col border-r border-ink-200 bg-white shadow-elevated xl:hidden dark:border-ink-dark-border dark:bg-ink-dark-surface"
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
