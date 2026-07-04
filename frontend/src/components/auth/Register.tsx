@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowRight, BriefcaseBusiness, Eye, EyeOff, GraduationCap, Shield, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 
-import wordmark from '@/assets/shaghalny-wordmark.svg';
+import { Logo } from '@/components/brand/Logo';
 import useAuth from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -57,7 +57,7 @@ const Register: React.FC = () => {
 
   const onSubmit = async (values: RegisterFormValues) => {
     try {
-      const user = await registerUser(values);
+      const user = await registerUser(values as { name: string; email: string; password: string; role: string });
       toast.success('Account created successfully');
       if (user?.role === 'Client') navigate('/client/dashboard');
       else navigate('/student/dashboard');
@@ -73,7 +73,7 @@ const Register: React.FC = () => {
         <div className="w-full max-w-md">
           <div className="mb-8">
             <Link to="/" className="flex items-center text-ink-900 no-underline dark:text-ink-dark-text">
-              <img src={wordmark} alt="Shaghalny" className="h-8 w-auto object-contain dark:brightness-[1.08] dark:contrast-[0.98]" />
+              <Logo />
             </Link>
           </div>
 

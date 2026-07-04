@@ -2,10 +2,11 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { AIInterviewerAvatar } from '../components/AIInterviewerAvatar';
+import {
+  Bot, LogOut, Mic, Monitor, RotateCcw, Square, Video, Wifi,
+} from 'lucide-react';
+
 import { CameraRecorder } from '../components/CameraRecorder';
-import { InterviewProgress } from '../components/InterviewProgress';
-import { InterviewQuestion } from '../components/InterviewQuestion';
 import { InterviewSetup } from '../components/InterviewSetup';
 import { useQuestionSpeech } from '../hooks/useQuestionSpeech';
 import { useVideoRecorder } from '../hooks/useVideoRecorder';
@@ -23,6 +24,12 @@ type RecordedCapture = {
 };
 
 const SHOW_MIC_DEBUG = false; // Hide mic debug during live interview
+
+const formatDuration = (totalSeconds: number) => {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
+};
 
 const getErrorMessage = (error: unknown, fallback: string) => {
   if (
@@ -51,6 +58,7 @@ const AIInterviewPage: React.FC = () => {
   const [statusError, setStatusError] = useState<string | null>(null);
   const [retryPayload, setRetryPayload] = useState<{ questionId: string; files: RecordedCapture } | null>(null);
   const [isCompactViewport, setIsCompactViewport] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
 
   const {
     cameraReady,
@@ -378,6 +386,21 @@ const aiProcessingSteps = useMemo(() => {
     isRecording &&
     !answerMutation.isPending;
 
+  // Track recording duration for the bottom control bar.
+  useEffect(() => {
+    if (callPhase !== 'recordingAnswer') {
+      setRecordingSeconds(0);
+      return undefined;
+    }
+
+    const startedAt = Date.now();
+    const timer = window.setInterval(() => {
+      setRecordingSeconds(Math.floor((Date.now() - startedAt) / 1000));
+    }, 500);
+
+    return () => window.clearInterval(timer);
+  }, [callPhase]);
+
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
 
@@ -465,187 +488,326 @@ const aiProcessingSteps = useMemo(() => {
   }
 
   if (stage === 'call') {
+    const totalQuestions = session.questions.length;
+    const currentNumber = Math.min(session.answers.length + 1, totalQuestions);
+    const completionPct = totalQuestions
+      ? Math.round((session.answers.length / totalQuestions) * 100)
+      : 0;
+    const connectionOk = cameraReady && micReady && screenReady;
+    const isRecordingPhase = callPhase === 'recordingAnswer';
+
+    const aiStatusLabel =
+      callPhase === 'speakingQuestion'
+        ? 'Speaking'
+        : callPhase === 'processingAnswer'
+          ? 'Evaluating answer'
+          : isRecordingPhase
+            ? 'Listening'
+            : 'Waiting for you';
+
+    const deviceChecklist = [
+      { label: 'Microphone', ready: micReady, icon: Mic },
+      { label: 'Camera', ready: cameraReady, icon: Video },
+      { label: 'Screen share', ready: screenReady, icon: Monitor },
+    ];
+
     return (
-      <div className="fixed inset-0 z-50 h-screen w-screen overflow-hidden bg-[#05070d] text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(58,118,255,0.18),transparent_28%),radial-gradient(circle_at_bottom,rgba(18,27,44,0.72),transparent_42%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent_16%,transparent_84%,rgba(255,255,255,0.03))]" />
+      <div className="fixed inset-0 z-50 flex h-screen w-screen flex-col overflow-hidden bg-[#05070d] text-white">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(58,118,255,0.18),transparent_28%),radial-gradient(circle_at_bottom,rgba(18,27,44,0.72),transparent_42%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent_16%,transparent_84%,rgba(255,255,255,0.03))]" />
 
-        <div className="relative flex h-full w-full flex-col px-5 py-5 md:px-8 md:py-6">
-          <div className="flex items-start justify-between gap-4">
-            <div className="max-w-xs space-y-2">
-              <div className="flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.22em] text-white/45">
-                <span>Live interview</span>
-                <span className="h-1 w-1 rounded-full bg-white/25" />
-                <span>{session.skill}</span>
-              </div>
-
-              <div className="max-w-[15rem]">
-                <InterviewProgress
-                  answeredCount={session.answers.length}
-                  totalQuestions={session.questions.length}
-                  variant="inverted"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Badge variant="brand" className="border-brand-300/22 bg-[#142742]/92 text-ink-50">
-                {session.answers.length + 1} / {session.questions.length}
-              </Badge>
-              <Button
-                type="button"
-                variant="ghost"
-                className="border border-brand-300/18 bg-[#142742]/88 text-ink-50 hover:bg-[#19314f] hover:text-white"
-                onClick={handleBackToSkills}
-              >
-                Leave
-              </Button>
+        {/* Top bar */}
+        <header className="relative z-20 flex h-16 shrink-0 items-center justify-between gap-4 border-b border-white/10 bg-white/[0.03] px-4 backdrop-blur-md md:px-6">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="relative flex h-2.5 w-2.5 shrink-0" aria-hidden="true">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-60" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-rose-400" />
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-white">{session.skill} interview</p>
+              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/45">
+                Live · Skill verification
+              </p>
             </div>
           </div>
 
-          <div className="relative flex flex-1 items-center justify-center px-2 pb-28 pt-6 md:px-8">
-            <div className="relative flex w-full flex-1 items-center justify-center">
-              <div className="pointer-events-none absolute inset-x-0 top-[10%] mx-auto h-64 max-w-4xl rounded-full bg-brand-500/10 blur-3xl" />
-
-              <div className="w-full max-w-4xl">
-                <AIInterviewerAvatar
-                  status={avatarStatus}
-                  questionText={nextQuestion.text}
-                  speechSupported={speechSupported}
+          <div className="hidden flex-1 items-center justify-center px-6 md:flex">
+            <div className="w-full max-w-sm space-y-1.5">
+              <div className="flex items-center justify-between text-[11px] font-medium text-white/55">
+                <span>Question {currentNumber} of {totalQuestions}</span>
+                <span>{completionPct}% complete</span>
+              </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-brand-400 transition-[width] duration-500 ease-out"
+                  style={{ width: `${completionPct}%` }}
                 />
               </div>
             </div>
+          </div>
 
-            <div className="absolute bottom-5 right-5 z-10 md:bottom-6 md:right-6">
-              <CameraRecorder
-                cameraStream={cameraStream}
-                isRecording={isRecording}
-                error={error}
-                statusText={statusText}
+          <div className="flex shrink-0 items-center gap-3">
+            <Badge variant="brand" className="border-brand-300/22 bg-[#142742]/92 text-ink-50 md:hidden">
+              {currentNumber} / {totalQuestions}
+            </Badge>
+            <Button
+              type="button"
+              variant="ghost"
+              className="border border-white/10 bg-white/[0.05] text-white/85 hover:bg-white/10 hover:text-white"
+              onClick={handleBackToSkills}
+            >
+              <LogOut size={14} />
+              Leave
+            </Button>
+          </div>
+        </header>
+
+        {/* Main area: question card + session panel */}
+        <div className="relative z-10 flex min-h-0 flex-1 gap-6 px-4 py-5 md:px-6">
+          <section className="relative flex min-w-0 flex-1 items-center justify-center">
+            <div className="pointer-events-none absolute inset-x-0 top-[14%] mx-auto h-64 max-w-3xl rounded-full bg-brand-500/10 blur-3xl" />
+
+            <div
+              key={nextQuestion.id}
+              className="animate-fade-up relative w-full max-w-2xl rounded-3xl border border-white/10 bg-white/[0.05] px-6 py-8 text-center shadow-[0_30px_90px_rgba(3,7,18,0.55)] backdrop-blur-xl md:px-10 md:py-10"
+            >
+              <div className="mx-auto mb-6 inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.06] py-1.5 pl-2 pr-4">
+                <span
+                  className={[
+                    'flex h-7 w-7 items-center justify-center rounded-full bg-[radial-gradient(circle_at_30%_25%,#ffffff_0%,#dbeafe_35%,#7dd3fc_60%,#1e3a8a_100%)]',
+                    callPhase === 'speakingQuestion' ? 'animate-[pulse_1.6s_ease-in-out_infinite]' : '',
+                  ].join(' ')}
+                >
+                  <Bot size={15} className="text-ink-950" />
+                </span>
+                <span className="text-xs font-medium text-white/80">Gravis · {aiStatusLabel}</span>
+              </div>
+
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/45">
+                Question {nextQuestion.order}
+              </p>
+              <h1 className="mt-3 text-balance text-2xl font-semibold leading-snug tracking-tight text-white md:text-3xl">
+                {nextQuestion.text}
+              </h1>
+              <p className="mt-4 text-sm text-white/55">
+                Listen to the question, then answer clearly in 1–2 minutes.
+              </p>
+
+              <div className="mt-6 space-y-2">
+                <p className="text-sm font-medium text-white/85">{statusText}</p>
+                {speechBlocked ? (
+                  <p className="text-xs text-amber-200">
+                    Voice playback failed. Gravis switched to text and recording may continue.
+                  </p>
+                ) : null}
+                {!speechSupported ? (
+                  <p className="text-xs text-amber-200">
+                    Voice playback is unavailable in this browser. Gravis will continue in text only.
+                  </p>
+                ) : null}
+                {statusError ? <p className="text-sm text-rose-300">{statusError}</p> : null}
+                {aiProcessingSteps ? (
+                  <div className="space-y-1 pt-1">
+                    {aiProcessingSteps.map((step, i) => (
+                      <p key={i} className="animate-pulse text-xs text-white/60">{step}</p>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+
+              {canReplayQuestion ? (
+                <button
+                  type="button"
+                  className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.05] px-4 py-2 text-xs font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+                  onClick={handleReplayQuestion}
+                >
+                  <RotateCcw size={13} />
+                  Replay question
+                </button>
+              ) : null}
+            </div>
+          </section>
+
+          {/* Right panel: camera + session status */}
+          <aside className="hidden w-72 shrink-0 flex-col gap-4 overflow-y-auto lg:flex">
+            <CameraRecorder
+              cameraStream={cameraStream}
+              isRecording={isRecording}
+              error={error}
+              statusText={statusText}
+              className="max-w-none"
+            />
+
+            <div className="rounded-[1.6rem] border border-white/10 bg-black/45 p-4 shadow-[0_24px_60px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/55">
+                Session status
+              </p>
+
+              <div className="mt-3 space-y-2.5">
+                {deviceChecklist.map((device) => {
+                  const DeviceIcon = device.icon;
+                  return (
+                    <div key={device.label} className="flex items-center gap-2.5 text-xs text-white/80">
+                      <DeviceIcon size={13} className="shrink-0 text-white/45" />
+                      <span className="flex-1">{device.label}</span>
+                      <span
+                        className={[
+                          'h-2 w-2 rounded-full',
+                          device.ready ? 'bg-emerald-400' : 'bg-rose-400',
+                        ].join(' ')}
+                      />
+                      <span className="w-14 text-right text-[11px] text-white/55">
+                        {device.ready ? 'Ready' : 'Offline'}
+                      </span>
+                    </div>
+                  );
+                })}
+
+                <div className="flex items-center gap-2.5 border-t border-white/10 pt-2.5 text-xs text-white/80">
+                  <Wifi size={13} className="shrink-0 text-white/45" />
+                  <span className="flex-1">Connection</span>
+                  <span
+                    className={[
+                      'h-2 w-2 rounded-full',
+                      connectionOk ? 'bg-emerald-400' : 'bg-amber-400',
+                    ].join(' ')}
+                  />
+                  <span className="w-14 text-right text-[11px] text-white/55">
+                    {connectionOk ? 'Stable' : 'Check'}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2.5 text-xs text-white/80">
+                  <Bot size={13} className="shrink-0 text-white/45" />
+                  <span className="flex-1">Gravis</span>
+                  <span
+                    className={[
+                      'h-2 w-2 rounded-full',
+                      callPhase === 'processingAnswer'
+                        ? 'animate-pulse bg-brand-300'
+                        : callPhase === 'speakingQuestion'
+                          ? 'animate-pulse bg-brand-400'
+                          : 'bg-emerald-400',
+                    ].join(' ')}
+                  />
+                  <span className="text-right text-[11px] text-white/55">{aiStatusLabel}</span>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* Floating camera preview when the side panel is hidden */}
+          <div className="absolute bottom-4 right-4 z-10 lg:hidden">
+            <CameraRecorder
+              cameraStream={cameraStream}
+              isRecording={isRecording}
+              error={error}
+              statusText={statusText}
+            />
+          </div>
+        </div>
+
+        {/* Bottom controls */}
+        <footer className="relative z-20 shrink-0 border-t border-white/10 bg-white/[0.03] px-4 py-4 backdrop-blur-md md:px-6">
+          <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-3">
+            <div className="flex min-h-11 flex-wrap items-center justify-center gap-4">
+              {isRecordingPhase ? (
+                <div className="flex items-center gap-3" aria-live="polite">
+                  <div className="flex h-8 items-center gap-[3px]" aria-hidden="true">
+                    {Array.from({ length: 24 }).map((_, i) => (
+                      <span
+                        key={i}
+                        className="w-[3px] origin-center rounded-full bg-rose-400/90"
+                        style={{
+                          height: `${10 + ((i * 37) % 20)}px`,
+                          animation: `waveform ${0.8 + ((i * 13) % 10) / 18}s ease-in-out ${(i % 8) * 0.06}s infinite`,
+                          transform: `scaleY(${0.45 + Math.min(0.55, micLevel * 1.4)})`,
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <span className="font-mono text-sm tabular-nums text-white/85">
+                    {formatDuration(recordingSeconds)}
+                  </span>
+                </div>
+              ) : null}
+
+              {canStartAnswerRecording ? (
+                <Button type="button" size="lg" onClick={() => void startAnswerRecording()}>
+                  <Mic size={15} />
+                  Start recording
+                </Button>
+              ) : null}
+
+              {canStopAnswerRecording ? (
+                <Button type="button" size="lg" variant="danger" onClick={handleStopAnswerRecording}>
+                  <Square size={13} className="fill-current" />
+                  Stop and submit
+                </Button>
+              ) : null}
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-sm">
+              {retryPayload ? (
+                <button
+                  type="button"
+                  className="text-white/80 underline decoration-white/25 underline-offset-4 transition hover:text-white disabled:opacity-50"
+                  onClick={handleRetryUpload}
+                  disabled={answerMutation.isPending}
+                >
+                  Retry upload
+                </button>
+              ) : null}
+
+              {statusError ? (
+                <button
+                  type="button"
+                  className="text-white/80 underline decoration-white/25 underline-offset-4 transition hover:text-white disabled:opacity-50"
+                  onClick={handleRestartAnswer}
+                  disabled={answerMutation.isPending || !cameraReady || !micReady || !screenReady}
+                >
+                  Try this answer again
+                </button>
+              ) : null}
+
+              {statusError && (!cameraReady || !micReady || !screenReady) ? (
+                <button
+                  type="button"
+                  className="text-white/80 underline decoration-white/25 underline-offset-4 transition hover:text-white"
+                  onClick={handleReturnToSetup}
+                >
+                  Reconnect setup
+                </button>
+              ) : null}
+            </div>
+          </div>
+        </footer>
+
+        {SHOW_MIC_DEBUG ? (
+          <div className="absolute bottom-24 left-5 z-30 w-[15rem] rounded-2xl border border-white/10 bg-black/45 p-3 shadow-[0_18px_55px_rgba(0,0,0,0.35)] backdrop-blur-md">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/55">
+                Mic debug
+              </p>
+              <span className="text-[11px] text-white/65">{micLevel.toFixed(2)}</span>
+            </div>
+
+            <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+              <div
+                className="h-full rounded-full bg-emerald-300 transition-[width] duration-150"
+                style={{ width: `${Math.min(100, micLevel * 100)}%` }}
               />
             </div>
 
-            {SHOW_MIC_DEBUG ? (
-              <div className="absolute bottom-5 left-5 z-10 w-[15rem] rounded-2xl border border-white/10 bg-black/45 p-3 shadow-[0_18px_55px_rgba(0,0,0,0.35)] backdrop-blur-md md:bottom-6 md:left-6">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/55">
-                    Mic debug
-                  </p>
-                  <span className="text-[11px] text-white/65">{micLevel.toFixed(2)}</span>
-                </div>
-
-                <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
-                  <div
-                    className="h-full rounded-full bg-emerald-300 transition-[width] duration-150"
-                    style={{ width: `${Math.min(100, micLevel * 100)}%` }}
-                  />
-                </div>
-
-                <div className="mt-3 space-y-1 text-xs text-white/84">
-                  <p>State: {micDebugState}</p>
-                  <p>Camera: {cameraReady ? 'ready' : 'offline'}</p>
-                  <p>Screen: {screenReady ? 'ready' : 'offline'}</p>
-                  <p>Mic: {micReady ? 'ready' : 'offline'}</p>
-                  <p>Recorder: {isRecording ? 'active' : 'idle'}</p>
-                </div>
-              </div>
-            ) : null}
-
-            <div className="pointer-events-none absolute inset-x-0 bottom-8 flex justify-center px-4">
-              <div className="pointer-events-auto flex w-full max-w-3xl flex-col items-center gap-3">
-                <InterviewQuestion question={nextQuestion} variant="overlay" />
-
-                <div className="space-y-1 text-center">
-                  <p className="text-sm font-medium text-white/88">{statusText}</p>
-                  {callPhase === 'idle' ? (
-                    <p className="text-xs text-white/55">Start recording when you are ready to answer.</p>
-                  ) : null}
-                  {callPhase === 'recordingAnswer' ? (
-                    <p className="text-xs text-white/55">Recording will continue until you stop and submit.</p>
-                  ) : null}
-                  {speechBlocked ? (
-                    <p className="text-xs text-amber-200">
-                      Voice playback failed. Gravis switched to text and recording may continue.
-                    </p>
-                  ) : null}
-                  {!speechSupported ? (
-                    <p className="text-xs text-amber-200">
-                      Voice playback is unavailable in this browser. Gravis will continue in text only.
-                    </p>
-                  ) : null}
-                  {statusError ? (
-                    <p className="text-sm text-rose-300">{statusError}</p>
-                  ) : null}
-{aiProcessingSteps ? (
-  <div className="space-y-1 text-center">
-    {aiProcessingSteps.map((step, i) => (
-      <p key={i} className="text-xs text-white/60 animate-pulse">{step}</p>
-    ))}
-  </div>
-) : null}
-                </div>
-
-                <div className="flex flex-wrap items-center justify-center gap-3">
-                  {canStartAnswerRecording ? (
-                    <Button type="button" size="lg" onClick={() => void startAnswerRecording()}>
-                      Start recording
-                    </Button>
-                  ) : null}
-
-                  {canStopAnswerRecording ? (
-                    <Button type="button" size="lg" onClick={handleStopAnswerRecording}>
-                      Stop and submit
-                    </Button>
-                  ) : null}
-                </div>
-
-                <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
-                  {canReplayQuestion ? (
-                    <button
-                      type="button"
-                      className="text-white/84 underline decoration-white/25 underline-offset-4 transition hover:text-white"
-                      onClick={handleReplayQuestion}
-                    >
-                      Replay question
-                    </button>
-                  ) : null}
-
-                  {retryPayload ? (
-                    <button
-                      type="button"
-                      className="text-white/84 underline decoration-white/25 underline-offset-4 transition hover:text-white"
-                      onClick={handleRetryUpload}
-                      disabled={answerMutation.isPending}
-                    >
-                      Retry upload
-                    </button>
-                  ) : null}
-
-                  {statusError ? (
-                    <button
-                      type="button"
-                      className="text-white/84 underline decoration-white/25 underline-offset-4 transition hover:text-white"
-                      onClick={handleRestartAnswer}
-                      disabled={answerMutation.isPending || !cameraReady || !micReady || !screenReady}
-                    >
-                      Try this answer again
-                    </button>
-                  ) : null}
-
-                  {statusError && (!cameraReady || !micReady || !screenReady) ? (
-                    <button
-                      type="button"
-                      className="text-white/84 underline decoration-white/25 underline-offset-4 transition hover:text-white"
-                      onClick={handleReturnToSetup}
-                    >
-                      Reconnect setup
-                    </button>
-                  ) : null}
-                </div>
-              </div>
+            <div className="mt-3 space-y-1 text-xs text-white/84">
+              <p>State: {micDebugState}</p>
+              <p>Camera: {cameraReady ? 'ready' : 'offline'}</p>
+              <p>Screen: {screenReady ? 'ready' : 'offline'}</p>
+              <p>Mic: {micReady ? 'ready' : 'offline'}</p>
+              <p>Recorder: {isRecording ? 'active' : 'idle'}</p>
             </div>
           </div>
-        </div>
+        ) : null}
       </div>
     );
   }

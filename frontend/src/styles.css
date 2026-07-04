@@ -55,7 +55,7 @@
   }
 
   .page-container {
-    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-screen-2xl px-4 sm:px-6 lg:px-8;
   }
 
   .page-copy {
@@ -134,6 +134,22 @@
 
   .label-muted {
     @apply text-xs font-semibold uppercase tracking-[0.12em] text-ink-500 dark:text-ink-dark-muted;
+  }
+}
+
+@keyframes waveform {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@layer utilities {
+  .animate-fade-up {
+    animation: fade-up 0.35s cubic-bezier(0.23, 1, 0.32, 1) both;
   }
 }
 

@@ -3,10 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowRight, BadgeCheck, Eye, EyeOff, ShieldCheck, Sparkles, Video } from 'lucide-react';
+import { ArrowRight, BadgeCheck, Eye, EyeOff, Loader2, ShieldCheck, Sparkles, Video } from 'lucide-react';
 import { toast } from 'sonner';
 
-import wordmark from '@/assets/shaghalny-wordmark.svg';
+import { Logo } from '@/components/brand/Logo';
 import useAuth from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -55,8 +55,8 @@ const Login: React.FC = () => {
     <div className="flex min-h-screen bg-ink-50 dark:bg-ink-dark-bg">
       {/* Left: brand panel */}
       <div className="hidden w-[42%] shrink-0 flex-col justify-between bg-brand-700 p-10 lg:flex">
-        <Link to="/" className="flex items-center text-white no-underline">
-          <img src={wordmark} alt="Shaghalny" className="h-8 w-auto object-contain brightness-0 invert" />
+        <Link to="/" className="flex items-center text-white no-underline" aria-label="Shaghalny home">
+          <Logo tone="inverted" />
         </Link>
 
         <div className="space-y-8">
@@ -90,8 +90,8 @@ const Login: React.FC = () => {
       <div className="flex flex-1 items-center justify-center px-4 py-10 sm:px-8">
         <div className="w-full max-w-md">
           <div className="mb-8 lg:hidden">
-            <Link to="/" className="flex items-center text-ink-900 no-underline dark:text-ink-dark-text">
-              <img src={wordmark} alt="Shaghalny" className="h-8 w-auto object-contain dark:brightness-[1.08] dark:contrast-[0.98]" />
+            <Link to="/" className="flex items-center text-ink-900 no-underline dark:text-ink-dark-text" aria-label="Shaghalny home">
+              <Logo />
             </Link>
           </div>
 
@@ -135,6 +135,7 @@ const Login: React.FC = () => {
                 </div>
 
                 <Button type="submit" size="lg" disabled={isSubmitting} className="w-full">
+                  {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : null}
                   {isSubmitting ? 'Signing in...' : 'Sign in'}
                   {!isSubmitting ? <ArrowRight size={16} /> : null}
                 </Button>

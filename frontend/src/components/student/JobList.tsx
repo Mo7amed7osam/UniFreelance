@@ -39,7 +39,7 @@ const emptyDraft = (): ProposalDraft => ({ details: '', timeline: '', portfolio:
 
 const fadeUp = {
   hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.23, 1, 0.32, 1] } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] } },
   exit: { opacity: 0, y: -8, transition: { duration: 0.15 } },
 };
 

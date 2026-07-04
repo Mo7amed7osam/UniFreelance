@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-import { getStudentProfile, getStudentProposals } from '@/services/api';
+import { getJobs, getStudentProfile, getStudentProposals } from '@/services/api';
 import useAuth from '@/hooks/useAuth';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -21,7 +21,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.23, 1, 0.32, 1] } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] } },
 };
 
 const staggerContainer = {
@@ -92,7 +92,18 @@ const StudentDashboard: React.FC = () => {
     enabled: !!userId,
   });
 
+  const { data: jobs, isLoading: jobsLoading } = useQuery({
+    queryKey: ['jobs', 'dashboard-recommended'],
+    queryFn: () => getJobs(),
+  });
+
   const proposalList = proposals || [];
+  const appliedJobIds = new Set(
+    proposalList.map((p: any) => p.jobId?._id || p.jobId).filter(Boolean)
+  );
+  const recommendedJobs = (jobs || [])
+    .filter((job: any) => !appliedJobIds.has(job._id))
+    .slice(0, 4);
   const activeProposals = proposalList.filter((p: any) => ['submitted', 'shortlisted'].includes(p.status)).length;
   const verifiedSkillsCount = profile?.verifiedSkills?.length || 0;
   const balance = profile?.balance?.toFixed?.(2) ?? '0.00';
@@ -228,7 +239,8 @@ const StudentDashboard: React.FC = () => {
         </motion.div>
       </motion.div>
 
-      {/* Recent applications */}
+      {/* Bottom row: recent applications + recommended jobs */}
+      <motion.div variants={staggerContainer} className="grid items-start gap-6 xl:grid-cols-[1fr_360px]">
       <motion.div variants={fadeUp}>
         <div className="mb-4 flex items-center justify-between">
           <div>
@@ -255,7 +267,7 @@ const StudentDashboard: React.FC = () => {
           />
         ) : (
           <motion.div
-            className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
+            className="grid gap-3 sm:grid-cols-2"
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
@@ -281,6 +293,62 @@ const StudentDashboard: React.FC = () => {
             ))}
           </motion.div>
         )}
+      </motion.div>
+
+      {/* Recommended jobs */}
+      <motion.div variants={fadeUp}>
+        <Card>
+          <CardHeader className="mb-0">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles size={16} className="text-brand-500" />
+                Recommended jobs
+              </CardTitle>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/student/jobs')}>
+                View all
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="mt-3 space-y-2">
+            {jobsLoading ? (
+              <>
+                {[1, 2, 3].map((i) => <Skeleton key={i} className="h-16 w-full rounded-lg" />)}
+              </>
+            ) : recommendedJobs.length === 0 ? (
+              <p className="py-4 text-center text-sm text-ink-500 dark:text-ink-400">
+                No new jobs right now — check back soon.
+              </p>
+            ) : (
+              recommendedJobs.map((job: any) => (
+                <button
+                  key={job._id}
+                  onClick={() => navigate('/student/jobs')}
+                  className="group flex w-full flex-col gap-1.5 rounded-lg border border-ink-100 px-3 py-2.5 text-left transition-colors hover:border-brand-200 hover:bg-brand-50/50 dark:border-ink-dark-border dark:hover:border-brand-700/50 dark:hover:bg-brand-900/10"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="line-clamp-1 text-sm font-semibold text-ink-900 group-hover:text-brand-700 dark:text-white dark:group-hover:text-brand-300">
+                      {job.title}
+                    </p>
+                    <ArrowRight size={13} className="mt-0.5 shrink-0 text-ink-300 transition-transform group-hover:translate-x-0.5 group-hover:text-brand-500 dark:text-ink-600" />
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-ink-500 dark:text-ink-400">
+                    {(job.budgetMin !== undefined || job.budgetMax !== undefined) && (
+                      <span className="font-medium">
+                        {job.budgetMin !== undefined ? formatCurrency(job.budgetMin) : '—'} – {job.budgetMax !== undefined ? formatCurrency(job.budgetMax) : '—'}
+                      </span>
+                    )}
+                    {(job.requiredSkills || []).slice(0, 2).map((skill: any) => (
+                      <Badge key={skill.name || skill} variant="brand" className="text-[10px]">
+                        {skill.name || skill}
+                      </Badge>
+                    ))}
+                  </div>
+                </button>
+              ))
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
       </motion.div>
     </motion.div>
   );

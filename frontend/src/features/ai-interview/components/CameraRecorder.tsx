@@ -1,10 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 
+import { cn } from '@/lib/utils';
+
 interface CameraRecorderProps {
   cameraStream: MediaStream | null;
   isRecording: boolean;
   statusText?: string;
   error?: string | null;
+  className?: string;
 }
 
 export const CameraRecorder: React.FC<CameraRecorderProps> = ({
@@ -12,6 +15,7 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({
   isRecording,
   statusText,
   error,
+  className,
 }) => {
   const previewRef = useRef<HTMLVideoElement | null>(null);
 
@@ -27,7 +31,7 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({
   }, [cameraStream]);
 
   return (
-    <div className="pointer-events-none w-full max-w-[15rem] rounded-[1.6rem] border border-white/10 bg-black/60 p-2.5 shadow-[0_24px_60px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+    <div className={cn('pointer-events-none w-full max-w-[15rem] rounded-[1.6rem] border border-white/10 bg-black/60 p-2.5 shadow-[0_24px_60px_rgba(0,0,0,0.45)] backdrop-blur-xl', className)}>
       <div className="overflow-hidden rounded-[1.15rem] border border-white/10 bg-black">
         <video ref={previewRef} className="aspect-[4/5] w-full object-cover" autoPlay playsInline muted />
       </div>
