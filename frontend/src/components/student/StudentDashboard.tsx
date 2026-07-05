@@ -3,31 +3,39 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
-  ArrowRight, BookOpen, Briefcase, CheckCircle2,
-  Clock, Wallet, FileText, Shield, Sparkles, TrendingUp, CalendarDays,
+  ArrowRight,
+  Briefcase,
+  CalendarDays,
+  Check,
+  ClipboardList,
+  FileText,
+  Mic,
+  Sparkles,
+  TrendingUp,
+  UserRound,
+  Wallet,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { getJobs, getStudentProfile, getStudentProposals } from '@/services/api';
 import useAuth from '@/hooks/useAuth';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] } },
+  hidden: { opacity: 0, y: 14 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.32, ease: [0.23, 1, 0.32, 1] as [number, number, number, number] } },
 };
 
 const staggerContainer = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.07 } },
+  visible: { transition: { staggerChildren: 0.06 } },
 };
+
+const logoColors = ['#111014', '#6366f1', '#0ea5e9', '#16a34a', '#f59e0b'];
 
 const statusVariant: Record<string, 'success' | 'brand' | 'danger' | 'warning'> = {
   accepted: 'success',
@@ -35,18 +43,13 @@ const statusVariant: Record<string, 'success' | 'brand' | 'danger' | 'warning'> 
   rejected: 'danger',
 };
 
-function getInitials(name?: string) {
-  if (!name) return '?';
-  return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
-}
-
 function getProfileCompletion(profile: any, verifiedSkillsCount: number): { pct: number; missing: string[] } {
   const portfolioLinks = Array.isArray(profile?.portfolioLinks) ? profile.portfolioLinks.filter(Boolean) : [];
   const checks = [
-    { label: 'Bio added', done: !!profile?.description },
-    { label: 'Skills verified', done: verifiedSkillsCount > 0 },
-    { label: 'Portfolio links', done: portfolioLinks.length > 0 },
-    { label: 'University set', done: !!profile?.university },
+    { label: 'Verify 1 skill', done: verifiedSkillsCount > 0 },
+    { label: 'Add profile photo', done: !!profile?.profilePhotoUrl },
+    { label: 'Add portfolio projects', done: portfolioLinks.length > 0 },
+    { label: 'Upload your CV', done: !!profile?.cvUrl },
   ];
   const done = checks.filter((c) => c.done).length;
   return {
@@ -55,29 +58,48 @@ function getProfileCompletion(profile: any, verifiedSkillsCount: number): { pct:
   };
 }
 
-const StatItem: React.FC<{
+function initials(value?: string) {
+  if (!value) return 'S';
+  return value.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase();
+}
+
+function companyName(job: any) {
+  return job?.clientId?.name || job?.company || 'Client';
+}
+
+function budgetLabel(job: any) {
+  if (job?.budgetMin !== undefined || job?.budgetMax !== undefined) {
+    return `${job.budgetMin !== undefined ? formatCurrency(job.budgetMin) : '-'}-${job.budgetMax !== undefined ? formatCurrency(job.budgetMax) : '-'}`;
+  }
+  return job?.budget ? formatCurrency(job.budget) : 'Budget TBA';
+}
+
+const QuickAction = ({
+  title,
+  meta,
+  icon,
+  tone,
+  onClick,
+}: {
+  title: string;
+  meta: string;
   icon: React.ReactNode;
-  label: string;
-  value: React.ReactNode;
-  sub?: string;
-  accent?: boolean;
-}> = ({ icon, label, value, sub, accent }) => (
-  <motion.div variants={fadeUp}>
-    <Card className={`group relative min-h-[7.5rem] overflow-hidden ${accent ? 'border-brand-200/80 bg-brand-50/80 dark:border-brand-700/40 dark:bg-brand-900/20' : ''}`}>
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
-      <div className="flex items-start justify-between gap-3">
-        <div className={`flex h-8 w-8 items-center justify-center rounded-xl ring-1 ring-inset ${accent ? 'bg-brand-100 text-brand-600 ring-brand-200 dark:bg-brand-800/50 dark:text-brand-300 dark:ring-brand-700/40' : 'bg-ink-100/80 text-ink-500 ring-ink-200/70 dark:bg-white/10 dark:text-ink-400 dark:ring-white/10'}`}>
-          {icon}
-        </div>
-        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-ink-300 transition-colors group-hover:bg-brand-500 dark:bg-white/20" />
-      </div>
-      <div className="mt-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.1em] text-ink-500 dark:text-ink-400">{label}</p>
-        <p className={`mt-1 text-xl font-bold tracking-tight ${accent ? 'text-brand-700 dark:text-brand-300' : 'text-ink-900 dark:text-white'}`}>{value}</p>
-        {sub && <p className="mt-0.5 text-xs text-ink-400 dark:text-ink-500">{sub}</p>}
-      </div>
-    </Card>
-  </motion.div>
+  tone: string;
+  onClick: () => void;
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="sh-panel flex items-center gap-3 px-4 py-3 text-left transition hover:-translate-y-0.5 hover:border-brand-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+  >
+    <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] ${tone}`}>
+      {icon}
+    </span>
+    <span className="min-w-0">
+      <span className="block text-sm font-semibold text-ink-900 dark:text-white">{title}</span>
+      <span className="block text-xs text-ink-500 dark:text-ink-dark-muted">{meta}</span>
+    </span>
+  </button>
 );
 
 const StudentDashboard: React.FC = () => {
@@ -103,360 +125,203 @@ const StudentDashboard: React.FC = () => {
   });
 
   const proposalList = proposals || [];
-  const appliedJobIds = new Set(
-    proposalList.map((p: any) => p.jobId?._id || p.jobId).filter(Boolean)
-  );
-  const recommendedJobs = (jobs || [])
-    .filter((job: any) => !appliedJobIds.has(job._id))
-    .slice(0, 4);
-  const activeProposals = proposalList.filter((p: any) => ['submitted', 'shortlisted'].includes(p.status)).length;
+  const appliedJobIds = new Set(proposalList.map((p: any) => p.jobId?._id || p.jobId).filter(Boolean));
+  const recommendedJobs = (jobs || []).filter((job: any) => !appliedJobIds.has(job._id)).slice(0, 3);
   const verifiedSkillsCount = profile?.verifiedSkills?.length || 0;
   const balance = profile?.balance?.toFixed?.(2) ?? '0.00';
   const { pct: completionPct, missing: completionMissing } = getProfileCompletion(profile, verifiedSkillsCount);
-
-  const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-  const recentActivity = proposalList.slice(0, 3);
-  const nextAction = completionMissing.includes('Skills verified')
-    ? {
-        title: 'Verify your first skill',
-        body: 'Verified skills make proposals more credible before clients review your profile.',
-        cta: 'Start verification',
-        path: '/student/skill-verification',
-        icon: <Shield size={17} />,
-      }
-    : completionPct < 100
-      ? {
-          title: `Add ${completionMissing[0]?.toLowerCase() || 'profile proof'}`,
-          body: 'Finish the missing profile proof so clients can evaluate you faster.',
-          cta: 'Finish profile',
-          path: '/student/profile',
-          icon: <TrendingUp size={17} />,
-        }
-      : activeProposals === 0
-        ? {
-            title: 'Send your first proposal',
-            body: 'You have a client-ready profile. Browse matched jobs and apply with a focused proposal.',
-            cta: 'Browse jobs',
-            path: '/student/jobs',
-            icon: <Briefcase size={17} />,
-          }
-        : {
-            title: 'Review active proposals',
-            body: 'Keep an eye on shortlisted work, contract progress, and client responses.',
-            cta: 'View contracts',
-            path: '/student/contracts',
-            icon: <FileText size={17} />,
-          };
+  const firstName = user?.name?.split(' ')[0] || 'there';
 
   return (
-    <motion.div className="space-y-5" initial="hidden" animate="visible" variants={staggerContainer}>
-      {/* Welcome header */}
-      <motion.div variants={fadeUp} className="glass-panel p-4 sm:p-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-14 w-14 ring-2 ring-white shadow-soft dark:ring-white/10">
-              <AvatarFallback className="text-lg">{getInitials(user?.name)}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600 dark:text-brand-400">Student dashboard</p>
-              <h1 className="text-2xl font-bold tracking-tight text-ink-900 dark:text-white">
-                Welcome back, {user?.name?.split(' ')[0]}
-              </h1>
-              <p className="text-sm text-ink-500 dark:text-ink-400">{today}</p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => navigate('/student/profile')}>
-              View profile
-            </Button>
-            <Button size="sm" onClick={() => navigate('/student/jobs')}>
-              Browse jobs <ArrowRight size={14} />
-            </Button>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Stats grid */}
-      <motion.div variants={staggerContainer} className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatItem
-          icon={<Shield size={18} />}
-          label="Verified skills"
-          value={profileLoading ? <Skeleton className="h-8 w-16" /> : verifiedSkillsCount}
-          sub="AI-verified via interview"
-        />
-        <StatItem
-          icon={<FileText size={18} />}
-          label="Active proposals"
-          value={proposalsLoading ? <Skeleton className="h-8 w-16" /> : activeProposals}
-          sub="Submitted or shortlisted"
-        />
-        <StatItem
-          icon={<Wallet size={18} />}
-          label="Available balance"
-          value={profileLoading ? <Skeleton className="h-8 w-16" /> : formatCurrency(balance)}
-          sub="Ready to withdraw"
-          accent
-        />
-        <StatItem
-          icon={<CheckCircle2 size={18} />}
-          label="Profile status"
-          value={<Badge variant="success" className="text-sm normal-case tracking-normal">Active</Badge>}
-          sub="Visible to clients"
-        />
-      </motion.div>
-
-      <motion.div variants={fadeUp}>
-        <Card className="overflow-hidden border-brand-200/70 bg-white/[0.92] p-0 dark:border-brand-400/20 dark:bg-ink-dark-surface/[0.92]">
-          <CardContent className="flex flex-col gap-3 p-3.5 sm:flex-row sm:items-center sm:justify-between sm:p-4">
-            <div className="flex min-w-0 items-start gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100 dark:bg-brand-400/[0.12] dark:text-brand-200 dark:ring-brand-400/20">
-                {nextAction.icon}
-              </span>
-              <div className="min-w-0">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-600 dark:text-brand-300">Next best action</p>
-                <p className="mt-0.5 font-semibold text-ink-950 dark:text-white">{nextAction.title}</p>
-                <p className="mt-0.5 max-w-2xl text-sm leading-6 text-ink-500 dark:text-ink-dark-muted">{nextAction.body}</p>
-              </div>
-            </div>
-            <Button size="sm" className="w-full shrink-0 sm:w-auto" onClick={() => navigate(nextAction.path)}>
-              {nextAction.cta} <ArrowRight size={13} />
-            </Button>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* Middle row: quick actions + upcoming interviews */}
-      <motion.div variants={staggerContainer} className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
-        <motion.div variants={fadeUp}>
-          <Card className="h-full">
-            <CardHeader className="mb-0">
-              <CardTitle className="flex items-center gap-2">
-                <Briefcase size={16} className="text-brand-500" />
-                Quick actions
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-              {[
-                { label: 'Browse job board', icon: <BookOpen size={14} />, path: '/student/jobs' },
-                { label: 'Verify a skill', icon: <Shield size={14} />, path: '/student/skill-verification' },
-                { label: 'View my wallet', icon: <Wallet size={14} />, path: '/student/wallet' },
-                { label: 'My contracts', icon: <FileText size={14} />, path: '/student/contracts' },
-              ].map((action) => (
-                <button
-                  key={action.path}
-                  onClick={() => navigate(action.path)}
-                  className="group flex items-center gap-3 rounded-xl border border-ink-200/70 bg-ink-50/70 px-3 py-3 text-left text-sm font-semibold text-ink-700 transition-colors hover:border-brand-200 hover:bg-brand-50/70 hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-white/10 dark:bg-white/[0.045] dark:text-ink-300 dark:hover:border-brand-400/25 dark:hover:bg-brand-400/10 dark:hover:text-brand-200"
-                >
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-ink-500 shadow-soft transition-colors group-hover:text-brand-600 dark:bg-white/10 dark:text-ink-300 dark:group-hover:text-brand-200">
-                    {action.icon}
-                  </span>
-                  <span className="min-w-0 flex-1">{action.label}</span>
-                  <ArrowRight size={13} className="shrink-0 text-ink-300 transition-transform group-hover:translate-x-0.5 group-hover:text-brand-500 dark:text-ink-600" />
-                </button>
-              ))}
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div variants={fadeUp}>
-          <div className="grid h-full gap-4">
-          <Card>
-            <CardHeader className="mb-0">
-              <CardTitle className="flex items-center gap-2">
-                <CalendarDays size={16} className="text-brand-500" />
-                Upcoming interviews
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="mt-3">
-              <div className="flex items-center justify-between gap-3 rounded-xl border border-dashed border-ink-200/80 bg-ink-50/70 px-3 py-3 dark:border-white/10 dark:bg-white/[0.035]">
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-ink-900 dark:text-white">No interviews scheduled</p>
-                  <p className="mt-0.5 text-xs leading-5 text-ink-500 dark:text-ink-dark-muted">Invitations appear here.</p>
-                </div>
-                <Button variant="ghost" size="sm" className="shrink-0" onClick={() => navigate('/student/skill-verification')}>
-                  Prepare
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          </div>
-        </motion.div>
-      </motion.div>
-
-      {/* Bottom row: recent applications + recommended jobs */}
-      <motion.div variants={staggerContainer} className="grid items-start gap-4 xl:grid-cols-[1fr_320px]">
-      <motion.div variants={fadeUp}>
-        <div className="mb-4 flex items-center justify-between">
+    <motion.div className="space-y-[22px]" initial="hidden" animate="visible" variants={staggerContainer}>
+      <motion.section
+        variants={fadeUp}
+        className="relative overflow-hidden rounded-[20px] bg-[linear-gradient(115deg,#4f46e5_0%,#6366f1_45%,#818cf8_100%)] p-6 text-white shadow-glass sm:p-7"
+      >
+        <div className="pointer-events-none absolute -right-10 -top-16 h-64 w-64 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.25),transparent_70%)]" />
+        <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-ink-900 dark:text-white">Recent applications</h2>
-            <p className="text-sm text-ink-500 dark:text-ink-400">Where your proposals stand right now.</p>
+            <div className="mb-1.5 text-[13px] font-medium text-[#dcdcff]">Good afternoon, {firstName}</div>
+            <h1 className="max-w-3xl text-[26px] font-bold tracking-[-0.025em] text-white">
+              {verifiedSkillsCount > 0 ? 'Keep building your student freelance profile' : "You're 1 verified skill away from better matches"}
+            </h1>
+            <p className="mt-2 max-w-xl text-sm leading-6 text-[#e4e4ff]">
+              Complete your verification profile to unlock stronger job matches and a higher client trust score.
+            </p>
           </div>
-          {proposalList.length > 0 && (
-            <Button variant="outline" size="sm" onClick={() => navigate('/student/contracts')}>
-              View all <ArrowRight size={13} />
-            </Button>
-          )}
-        </div>
-
-        {proposalsLoading ? (
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-32 w-full rounded-xl" />)}
-          </div>
-        ) : proposalList.length === 0 ? (
-          <EmptyState
-            title="No proposals yet"
-            description="Apply to jobs from the job board and your applications will appear here."
-            actionLabel="Browse jobs"
-            onAction={() => navigate('/student/jobs')}
-          />
-        ) : (
-          <motion.div
-            className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3"
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
+          <Button
+            type="button"
+            variant="outline"
+            className="border-0 bg-white text-brand-600 hover:bg-white hover:text-brand-700"
+            onClick={() => navigate('/student/skill-verification')}
           >
-            {proposalList.slice(0, 6).map((proposal: any) => (
-              <motion.div key={proposal._id} variants={fadeUp}>
-                <Card className="group flex flex-col gap-3 p-4 transition-all hover:-translate-y-0.5 hover:shadow-card">
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="line-clamp-1 font-semibold text-ink-900 dark:text-white">
-                      {proposal.jobId?.title || 'Job'}
-                    </p>
-                    <Badge variant={statusVariant[proposal.status] ?? 'warning'} className="shrink-0">
-                      {proposal.status || 'submitted'}
-                    </Badge>
-                  </div>
-                  <Separator />
-                  <div className="flex items-center gap-2 text-xs text-ink-500 dark:text-ink-400">
-                    <Clock size={11} />
-                    Applied {proposal.createdAt ? new Date(proposal.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—'}
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
+            Start AI verification <ArrowRight size={15} />
+          </Button>
+        </div>
+      </motion.section>
+
+      <motion.div variants={fadeUp} className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
+        <QuickAction title="Browse jobs" meta={`${(jobs || []).length} open`} icon={<Briefcase size={18} />} tone="bg-brand-50 text-brand-500" onClick={() => navigate('/student/jobs')} />
+        <QuickAction title="Edit profile" meta={`${profileLoading ? '...' : completionPct}% complete`} icon={<UserRound size={18} />} tone="bg-amber-50 text-amber-600" onClick={() => navigate('/student/profile')} />
+        <QuickAction title="Verify skills" meta={`${verifiedSkillsCount} verified`} icon={<Mic size={18} />} tone="bg-emerald-50 text-emerald-600" onClick={() => navigate('/student/skill-verification')} />
+        <QuickAction title="Wallet" meta={formatCurrency(balance)} icon={<Wallet size={18} />} tone="bg-sky-50 text-sky-600" onClick={() => navigate('/student/wallet')} />
       </motion.div>
 
-      {/* Recommended jobs */}
-      <motion.div variants={fadeUp}>
-        <Card className="mb-4">
-          <CardHeader className="mb-0">
-            <CardTitle>Recent activity</CardTitle>
-          </CardHeader>
-          <CardContent className="mt-3 space-y-2">
-            {recentActivity.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-ink-200/80 bg-ink-50/70 px-3 py-3 text-center text-sm text-ink-500 dark:border-white/10 dark:bg-white/[0.035] dark:text-ink-dark-muted">
-                Activity will appear here after you apply to jobs.
-              </p>
-            ) : (
-              recentActivity.map((proposal: any) => (
-                <div key={proposal._id} className="flex items-center gap-3 rounded-xl px-2 py-2">
-                  <span className="h-2 w-2 rounded-full bg-brand-500" />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-ink-900 dark:text-white">{proposal.jobId?.title || 'Job application'}</p>
-                    <p className="text-xs text-ink-500 dark:text-ink-dark-muted">Application status: {proposal.status || 'submitted'}</p>
-                  </div>
-                </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="mb-0">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles size={16} className="text-brand-500" />
-                Recommended jobs
-              </CardTitle>
-              <Button variant="ghost" size="sm" onClick={() => navigate('/student/jobs')}>
-                View all
-              </Button>
+      <div className="grid items-start gap-[22px] xl:grid-cols-[minmax(0,1fr)_340px]">
+        <motion.div variants={fadeUp} className="space-y-5">
+          <section>
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-base font-semibold text-ink-900 dark:text-white">Recommended for you</h2>
+              <button type="button" onClick={() => navigate('/student/jobs')} className="text-sm font-semibold text-brand-600 hover:text-brand-700">
+                View all <ArrowRight size={13} className="inline" />
+              </button>
             </div>
-          </CardHeader>
-          <CardContent className="mt-3 space-y-2">
-            {jobsLoading ? (
-              <>
-                {[1, 2, 3].map((i) => <Skeleton key={i} className="h-16 w-full rounded-lg" />)}
-              </>
-            ) : recommendedJobs.length === 0 ? (
-              <p className="py-4 text-center text-sm text-ink-500 dark:text-ink-400">
-                No new jobs right now — check back soon.
-              </p>
-            ) : (
-              recommendedJobs.map((job: any) => (
-                <button
-                  key={job._id}
-                  onClick={() => navigate('/student/jobs')}
-                  className="group flex w-full flex-col gap-1.5 rounded-lg border border-ink-100 px-3 py-2.5 text-left transition-colors hover:border-brand-200 hover:bg-brand-50/50 dark:border-ink-dark-border dark:hover:border-brand-700/50 dark:hover:bg-brand-900/10"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="line-clamp-1 text-sm font-semibold text-ink-900 group-hover:text-brand-700 dark:text-white dark:group-hover:text-brand-300">
-                      {job.title}
-                    </p>
-                    <ArrowRight size={13} className="mt-0.5 shrink-0 text-ink-300 transition-transform group-hover:translate-x-0.5 group-hover:text-brand-500 dark:text-ink-600" />
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-ink-500 dark:text-ink-400">
-                    {(job.budgetMin !== undefined || job.budgetMax !== undefined) && (
-                      <span className="font-medium">
-                        {job.budgetMin !== undefined ? formatCurrency(job.budgetMin) : '—'} – {job.budgetMax !== undefined ? formatCurrency(job.budgetMax) : '—'}
-                      </span>
-                    )}
-                    {(job.requiredSkills || []).slice(0, 2).map((skill: any) => (
-                      <Badge key={skill.name || skill} variant="brand" className="text-[10px]">
-                        {skill.name || skill}
-                      </Badge>
-                    ))}
-                  </div>
-                </button>
-              ))
-            )}
-          </CardContent>
-        </Card>
 
-        <Card className="mt-4">
-          <CardContent className="space-y-3 p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex min-w-0 items-center gap-2">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100 dark:bg-brand-400/10 dark:text-brand-200 dark:ring-brand-400/20">
-                  <TrendingUp size={15} />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-ink-900 dark:text-white">Profile completion</p>
-                  <p className="text-xs text-ink-500 dark:text-ink-dark-muted">Improve client visibility</p>
-                </div>
+            <div className="space-y-2.5">
+              {jobsLoading ? (
+                Array.from({ length: 3 }).map((_, index) => <Skeleton key={index} className="h-[70px] rounded-2xl" />)
+              ) : recommendedJobs.length === 0 ? (
+                <EmptyState title="No new jobs right now" description="New recommendations will appear here once clients publish matching work." />
+              ) : (
+                recommendedJobs.map((job: any, index: number) => (
+                  <button
+                    key={job._id || index}
+                    type="button"
+                    onClick={() => navigate('/student/jobs')}
+                    className="sh-panel flex w-full items-center gap-3 px-4 py-3 text-left transition hover:-translate-y-0.5 hover:border-brand-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                  >
+                    <span
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] text-sm font-bold text-white"
+                      style={{ background: logoColors[index % logoColors.length] }}
+                    >
+                      {initials(companyName(job))}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[14.5px] font-semibold text-ink-900 dark:text-white">{job.title}</span>
+                      <span className="block truncate text-xs text-ink-500 dark:text-ink-dark-muted">{companyName(job)} · {job.duration || 'Fixed price'}</span>
+                    </span>
+                    <span className="text-right">
+                      <span className="sh-number block text-sm text-ink-900 dark:text-white">{budgetLabel(job)}</span>
+                      <span className="block text-[11.5px] font-semibold text-emerald-600">match ready</span>
+                    </span>
+                  </button>
+                ))
+              )}
+            </div>
+          </section>
+
+          <section className="sh-panel p-5">
+            <div className="mb-2 flex items-center justify-between">
+              <h2 className="text-base font-semibold text-ink-900 dark:text-white">Recent applications</h2>
+              <button type="button" onClick={() => navigate('/student/contracts')} className="text-sm font-semibold text-brand-600 hover:text-brand-700">
+                See all
+              </button>
+            </div>
+
+            {proposalsLoading ? (
+              <div className="space-y-2">
+                {Array.from({ length: 3 }).map((_, index) => <Skeleton key={index} className="h-14 rounded-xl" />)}
               </div>
-              <span className="text-sm font-bold text-brand-600 dark:text-brand-300">{profileLoading ? '...' : `${completionPct}%`}</span>
-            </div>
-
-            {profileLoading ? <Skeleton className="h-2 w-full rounded-full" /> : <Progress value={completionPct} />}
-
-            {!profileLoading && completionMissing.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5">
-                {completionMissing.slice(0, 3).map((item) => (
-                  <span key={item} className="inline-flex items-center gap-1.5 rounded-lg border border-ink-200 bg-ink-50 px-2 py-1 text-[11px] font-medium text-ink-600 dark:border-white/10 dark:bg-white/[0.055] dark:text-ink-300">
-                    <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-                    {item}
-                  </span>
+            ) : proposalList.length === 0 ? (
+              <p className="rounded-xl border border-dashed border-ink-200 bg-ink-50 px-4 py-4 text-center text-sm text-ink-500 dark:border-ink-dark-border dark:bg-white/[0.04]">
+                Apply to jobs from the job board and your applications will appear here.
+              </p>
+            ) : (
+              <div className="divide-y divide-ink-100 dark:divide-ink-dark-border">
+                {proposalList.slice(0, 3).map((proposal: any, index: number) => (
+                  <div key={proposal._id || index} className="flex items-center gap-3 py-3">
+                    <span
+                      className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[9px] text-xs font-bold text-white"
+                      style={{ background: logoColors[index % logoColors.length] }}
+                    >
+                      {initials(proposal.jobId?.clientId?.name || proposal.jobId?.title)}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[13.5px] font-semibold text-ink-900 dark:text-white">{proposal.jobId?.title || 'Job'}</span>
+                      <span className="block text-xs text-ink-500 dark:text-ink-dark-muted">
+                        Applied {proposal.createdAt ? new Date(proposal.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '-'}
+                      </span>
+                    </span>
+                    <Badge variant={statusVariant[proposal.status] ?? 'warning'}>{proposal.status || 'submitted'}</Badge>
+                  </div>
                 ))}
               </div>
-            ) : null}
-
-            {!profileLoading && completionPct === 100 ? (
-              <p className="flex items-center gap-2 text-xs font-semibold text-accent-600 dark:text-accent-300">
-                <Sparkles size={13} /> Complete profile
-              </p>
-            ) : (
-              <Button variant="ghost" size="sm" className="h-8 w-full justify-between px-2" onClick={() => navigate('/student/profile')}>
-                Finish profile <ArrowRight size={13} />
-              </Button>
             )}
-          </CardContent>
-        </Card>
-      </motion.div>
-      </motion.div>
+          </section>
+        </motion.div>
+
+        <motion.aside variants={fadeUp} className="space-y-4 xl:sticky xl:top-[88px]">
+          <section className="sh-panel p-5">
+            <div className="flex items-center gap-4">
+              <div
+                className="flex h-[70px] w-[70px] shrink-0 items-center justify-center rounded-full"
+                style={{ background: `conic-gradient(#6366f1 ${completionPct}%, #edeef3 0)` }}
+              >
+                <div className="flex h-[54px] w-[54px] items-center justify-center rounded-full bg-white text-[17px] font-bold text-brand-600 dark:bg-ink-dark-surface">
+                  {profileLoading ? '...' : `${completionPct}%`}
+                </div>
+              </div>
+              <div>
+                <div className="text-[15px] font-semibold text-ink-900 dark:text-white">Profile completion</div>
+                <div className="mt-0.5 text-[12.5px] leading-5 text-ink-500 dark:text-ink-dark-muted">
+                  {completionPct === 100 ? 'Your profile is client-ready.' : 'Add items to reach 100% and rank higher.'}
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 space-y-2.5">
+              {['Verify 1 skill', 'Add profile photo', 'Add portfolio projects', 'Upload your CV'].map((item) => {
+                const done = !completionMissing.includes(item);
+                return (
+                  <div key={item} className={`flex items-center gap-2.5 text-[13px] ${done ? 'text-ink-700 dark:text-ink-200' : 'text-ink-500 dark:text-ink-dark-muted'}`}>
+                    <span className={`flex h-4 w-4 items-center justify-center rounded-[5px] ${done ? 'bg-emerald-600 text-white' : 'border border-ink-400'}`}>
+                      {done ? <Check size={10} /> : null}
+                    </span>
+                    {item}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="sh-wallet-card">
+            <div className="flex items-center justify-between">
+              <span className="text-[13px] text-[#b7b7d6]">Available balance</span>
+              <Wallet size={17} className="text-[#8b8bd6]" />
+            </div>
+            <div className="sh-number mt-2 text-[28px] text-white">{profileLoading ? '...' : formatCurrency(balance)}</div>
+            <div className="mt-1 text-[12.5px] text-[#9a9ac9]">Ready to withdraw</div>
+            <Button className="mt-4 w-full" onClick={() => navigate('/student/wallet')}>Withdraw funds</Button>
+          </section>
+
+          <section className="sh-panel p-[18px]">
+            <div className="flex items-center gap-3">
+              <div className="flex h-[46px] w-[46px] shrink-0 flex-col items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/15">
+                <span className="text-[10px] font-bold uppercase">AI</span>
+                <span className="text-[17px] font-bold leading-none">09</span>
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-semibold text-ink-900 dark:text-white">AI Interview</div>
+                <div className="mt-0.5 text-[12.5px] text-ink-500 dark:text-ink-dark-muted">Verify your next skill · 15 min</div>
+              </div>
+            </div>
+            <Button variant="soft" className="mt-3 w-full" onClick={() => navigate('/student/skill-verification')}>
+              Join interview
+            </Button>
+          </section>
+
+          <section className="sh-panel p-[18px]">
+            <div className="flex items-center gap-2 text-sm font-semibold text-ink-900 dark:text-white">
+              <CalendarDays size={16} className="text-brand-500" />
+              Events and contracts
+            </div>
+            <div className="mt-3 grid gap-2">
+              <Button variant="outline" size="sm" onClick={() => navigate('/student/contracts')}><ClipboardList size={14} /> Contracts</Button>
+              <Button variant="outline" size="sm" onClick={() => navigate('/student/career-roadmap')}><Sparkles size={14} /> Career roadmap</Button>
+              <Button variant="outline" size="sm" onClick={() => navigate('/student/interview-history')}><FileText size={14} /> Interview history</Button>
+            </div>
+          </section>
+        </motion.aside>
+      </div>
     </motion.div>
   );
 };

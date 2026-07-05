@@ -321,12 +321,12 @@ const StudentProfile: React.FC = () => {
   const profileTitle = getProfileTitle(profile, verifiedSkills);
   const coverStyle = coverUrl
     ? {
-        backgroundImage: `linear-gradient(135deg, rgba(37,99,235,0.18), rgba(15,23,42,0.26)), url("${coverUrl.replace(/"/g, '\\"')}")`,
+        backgroundImage: `linear-gradient(135deg, rgba(79,70,229,0.18), rgba(15,15,20,0.26)), url("${coverUrl.replace(/"/g, '\\"')}")`,
       }
     : undefined;
 
   return (
-    <motion.div className="mx-auto w-full max-w-6xl space-y-4 sm:space-y-5" initial="hidden" animate="visible" variants={stagger}>
+    <motion.div className="mx-auto w-full max-w-[1080px] space-y-5" initial="hidden" animate="visible" variants={stagger}>
       <motion.div variants={fadeUp} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <p className="page-eyebrow">Profile workspace</p>
@@ -358,11 +358,12 @@ const StudentProfile: React.FC = () => {
         </div>
       </motion.div>
 
-      <motion.section variants={fadeUp} className="min-w-0 overflow-hidden rounded-2xl border border-white/70 bg-white/95 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/90 sm:rounded-[1.75rem]">
+      <motion.section variants={fadeUp} className="sh-panel min-w-0 overflow-hidden rounded-[20px]">
         <div
-          className="relative h-28 bg-[linear-gradient(135deg,#2563eb_0%,#1e40af_48%,#0f172a_100%)] bg-cover bg-center sm:h-32 lg:h-36"
+          className="relative h-[170px] bg-[linear-gradient(120deg,#4f46e5,#6366f1_55%,#a78bfa)] bg-cover bg-center"
           style={coverStyle}
         >
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,255,0.18),transparent_40%),radial-gradient(circle_at_80%_60%,rgba(255,255,255,0.12),transparent_40%)]" />
           {viewMode === 'edit' ? (
             <div className="absolute right-3 top-3 flex items-center gap-2 sm:right-4 sm:top-4">
               <Button type="button" size="sm" variant="secondary" className="h-8 border border-white/20 bg-ink-950/35 px-3 text-xs text-white shadow-soft backdrop-blur hover:bg-ink-950/45 hover:text-white sm:h-9 sm:text-sm" disabled={isUploadingCover} onClick={() => coverInputRef.current?.click()}>
@@ -380,9 +381,9 @@ const StudentProfile: React.FC = () => {
           ) : null}
         </div>
 
-        <div className="relative grid min-w-0 gap-4 px-4 pb-4 pt-14 sm:gap-5 sm:px-6 sm:pb-5 sm:pt-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-7">
+        <div className="relative grid min-w-0 gap-5 px-5 pb-6 pt-16 sm:px-7 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="absolute left-4 top-0 -translate-y-1/2 sm:left-6 lg:left-7">
-            <Avatar className="h-24 w-24 border-4 border-white bg-white shadow-elevated ring-1 ring-ink-200 dark:border-ink-dark-surface dark:bg-ink-dark-surface dark:ring-white/10 sm:h-28 sm:w-28">
+            <Avatar className="h-[104px] w-[104px] rounded-[26px] border-4 border-white bg-white shadow-elevated ring-1 ring-ink-200 dark:border-ink-dark-surface dark:bg-ink-dark-surface dark:ring-white/10">
               {photoUrl && !photoLoadError ? (
                 <AvatarImage src={photoUrl} alt={profile.name} onError={() => setPhotoLoadError(true)} />
               ) : null}
@@ -429,7 +430,7 @@ const StudentProfile: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid min-w-0 grid-cols-3 gap-2 self-end sm:gap-3">
+          <div className="grid min-w-0 grid-cols-3 gap-3 self-end">
             <ProfileStat label="Skills" value={verifiedSkills.length} />
             <ProfileStat label="Projects" value={portfolioLinks.length} />
             <ProfileStat label="Reviews" value={reviews.length} />

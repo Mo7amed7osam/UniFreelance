@@ -1,7 +1,8 @@
 import { formatCurrency } from '@/lib/currency';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { ArrowDown, ArrowUp, Check, CreditCard, Wallet } from 'lucide-react';
 
 import {
   createWithdrawalRequest,
@@ -12,20 +13,16 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
-import { PageHeader } from '@/components/ui/page-header';
 import { Select } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { StatCard } from '@/components/ui/stat-card';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from '@/components/ui/table';
 import useAuth from '@/hooks/useAuth';
+
+const statusVariant = (status: string) => {
+  if (status === 'APPROVED') return 'success';
+  if (status === 'DECLINED') return 'danger';
+  return 'warning';
+};
 
 const StudentWallet: React.FC = () => {
   const queryClient = useQueryClient();
@@ -95,123 +92,154 @@ const StudentWallet: React.FC = () => {
     });
   };
 
+  const stats = useMemo(() => {
+    const list = withdrawals || [];
+    const pending = list
+      .filter((item: any) => item.status === 'PENDING')
+      .reduce((sum: number, item: any) => sum + Number(item.amount || 0), 0);
+    const lifetimeWithdrawn = list
+      .filter((item: any) => item.status === 'APPROVED')
+      .reduce((sum: number, item: any) => sum + Number(item.amount || 0), 0);
+    return { pending, lifetimeWithdrawn };
+  }, [withdrawals]);
+
+  const balance = balanceData?.balance ?? 0;
+
   return (
-    <div className="space-y-5">
-      <PageHeader
-        eyebrow="Student wallet"
-        title="Withdraw earnings"
-        description="Request payouts through your preferred method and keep a clean view of every withdrawal request."
-      />
+    <div className="space-y-[22px]">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h1 className="sh-page-title">Wallet</h1>
+          <p className="mt-1 text-sm text-ink-500 dark:text-ink-dark-muted">Earnings, pending payments, and withdrawals.</p>
+        </div>
+        <Button onClick={handleSubmit} disabled={withdrawMutation.isPending}>
+          {withdrawMutation.isPending ? 'Submitting...' : 'Withdraw funds'}
+        </Button>
+      </div>
 
-      <div className="grid gap-4 xl:grid-cols-3">
-        <StatCard
-          label="Available balance"
-          value={balanceLoading ? <Skeleton className="h-10 w-24" /> : formatCurrency(balanceData?.balance)}
-          caption="Your balance updates after client acceptance."
-          tone="brand"
-          className="xl:col-span-1"
-        />
+      <div className="grid gap-3 lg:grid-cols-[1.2fr_1fr_1fr]">
+        <section className="sh-wallet-card">
+          <div className="flex items-center justify-between">
+            <span className="text-[13px] text-[#b7b7d6]">Available balance</span>
+            <Wallet size={17} className="text-[#8b8bd6]" />
+          </div>
+          <div className="sh-number mt-2 text-[30px] text-white">
+            {balanceLoading ? <Skeleton className="h-9 w-28 bg-white/20" /> : formatCurrency(balance)}
+          </div>
+          <div className="mt-1 text-[12.5px] text-[#9a9ac9]">Ready to withdraw · {payoutMethod === 'INSTAPAY' ? 'Instapay' : 'Bank account'}</div>
+        </section>
 
-        <div className="glass-panel xl:col-span-2 p-4">
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-xl font-semibold">Request a withdrawal</h2>
-              <p className="text-sm text-ink-500 dark:text-ink-300">Provide the amount and payout destination, then submit the request for admin review.</p>
+        <section className="sh-panel p-5">
+          <div className="text-[13px] text-ink-500 dark:text-ink-dark-muted">Pending withdrawals</div>
+          <div className="sh-number mt-2 text-2xl text-ink-900 dark:text-white">{formatCurrency(stats.pending)}</div>
+          <span className="mt-2 inline-flex rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:border-amber-500/25 dark:bg-amber-500/10 dark:text-amber-200">
+            Awaiting admin review
+          </span>
+        </section>
+
+        <section className="sh-panel p-5">
+          <div className="text-[13px] text-ink-500 dark:text-ink-dark-muted">Lifetime withdrawn</div>
+          <div className="sh-number mt-2 text-2xl text-ink-900 dark:text-white">{formatCurrency(stats.lifetimeWithdrawn)}</div>
+          <span className="mt-2 inline-flex rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/10 dark:text-emerald-300">
+            Cleared payouts
+          </span>
+        </section>
+      </div>
+
+      <div className="grid items-start gap-[22px] lg:grid-cols-[minmax(0,1fr)_320px]">
+        <section className="sh-panel p-5">
+          <div className="mb-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-base font-semibold text-ink-900 dark:text-white">Transactions</h2>
+            <div className="flex gap-1.5">
+              <span className="sh-chip">All</span>
+              <span className="sh-muted-chip">Withdrawals</span>
+              <span className="sh-muted-chip">Pending</span>
             </div>
+          </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
+          {withdrawalsLoading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 5 }).map((_, index) => <Skeleton key={index} className="h-16 rounded-xl" />)}
+            </div>
+          ) : (withdrawals || []).length === 0 ? (
+            <EmptyState title="No withdrawal requests yet" description="Your withdrawal history will appear here after you submit the first payout request." />
+          ) : (
+            <div className="divide-y divide-ink-100 dark:divide-ink-dark-border">
+              {(withdrawals || []).map((w: any) => (
+                <div key={w._id} className="grid gap-3 py-3 sm:grid-cols-[38px_minmax(0,1fr)_auto_auto] sm:items-center">
+                  <div className={`flex h-[38px] w-[38px] items-center justify-center rounded-[10px] ${w.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-600' : 'bg-ink-100 text-ink-500 dark:bg-white/[0.055]'}`}>
+                    {w.status === 'APPROVED' ? <ArrowDown size={17} /> : <ArrowUp size={17} />}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="truncate text-[13.5px] font-semibold text-ink-900 dark:text-white">Withdrawal request</div>
+                    <div className="mt-0.5 text-xs text-ink-500 dark:text-ink-dark-muted">
+                      {w.payoutMethod} · {w.createdAt ? new Date(w.createdAt).toLocaleDateString() : '-'}
+                    </div>
+                    {w.status === 'DECLINED' && w.decisionReason ? (
+                      <p className="mt-2 text-xs text-rose-600 dark:text-rose-300">{w.decisionReason}</p>
+                    ) : null}
+                  </div>
+                  <Badge variant={statusVariant(w.status) as any}>{w.status}</Badge>
+                  <div className="sh-number text-right text-sm text-ink-900 dark:text-white">{formatCurrency(w.amount)}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <aside className="space-y-4 lg:sticky lg:top-[88px]">
+          <section className="sh-panel p-[18px]">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-ink-900 dark:text-white">Payout method</h3>
+              <span className="text-xs font-semibold text-brand-600">Change</span>
+            </div>
+            <div className="flex items-center gap-3 rounded-[11px] border border-ink-200 p-3 dark:border-ink-dark-border">
+              <div className="flex h-9 w-9 items-center justify-center rounded-[9px] bg-brand-50 text-brand-500 dark:bg-brand-500/15">
+                <CreditCard size={17} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-[13px] font-semibold text-ink-900 dark:text-white">{payoutMethod === 'INSTAPAY' ? 'Instapay' : 'Bank account'}</div>
+                <div className="text-[11.5px] text-ink-500 dark:text-ink-dark-muted">Default destination</div>
+              </div>
+              <Check size={15} className="text-emerald-600" />
+            </div>
+            <p className="mt-2.5 text-xs leading-5 text-ink-400">Withdrawals arrive after admin review.</p>
+          </section>
+
+          <section className="sh-panel p-[18px]">
+            <h3 className="mb-3 text-sm font-semibold text-ink-900 dark:text-white">Request a withdrawal</h3>
+            <div className="space-y-3">
               <Input type="number" placeholder="Amount" value={amount} onChange={(e) => setAmount(e.target.value)} disabled={withdrawMutation.isPending} />
               <Select value={payoutMethod} onChange={(e) => setPayoutMethod(e.target.value as 'BANK' | 'INSTAPAY')} disabled={withdrawMutation.isPending}>
                 <option value="BANK">Bank account</option>
                 <option value="INSTAPAY">Instapay</option>
               </Select>
+
+              {payoutMethod === 'BANK' ? (
+                <Input placeholder="Bank account" value={bankAccount} onChange={(e) => setBankAccount(e.target.value)} disabled={withdrawMutation.isPending} />
+              ) : (
+                <Input placeholder="Instapay handle" value={instapayHandle} onChange={(e) => setInstapayHandle(e.target.value)} disabled={withdrawMutation.isPending} />
+              )}
+
+              <Textarea rows={4} placeholder="Optional note" value={note} onChange={(e) => setNote(e.target.value)} disabled={withdrawMutation.isPending} />
+              <Button className="w-full" onClick={handleSubmit} disabled={withdrawMutation.isPending}>
+                {withdrawMutation.isPending ? 'Submitting...' : 'Submit withdrawal'}
+              </Button>
             </div>
+          </section>
 
-            {payoutMethod === 'BANK' ? (
-              <Input placeholder="Bank account" value={bankAccount} onChange={(e) => setBankAccount(e.target.value)} disabled={withdrawMutation.isPending} />
-            ) : (
-              <Input placeholder="Instapay handle" value={instapayHandle} onChange={(e) => setInstapayHandle(e.target.value)} disabled={withdrawMutation.isPending} />
-            )}
-
-            <Textarea rows={4} placeholder="Optional note" value={note} onChange={(e) => setNote(e.target.value)} disabled={withdrawMutation.isPending} />
-
-            <Button onClick={handleSubmit} disabled={withdrawMutation.isPending}>
-              {withdrawMutation.isPending ? 'Submitting...' : 'Submit withdrawal'}
-            </Button>
-          </div>
-        </div>
+          <section className="sh-panel p-[18px]">
+            <h3 className="mb-3 text-sm font-semibold text-ink-900 dark:text-white">This month</h3>
+            <div className="space-y-2.5 text-[13px]">
+              <div className="flex justify-between"><span className="text-ink-500">Available</span><span className="sh-number">{formatCurrency(balance)}</span></div>
+              <div className="flex justify-between"><span className="text-ink-500">Pending</span><span className="sh-number text-amber-700">{formatCurrency(stats.pending)}</span></div>
+              <div className="flex justify-between"><span className="text-ink-500">Withdrawn</span><span className="sh-number">{formatCurrency(stats.lifetimeWithdrawn)}</span></div>
+              <div className="h-px bg-ink-100 dark:bg-ink-dark-border" />
+              <div className="flex justify-between font-semibold"><span>Net</span><span className="sh-number">{formatCurrency(Math.max(Number(balance) - stats.pending, 0))}</span></div>
+            </div>
+          </section>
+        </aside>
       </div>
-
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-2xl font-semibold">Withdrawal history</h2>
-          <p className="text-sm text-ink-500 dark:text-ink-300">Track status updates, decisions, and any decline reasons.</p>
-        </div>
-
-        {withdrawalsLoading ? (
-          <Skeleton className="h-40 w-full rounded-xl" />
-        ) : (withdrawals || []).length === 0 ? (
-          <EmptyState title="No withdrawal requests yet" description="Your withdrawal history will appear here after you submit the first payout request." />
-        ) : (
-          <>
-            <div className="space-y-3 md:hidden">
-              {(withdrawals || []).map((w: any) => (
-                <div key={w._id} className="rounded-2xl border border-ink-200 bg-white p-4 shadow-soft dark:border-ink-dark-border dark:bg-ink-dark-surface">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-500 dark:text-ink-400">
-                        {w.payoutMethod}
-                      </p>
-                      <p className="mt-1 text-lg font-semibold text-ink-900 dark:text-white">
-                        {formatCurrency(w.amount)}
-                      </p>
-                    </div>
-                    <Badge variant={w.status === 'APPROVED' ? 'success' : w.status === 'DECLINED' ? 'danger' : 'warning'}>
-                      {w.status}
-                    </Badge>
-                  </div>
-                  <p className="mt-3 text-sm text-ink-500 dark:text-ink-300">
-                    Submitted {w.createdAt ? new Date(w.createdAt).toLocaleDateString() : '—'}
-                  </p>
-                  {w.status === 'DECLINED' && w.decisionReason ? (
-                    <p className="mt-3 text-xs text-rose-600 dark:text-rose-300">{w.decisionReason}</p>
-                  ) : null}
-                </div>
-              ))}
-            </div>
-
-            <div className="hidden md:block">
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableHeaderCell>Amount</TableHeaderCell>
-                    <TableHeaderCell>Method</TableHeaderCell>
-                    <TableHeaderCell>Status</TableHeaderCell>
-                    <TableHeaderCell>Submitted</TableHeaderCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {(withdrawals || []).map((w: any) => (
-                    <TableRow key={w._id}>
-                      <TableCell className="font-semibold">{formatCurrency(w.amount)}</TableCell>
-                      <TableCell>{w.payoutMethod}</TableCell>
-                      <TableCell>
-                        <Badge variant={w.status === 'APPROVED' ? 'success' : w.status === 'DECLINED' ? 'danger' : 'warning'}>
-                          {w.status}
-                        </Badge>
-                        {w.status === 'DECLINED' && w.decisionReason ? (
-                          <p className="mt-2 text-xs text-rose-600 dark:text-rose-300">{w.decisionReason}</p>
-                        ) : null}
-                      </TableCell>
-                      <TableCell>{w.createdAt ? new Date(w.createdAt).toLocaleDateString() : '—'}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </>
-        )}
-      </section>
     </div>
   );
 };

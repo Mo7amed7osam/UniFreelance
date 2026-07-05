@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;background:#fbfbfc;transition:background .25s ease}
+  button{font-family:inherit}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:#c9c9d2;border-radius:8px;border:3px solid transparent;background-clip:content-box}
+  @keyframes orbpulse{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.06);opacity:1}}
+  @keyframes orbglow{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:.9;transform:scale(1.12)}}
+  @keyframes wave{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:{{ t.bg }};color:{{ t.text }}">
+
+  <!-- ============ TOP NAV ============ -->
+  <header style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;height:66px;padding:0 24px;background:{{ t.header }};backdrop-filter:blur(16px);border-bottom:1px solid {{ t.border }};animation:fadeUp .45s cubic-bezier(.22,1,.36,1) both">
+    <div style="display:flex;align-items:center;gap:11px;cursor:pointer;transition:opacity .2s" style-hover="opacity:.8" onClick="{{ goHome }}">
+      <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(145deg,#6366f1,#4f46e5);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px -3px rgba(99,102,241,.65)">
+        <span style="color:#fff;font-weight:800;font-size:17px;letter-spacing:-.5px">ش</span>
+      </div>
+      <span style="font-weight:700;font-size:17px;letter-spacing:-.4px">Shaghalny</span>
+    </div>
+
+    <nav style="margin:0 auto;flex-shrink:0;display:flex;align-items:center;gap:3px;padding:4px;background:{{ t.navPill }};border:1px solid {{ t.border }};border-radius:999px;backdrop-filter:blur(10px);box-shadow:0 2px 10px -4px rgba(16,16,20,.12)">
+      <sc-for list="{{ nav }}" as="item" hint-placeholder-count="6">
+        <button onClick="{{ item.go }}" style="{{ item.style }}" style-hover="{{ item.hover }}">{{ item.label }}</button>
+      </sc-for>
+    </nav>
+
+    <div style="display:flex;align-items:center;gap:8px">
+      <button style="display:flex;align-items:center;gap:9px;height:38px;padding:0 12px;background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:10px;cursor:pointer;transition:all .25s cubic-bezier(.22,1,.36,1)" style-hover="border-color:#6366f1">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="{{ t.text3 }}" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:{{ t.text4 }};border:1px solid {{ t.border }};border-radius:5px;padding:1px 5px;background:{{ t.surface2 }}">⌘K</span>
+      </button>
+      <button onClick="{{ toggleTheme }}" style="width:38px;height:38px;border-radius:10px;border:1px solid {{ t.border }};background:{{ t.surface }};display:flex;align-items:center;justify-content:center;cursor:pointer">
+        <sc-if value="{{ isDark }}" hint-placeholder-val="{{ true }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="{{ t.text2 }}" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg></sc-if>
+        <sc-if value="{{ isLight }}" hint-placeholder-val="{{ true }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{ t.text2 }}" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg></sc-if>
+      </button>
+      <button style="position:relative;width:38px;height:38px;border-radius:10px;border:1px solid {{ t.border }};background:{{ t.surface }};display:flex;align-items:center;justify-content:center;cursor:pointer">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="{{ t.text2 }}" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <span style="position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:50%;background:#f43f5e;border:1.5px solid {{ t.surface }}"></span>
+      </button>
+      <div style="display:flex;align-items:center;gap:8px;padding:3px 4px 3px 3px;border:1px solid {{ t.border }};border-radius:999px;background:{{ t.surface }};cursor:pointer" onClick="{{ goProfile }}">
+        <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#6366f1);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px">YH</div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="{{ t.text3 }}" stroke-width="2.2" style="margin-right:4px"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ JOB BOARD ============ -->
+  <sc-if value="{{ isJobs }}" hint-placeholder-val="{{ true }}">
+  <main style="animation:fadeUp .4s cubic-bezier(.22,1,.36,1) both;max-width:1200px;margin:0 auto;padding:30px 28px 64px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <h1 style="margin:0;font-size:27px;font-weight:700;letter-spacing:-.7px">Find work</h1>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:{{ t.indigoInk }};background:{{ t.tint }};border:1px solid {{ t.tintBd }};padding:3px 9px;border-radius:999px">248 open jobs</span>
+        </div>
+        <p style="margin:5px 0 0;color:{{ t.text3 }};font-size:14px">Roles matched to your verified skills and availability.</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:9px">
+        <div style="display:flex;align-items:center;gap:7px;height:38px;padding:0 13px;background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:10px;font-size:13.5px;color:{{ t.text2 }};font-weight:500;cursor:pointer">
+          Sort: <b style="color:{{ t.text }};font-weight:600">Best match</b>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="{{ t.text3 }}" stroke-width="2.2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:248px 1fr;gap:24px;align-items:start">
+      <!-- Filters -->
+      <aside style="position:sticky;top:88px;background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;padding:18px;box-shadow:{{ t.shadow }}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <span style="font-weight:600;font-size:14px">Filters</span>
+          <span style="font-size:12.5px;color:{{ t.indigoInk }};font-weight:600;cursor:pointer">Reset</span>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:{{ t.text3 }};text-transform:uppercase;letter-spacing:.6px;margin-bottom:9px">Category</div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px">
+          <span style="font-size:12.5px;padding:5px 11px;border-radius:8px;background:{{ t.tint }};color:{{ t.indigoInk }};border:1px solid {{ t.tintBd }};font-weight:600">Development</span>
+          <span style="font-size:12.5px;padding:5px 11px;border-radius:8px;background:{{ t.surface2 }};color:{{ t.text2 }};border:1px solid {{ t.border }}">Design</span>
+          <span style="font-size:12.5px;padding:5px 11px;border-radius:8px;background:{{ t.surface2 }};color:{{ t.text2 }};border:1px solid {{ t.border }}">Marketing</span>
+          <span style="font-size:12.5px;padding:5px 11px;border-radius:8px;background:{{ t.surface2 }};color:{{ t.text2 }};border:1px solid {{ t.border }}">Writing</span>
+          <span style="font-size:12.5px;padding:5px 11px;border-radius:8px;background:{{ t.surface2 }};color:{{ t.text2 }};border:1px solid {{ t.border }}">Data</span>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:{{ t.text3 }};text-transform:uppercase;letter-spacing:.6px;margin-bottom:9px">Job type</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
+          <label style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:{{ t.text2 }};cursor:pointer"><span style="width:17px;height:17px;border-radius:5px;background:#6366f1;display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="m5 12 5 5L20 6"/></svg></span>Fixed price</label>
+          <label style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:{{ t.text2 }};cursor:pointer"><span style="width:17px;height:17px;border-radius:5px;border:1.5px solid {{ t.text4 }}"></span>Hourly</label>
+          <label style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:{{ t.text2 }};cursor:pointer"><span style="width:17px;height:17px;border-radius:5px;border:1.5px solid {{ t.text4 }}"></span>Part-time</label>
+          <label style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:{{ t.text2 }};cursor:pointer"><span style="width:17px;height:17px;border-radius:5px;border:1.5px solid {{ t.text4 }}"></span>Internship</label>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:{{ t.text3 }};text-transform:uppercase;letter-spacing:.6px;margin-bottom:11px">Budget range</div>
+        <div style="height:5px;border-radius:5px;background:{{ t.track }};position:relative;margin:0 3px 8px">
+          <div style="position:absolute;left:12%;right:34%;top:0;bottom:0;background:#6366f1;border-radius:5px"></div>
+          <div style="position:absolute;left:12%;top:50%;width:15px;height:15px;border-radius:50%;background:{{ t.surface }};border:2px solid #6366f1;transform:translate(-50%,-50%)"></div>
+          <div style="position:absolute;left:66%;top:50%;width:15px;height:15px;border-radius:50%;background:{{ t.surface }};border:2px solid #6366f1;transform:translate(-50%,-50%)"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:12px;color:{{ t.text3 }};margin-bottom:18px"><span>$150</span><span>$2,400</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 12px;background:{{ t.greenBg }};border:1px solid {{ t.greenBd }};border-radius:11px">
+          <div style="display:flex;align-items:center;gap:8px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="{{ t.green }}" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg><span style="font-size:13px;font-weight:600;color:{{ t.greenInk }}">Verified clients only</span></div>
+          <span style="width:34px;height:19px;border-radius:999px;background:{{ t.green }};position:relative;display:inline-block"><span style="position:absolute;top:2px;right:2px;width:15px;height:15px;border-radius:50%;background:#fff"></span></span>
+        </div>
+      </aside>
+
+      <!-- Job list -->
+      <div style="display:flex;flex-direction:column;gap:13px">
+        <div style="display:flex;align-items:center;gap:12px;padding:13px 17px;background:{{ t.tint }};border:1px solid {{ t.tintBd }};border-radius:14px">
+          <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(145deg,#818cf8,#6366f1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l1.9 5.6L19.5 9l-5.6 1.9L12 16l-1.9-5.1L4.5 9l5.6-1.4z"/></svg></div>
+          <div style="flex:1"><div style="font-weight:600;font-size:14px">12 jobs perfectly match your verified skills</div><div style="font-size:12.5px;color:{{ t.text2 }};margin-top:1px">Based on your React, TypeScript & UI Design verifications</div></div>
+          <button style="background:{{ t.surface }};border:1px solid {{ t.tintBd }};color:{{ t.indigoInk }};font-weight:600;font-size:13px;padding:8px 14px;border-radius:9px;cursor:pointer">View matches</button>
+        </div>
+
+        <sc-for list="{{ jobs }}" as="job" hint-placeholder-count="5">
+          <article style="display:flex;gap:15px;padding:18px 20px;background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;box-shadow:{{ t.shadow }}">
+            <div style="width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;flex-shrink:0;background:{{ job.logoBg }}">{{ job.initial }}</div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:9px">
+                <h3 style="margin:0;font-size:16px;font-weight:600;letter-spacing:-.2px">{{ job.title }}</h3>
+                <span style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;color:{{ t.greenInk }};background:{{ t.greenBg }};border:1px solid {{ t.greenBd }};padding:2px 8px;border-radius:999px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="{{ t.green }}" stroke-width="2.6"><path d="M20 6 9 17l-5-5"/></svg>Verified client</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:5px;color:{{ t.text3 }};font-size:13px">
+                <span style="font-weight:600;color:{{ t.text2 }}">{{ job.company }}</span>
+                <span style="color:{{ t.text4 }}">·</span>
+                <span style="display:inline-flex;align-items:center;gap:3px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="{{ t.text3 }}" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>{{ job.location }}</span>
+                <span style="color:{{ t.text4 }}">·</span>
+                <span>{{ job.posted }}</span>
+              </div>
+              <p style="margin:10px 0 0;font-size:13.5px;line-height:1.55;color:{{ t.text2 }};display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ job.desc }}</p>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">
+                <sc-for list="{{ job.skills }}" as="skill" hint-placeholder-count="3">
+                  <span style="font-size:12px;font-weight:500;color:{{ t.text2 }};background:{{ t.surface3 }};border:1px solid {{ t.border }};padding:4px 10px;border-radius:7px">{{ skill }}</span>
+                </sc-for>
+                <span style="font-size:12px;font-weight:600;color:{{ t.text3 }};padding:4px 4px">{{ job.type }}</span>
+              </div>
+            </div>
+            <div style="width:158px;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;border-left:1px solid {{ t.divider }};padding-left:16px">
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;width:100%">
+                <button onClick="{{ job.save }}" style="align-self:flex-end;width:32px;height:32px;border-radius:9px;border:1px solid {{ t.border }};background:{{ t.surface }};display:flex;align-items:center;justify-content:center;cursor:pointer;margin-bottom:6px"><svg width="15" height="15" viewBox="0 0 24 24" fill="{{ job.saveFill }}" stroke="{{ job.saveStroke }}" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:600;letter-spacing:-.5px">{{ job.budget }}</div>
+                <div style="font-size:11.5px;color:{{ t.text3 }}">{{ job.budgetNote }}</div>
+                <div style="display:flex;align-items:center;gap:5px;margin-top:9px">
+                  <div style="width:26px;height:26px;border-radius:50%;background:{{ job.ring }};display:flex;align-items:center;justify-content:center"><span style="width:18px;height:18px;border-radius:50%;background:{{ t.surface }}"></span></div>
+                  <span style="font-size:12px;color:{{ t.text2 }}"><b style="color:{{ t.text }}">{{ job.match }}%</b> match</span>
+                </div>
+              </div>
+              <button style="width:100%;margin-top:12px;background:#6366f1;color:#fff;border:none;border-radius:10px;padding:9px 0;font-weight:600;font-size:13.5px;cursor:pointer;box-shadow:0 4px 12px -4px rgba(99,102,241,.5)">Apply now</button>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+    </div>
+  </main>
+  </sc-if>
+
+  <!-- ============ DASHBOARD ============ -->
+  <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
+  <main style="animation:fadeUp .4s cubic-bezier(.22,1,.36,1) both;max-width:1200px;margin:0 auto;padding:30px 28px 64px">
+    <div style="position:relative;overflow:hidden;border-radius:20px;padding:26px 28px;margin-bottom:22px;background:linear-gradient(115deg,#4f46e5 0%,#6366f1 45%,#818cf8 100%)">
+      <div style="position:absolute;right:-40px;top:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.25),transparent 70%)"></div>
+      <div style="position:relative;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:13px;color:#dcdcff;font-weight:500;margin-bottom:6px">Good afternoon, Yara 👋</div>
+          <h1 style="margin:0;font-size:26px;font-weight:700;color:#fff;letter-spacing:-.5px">You're 2 verified skills away from Top Talent</h1>
+          <p style="margin:8px 0 0;color:#e4e4ff;font-size:14px;max-width:520px">Complete your React verification to unlock 12 premium jobs and a higher match score.</p>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button onClick="{{ goInterview }}" style="background:#fff;color:#4f46e5;border:none;border-radius:11px;padding:11px 18px;font-weight:600;font-size:14px;cursor:pointer;box-shadow:0 6px 18px -6px rgba(0,0,0,.3)">Start AI verification →</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-bottom:22px">
+      <div onClick="{{ goJobs }}" style="flex:1;display:flex;align-items:center;gap:11px;padding:14px 16px;background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:14px;cursor:pointer;box-shadow:{{ t.shadow }}"><div style="width:36px;height:36px;border-radius:10px;background:rgba(99,102,241,.13);display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div><div><div style="font-weight:600;font-size:14px">Browse jobs</div><div style="font-size:12px;color:{{ t.text3 }}">248 open</div></div></div>
+      <div onClick="{{ goProfile }}" style="flex:1;display:flex;align-items:center;gap:11px;padding:14px 16px;background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:14px;cursor:pointer;box-shadow:{{ t.shadow }}"><div style="width:36px;height:36px;border-radius:10px;background:rgba(217,119,6,.14);display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-4 3-6 7-6s7 2 7 6"/></svg></div><div><div style="font-weight:600;font-size:14px">Edit profile</div><div style="font-size:12px;color:{{ t.text3 }}">78% complete</div></div></div>
+      <div onClick="{{ goInterview }}" style="flex:1;display:flex;align-items:center;gap:11px;padding:14px 16px;background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:14px;cursor:pointer;box-shadow:{{ t.shadow }}"><div style="width:36px;height:36px;border-radius:10px;background:rgba(34,197,94,.14);display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div><div><div style="font-weight:600;font-size:14px">Verify skills</div><div style="font-size:12px;color:{{ t.text3 }}">3 verified</div></div></div>
+      <div onClick="{{ goWallet }}" style="flex:1;display:flex;align-items:center;gap:11px;padding:14px 16px;background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:14px;cursor:pointer;box-shadow:{{ t.shadow }}"><div style="width:36px;height:36px;border-radius:10px;background:rgba(14,165,233,.14);display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div><div><div style="font-weight:600;font-size:14px">Wallet</div><div style="font-size:12px;color:{{ t.text3 }}">$1,240.00</div></div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:22px;align-items:start">
+      <!-- left -->
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><h2 style="margin:0;font-size:16px;font-weight:600">Recommended for you</h2><span onClick="{{ goJobs }}" style="font-size:13px;color:{{ t.indigoInk }};font-weight:600;cursor:pointer">View all →</span></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ recJobs }}" as="job" hint-placeholder-count="3">
+              <div onClick="{{ goJobs }}" style="display:flex;align-items:center;gap:13px;padding:14px 16px;background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:14px;cursor:pointer;box-shadow:{{ t.shadow }}">
+                <div style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;flex-shrink:0;background:{{ job.logoBg }}">{{ job.initial }}</div>
+                <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14.5px">{{ job.title }}</div><div style="font-size:12.5px;color:{{ t.text3 }};margin-top:2px">{{ job.company }} · {{ job.type }}</div></div>
+                <div style="text-align:right"><div style="font-family:'JetBrains Mono',monospace;font-weight:600;font-size:14px">{{ job.budget }}</div><div style="font-size:11.5px;color:{{ t.greenInk }};font-weight:600">{{ job.match }}% match</div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;padding:18px 20px;box-shadow:{{ t.shadow }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><h2 style="margin:0;font-size:16px;font-weight:600">Recent applications</h2><span style="font-size:13px;color:{{ t.indigoInk }};font-weight:600;cursor:pointer">See all</span></div>
+          <sc-for list="{{ applications }}" as="app" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid {{ t.divider }}">
+              <div style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;background:{{ app.logoBg }}">{{ app.initial }}</div>
+              <div style="flex:1"><div style="font-weight:600;font-size:13.5px">{{ app.title }}</div><div style="font-size:12px;color:{{ t.text3 }}">{{ app.company }} · applied {{ app.when }}</div></div>
+              <span style="font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;color:{{ app.statusColor }};background:{{ app.statusBg }}">{{ app.status }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- right rail -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;padding:20px;box-shadow:{{ t.shadow }}">
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="width:70px;height:70px;border-radius:50%;background:{{ ring78 }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:54px;height:54px;border-radius:50%;background:{{ t.surface }};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;color:{{ t.indigoInk }}">78%</div></div>
+            <div><div style="font-weight:600;font-size:15px">Profile completion</div><div style="font-size:12.5px;color:{{ t.text3 }};margin-top:2px">Add 2 items to reach 100% and rank higher.</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-top:16px">
+            <div style="display:flex;align-items:center;gap:9px;font-size:13px;color:{{ t.text2 }}"><span style="width:16px;height:16px;border-radius:5px;background:#16a34a;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="m5 12 5 5L20 6"/></svg></span>Verify 1 skill</div>
+            <div style="display:flex;align-items:center;gap:9px;font-size:13px;color:{{ t.text2 }}"><span style="width:16px;height:16px;border-radius:5px;background:#16a34a;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="m5 12 5 5L20 6"/></svg></span>Add profile photo</div>
+            <div style="display:flex;align-items:center;gap:9px;font-size:13px;color:{{ t.text3 }}"><span style="width:16px;height:16px;border-radius:5px;border:1.5px solid {{ t.text4 }}"></span>Add 2 portfolio projects</div>
+            <div style="display:flex;align-items:center;gap:9px;font-size:13px;color:{{ t.text3 }}"><span style="width:16px;height:16px;border-radius:5px;border:1.5px solid {{ t.text4 }}"></span>Upload your CV</div>
+          </div>
+        </div>
+
+        <div style="background:linear-gradient(140deg,#101014,#26264a);border:1px solid {{ t.border }};border-radius:16px;padding:20px;color:#fff">
+          <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;color:#b7b7d6">Available balance</span><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8b8bd6" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:600;letter-spacing:-1px;margin:8px 0 2px">$1,240.00</div>
+          <div style="font-size:12.5px;color:#9a9ac9">$480 pending clearance</div>
+          <button style="width:100%;margin-top:15px;background:#6366f1;color:#fff;border:none;border-radius:10px;padding:10px 0;font-weight:600;font-size:13.5px;cursor:pointer">Withdraw funds</button>
+        </div>
+
+        <div style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;padding:18px;box-shadow:{{ t.shadow }}">
+          <div style="display:flex;align-items:center;gap:11px">
+            <div style="width:46px;height:46px;border-radius:12px;background:{{ t.tint }};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:10px;color:{{ t.indigoInk }};font-weight:700;text-transform:uppercase">Jul</span><span style="font-size:17px;font-weight:700;color:{{ t.indigoInk }};line-height:1">09</span></div>
+            <div style="flex:1"><div style="font-weight:600;font-size:14px">AI Interview — UX Design</div><div style="font-size:12.5px;color:{{ t.text3 }};margin-top:1px">Tomorrow · 3:00 PM · 20 min</div></div>
+          </div>
+          <button onClick="{{ goInterview }}" style="width:100%;margin-top:13px;background:{{ t.surface }};color:{{ t.indigoInk }};border:1px solid {{ t.tintBd }};border-radius:10px;padding:9px 0;font-weight:600;font-size:13.5px;cursor:pointer">Join interview</button>
+        </div>
+      </div>
+    </div>
+  </main>
+  </sc-if>
+
+  <!-- ============ WALLET ============ -->
+  <sc-if value="{{ isWallet }}" hint-placeholder-val="{{ true }}">
+  <main style="animation:fadeUp .4s cubic-bezier(.22,1,.36,1) both;max-width:1080px;margin:0 auto;padding:30px 28px 64px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px">
+      <div>
+        <h1 style="margin:0;font-size:27px;font-weight:700;letter-spacing:-.7px">Wallet</h1>
+        <p style="margin:5px 0 0;color:{{ t.text3 }};font-size:14px">Earnings, pending payments, and withdrawals.</p>
+      </div>
+      <button style="background:#6366f1;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-weight:600;font-size:13.5px;cursor:pointer;box-shadow:0 4px 12px -4px rgba(99,102,241,.5)">Withdraw funds</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:14px;margin-bottom:22px">
+      <div style="background:linear-gradient(140deg,#101014,#26264a);border:1px solid {{ t.border }};border-radius:16px;padding:20px;color:#fff">
+        <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;color:#b7b7d6">Available balance</span><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8b8bd6" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:600;letter-spacing:-1px;margin:10px 0 4px">$1,240.00</div>
+        <div style="font-size:12.5px;color:#9a9ac9">Ready to withdraw · Instapay •••• 4521</div>
+      </div>
+      <div style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;padding:20px;box-shadow:{{ t.shadow }}">
+        <div style="font-size:13px;color:{{ t.text3 }}">Pending clearance</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:600;letter-spacing:-.5px;margin:10px 0 4px">$480.00</div>
+        <div style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:{{ t.amberInk }};background:{{ t.amberBg }};border:1px solid {{ t.amberBd }};padding:3px 9px;border-radius:999px">Clears in 4 days</div>
+      </div>
+      <div style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;padding:20px;box-shadow:{{ t.shadow }}">
+        <div style="font-size:13px;color:{{ t.text3 }}">Lifetime earned</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:600;letter-spacing:-.5px;margin:10px 0 4px">$14,200</div>
+        <div style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:{{ t.greenInk }};background:{{ t.greenBg }};border:1px solid {{ t.greenBd }};padding:3px 9px;border-radius:999px">+12% this month</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:start">
+      <div style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;padding:18px 20px;box-shadow:{{ t.shadow }}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <h2 style="margin:0;font-size:16px;font-weight:600">Transactions</h2>
+          <div style="display:flex;gap:6px">
+            <span style="font-size:12px;font-weight:600;color:{{ t.indigoInk }};background:{{ t.tint }};border:1px solid {{ t.tintBd }};padding:4px 11px;border-radius:999px;cursor:pointer">All</span>
+            <span style="font-size:12px;font-weight:600;color:{{ t.text3 }};background:{{ t.surface2 }};border:1px solid {{ t.border }};padding:4px 11px;border-radius:999px;cursor:pointer">Payments</span>
+            <span style="font-size:12px;font-weight:600;color:{{ t.text3 }};background:{{ t.surface2 }};border:1px solid {{ t.border }};padding:4px 11px;border-radius:999px;cursor:pointer">Withdrawals</span>
+          </div>
+        </div>
+        <sc-for list="{{ transactions }}" as="tx" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid {{ t.divider }}">
+            <div style="width:38px;height:38px;border-radius:10px;background:{{ tx.iconBg }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="{{ tx.iconStroke }}" stroke-width="2"><path d="{{ tx.arrow }}"/></svg></div>
+            <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px">{{ tx.title }}</div><div style="font-size:12px;color:{{ t.text3 }};margin-top:2px">{{ tx.from }} · {{ tx.when }}</div></div>
+            <span style="font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;color:{{ tx.statusColor }};background:{{ tx.statusBg }}">{{ tx.status }}</span>
+            <div style="width:92px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;color:{{ tx.amountColor }}">{{ tx.amount }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;padding:18px;box-shadow:{{ t.shadow }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><h3 style="margin:0;font-size:14px;font-weight:600">Payout method</h3><span style="font-size:12.5px;color:{{ t.indigoInk }};font-weight:600;cursor:pointer">Change</span></div>
+          <div style="display:flex;align-items:center;gap:11px;padding:12px;border:1px solid {{ t.border }};border-radius:11px">
+            <div style="width:36px;height:36px;border-radius:9px;background:{{ t.tint }};display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+            <div style="flex:1"><div style="font-weight:600;font-size:13px">Instapay</div><div style="font-size:11.5px;color:{{ t.text3 }}">•••• 4521 · default</div></div>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="{{ t.green }}" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <div style="font-size:12px;color:{{ t.text4 }};margin-top:10px;line-height:1.5">Withdrawals arrive within 1–2 business days. No fees under $1,000/mo.</div>
+        </div>
+
+        <div style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;padding:18px;box-shadow:{{ t.shadow }}">
+          <h3 style="margin:0 0 12px;font-size:14px;font-weight:600">This month</h3>
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:13px">
+            <div style="display:flex;justify-content:space-between"><span style="color:{{ t.text3 }}">Earned</span><span style="font-family:'JetBrains Mono',monospace;font-weight:600;color:{{ t.greenInk }}">+$1,420</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:{{ t.text3 }}">Withdrawn</span><span style="font-family:'JetBrains Mono',monospace;font-weight:600">$600</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:{{ t.text3 }}">Platform fees</span><span style="font-family:'JetBrains Mono',monospace;font-weight:600">$45</span></div>
+            <div style="height:1px;background:{{ t.divider }}"></div>
+            <div style="display:flex;justify-content:space-between"><span style="font-weight:600">Net</span><span style="font-family:'JetBrains Mono',monospace;font-weight:600">+$775</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  </sc-if>
+
+  <!-- ============ AI SKILL VERIFICATION ============ -->
+  <sc-if value="{{ isVerify }}" hint-placeholder-val="{{ true }}">
+  <main style="animation:fadeUp .4s cubic-bezier(.22,1,.36,1) both;max-width:1140px;margin:0 auto;padding:30px 28px 64px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:24px">
+      <div>
+        <div style="font-size:11.5px;font-weight:700;letter-spacing:1.4px;color:{{ t.indigoInk }};text-transform:uppercase;margin-bottom:9px">Mandatory verification</div>
+        <h1 style="margin:0;font-size:28px;font-weight:700;letter-spacing:-.8px">Verify your skills</h1>
+        <p style="margin:7px 0 0;color:{{ t.text3 }};font-size:14.5px;max-width:520px;line-height:1.55">Short AI-guided interviews that turn your skills into trusted, verified badges clients can rely on.</p>
+      </div>
+      <div style="display:flex;gap:26px;background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;padding:16px 24px;box-shadow:{{ t.shadow }};flex-shrink:0">
+        <div><div style="font-family:'JetBrains Mono',monospace;font-size:21px;font-weight:600;color:{{ t.greenInk }}">3</div><div style="font-size:12px;color:{{ t.text3 }};margin-top:2px">Verified</div></div>
+        <div style="width:1px;background:{{ t.divider }}"></div>
+        <div><div style="font-family:'JetBrains Mono',monospace;font-size:21px;font-weight:600">89</div><div style="font-size:12px;color:{{ t.text3 }};margin-top:2px">Avg score</div></div>
+        <div style="width:1px;background:{{ t.divider }}"></div>
+        <div><div style="font-family:'JetBrains Mono',monospace;font-size:21px;font-weight:600;color:{{ t.indigoInk }}">12</div><div style="font-size:12px;color:{{ t.text3 }};margin-top:2px">Jobs unlocked</div></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:start">
+      <div>
+        <div style="display:flex;gap:6px;margin-bottom:14px">
+          <span style="font-size:12.5px;font-weight:600;color:{{ t.indigoInk }};background:{{ t.tint }};border:1px solid {{ t.tintBd }};padding:5px 13px;border-radius:999px;cursor:pointer;white-space:nowrap">All skills</span>
+          <span style="font-size:12.5px;font-weight:600;color:{{ t.text3 }};background:{{ t.surface2 }};border:1px solid {{ t.border }};padding:5px 13px;border-radius:999px;cursor:pointer;white-space:nowrap">Verified</span>
+          <span style="font-size:12.5px;font-weight:600;color:{{ t.text3 }};background:{{ t.surface2 }};border:1px solid {{ t.border }};padding:5px 13px;border-radius:999px;cursor:pointer;white-space:nowrap">Not verified</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ skillCards }}" as="c" hint-placeholder-count="6">
+            <article style="display:flex;align-items:center;gap:15px;padding:16px 18px;background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;box-shadow:{{ t.shadow }};transition:all .25s cubic-bezier(.22,1,.36,1)" style-hover="transform:translateY(-1px);border-color:#6366f1">
+              <div style="width:44px;height:44px;border-radius:12px;background:{{ t.tint }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <h3 style="margin:0;font-size:15.5px;font-weight:600;letter-spacing:-.2px">{{ c.name }}</h3>
+                  <sc-if value="{{ c.verified }}" hint-placeholder-val="{{ true }}"><span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:{{ t.greenInk }};background:{{ t.greenBg }};border:1px solid {{ t.greenBd }};padding:2px 8px;border-radius:999px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="{{ t.green }}" stroke-width="2.6"><path d="M20 6 9 17l-5-5"/></svg>Verified</span></sc-if>
+                  <sc-if value="{{ c.notVerified }}" hint-placeholder-val="{{ true }}"><span style="font-size:11px;font-weight:600;color:{{ t.text3 }};background:{{ t.surface2 }};border:1px solid {{ t.border }};padding:2px 8px;border-radius:999px;white-space:nowrap">Not verified</span></sc-if>
+                </div>
+                <p style="margin:5px 0 0;font-size:13px;line-height:1.5;color:{{ t.text2 }}">{{ c.desc }}</p>
+                <div style="font-size:11.5px;color:{{ t.text4 }};margin-top:5px">≈ 15 min · 8 questions · live with Shaghalny AI</div>
+              </div>
+              <sc-if value="{{ c.verified }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
+                  <div style="width:38px;height:38px;border-radius:50%;background:{{ c.ring }};display:flex;align-items:center;justify-content:center"><span style="width:29px;height:29px;border-radius:50%;background:{{ t.surface }};display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600">{{ c.score }}</span></div>
+                  <button style="background:{{ t.surface }};color:{{ t.text2 }};border:1px solid {{ t.border }};border-radius:10px;padding:9px 15px;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap;transition:all .2s" style-hover="border-color:#6366f1;color:{{ t.text }}">View result</button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ c.notVerified }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ c.go }}" style="flex-shrink:0;background:#6366f1;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap;box-shadow:0 4px 12px -4px rgba(99,102,241,.5);transition:all .2s" style-hover="background:#4f46e5">Start interview →</button>
+              </sc-if>
+            </article>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;padding:20px;box-shadow:{{ t.shadow }}">
+          <h3 style="margin:0 0 14px;font-size:14px;font-weight:600">How it works</h3>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;gap:12px"><div style="width:26px;height:26px;border-radius:8px;background:{{ t.tint }};color:{{ t.indigoInk }};display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;flex-shrink:0">1</div><div><div style="font-weight:600;font-size:13px">AI-guided interview</div><div style="font-size:12.5px;color:{{ t.text3 }};line-height:1.5;margin-top:2px">Shaghalny AI leads a short, structured session.</div></div></div>
+            <div style="display:flex;gap:12px"><div style="width:26px;height:26px;border-radius:8px;background:{{ t.tint }};color:{{ t.indigoInk }};display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;flex-shrink:0">2</div><div><div style="font-weight:600;font-size:13px">Manual review</div><div style="font-size:12.5px;color:{{ t.text3 }};line-height:1.5;margin-top:2px">Admins can verify results before the badge is final.</div></div></div>
+            <div style="display:flex;gap:12px"><div style="width:26px;height:26px;border-radius:8px;background:{{ t.tint }};color:{{ t.indigoInk }};display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;flex-shrink:0">3</div><div><div style="font-weight:600;font-size:13px">Verified badge</div><div style="font-size:12.5px;color:{{ t.text3 }};line-height:1.5;margin-top:2px">The badge boosts your profile and proposal credibility.</div></div></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;padding:14px 16px;border-radius:14px;background:{{ t.amberBg }};border:1px solid {{ t.amberBd }}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{ t.amberInk }}" stroke-width="2" style="flex-shrink:0;margin-top:1px"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+          <span style="font-size:12.5px;font-weight:500;color:{{ t.amberInk }};line-height:1.55">Use a desktop or laptop — the live flow needs camera, microphone, and full-screen sharing.</span>
+        </div>
+
+        <div style="position:relative;overflow:hidden;border-radius:16px;padding:20px;background:linear-gradient(135deg,#4f46e5,#6366f1 60%,#818cf8)">
+          <div style="position:absolute;right:-30px;top:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%)"></div>
+          <div style="position:relative">
+            <div style="font-size:11.5px;font-weight:700;letter-spacing:1px;color:#dcdcff;text-transform:uppercase;margin-bottom:8px">Recommended next</div>
+            <div style="font-size:17px;font-weight:700;color:#fff;letter-spacing:-.3px">Node.js</div>
+            <div style="font-size:12.5px;color:#e4e4ff;margin-top:4px;line-height:1.5">Verifying Node.js unlocks 8 more matched jobs.</div>
+            <button onClick="{{ goInterview }}" style="margin-top:14px;background:#fff;color:#4f46e5;border:none;border-radius:10px;padding:9px 16px;font-weight:600;font-size:13px;cursor:pointer;box-shadow:0 6px 16px -6px rgba(0,0,0,.35);transition:transform .2s" style-hover="transform:translateY(-1px)">Start now →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  </sc-if>
+
+  <!-- ============ PROFILE ============ -->
+  <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ true }}">
+  <main style="animation:fadeUp .4s cubic-bezier(.22,1,.36,1) both;max-width:1080px;margin:0 auto;padding:24px 28px 64px">
+    <div style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:20px;overflow:hidden;box-shadow:{{ t.shadow }}">
+      <div style="position:relative;height:170px;background:linear-gradient(120deg,#4f46e5,#6366f1 55%,#a78bfa)">
+        <div style="position:absolute;inset:0;background-image:radial-gradient(circle at 20% 30%,rgba(255,255,255,.18),transparent 40%),radial-gradient(circle at 80% 60%,rgba(255,255,255,.12),transparent 40%)"></div>
+        <div style="position:absolute;top:16px;right:16px;display:flex;gap:8px">
+          <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.92);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:600;color:#15803d"><span style="width:8px;height:8px;border-radius:50%;background:#16a34a"></span>Available for work</span>
+          <button style="background:rgba(255,255,255,.92);border:none;border-radius:999px;padding:6px 14px;font-size:12.5px;font-weight:600;color:#3b3b44;cursor:pointer">Edit profile</button>
+        </div>
+      </div>
+      <div style="padding:0 30px 26px">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;padding-top:16px">
+          <div style="display:flex;align-items:flex-end;gap:18px">
+            <div style="width:104px;height:104px;border-radius:26px;background:linear-gradient(135deg,#a78bfa,#6366f1);border:4px solid {{ t.surface }};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:34px;box-shadow:0 8px 24px -10px rgba(99,102,241,.6);margin-top:-62px">YH</div>
+            <div style="padding-bottom:6px">
+              <div style="display:flex;align-items:center;gap:9px"><h1 style="margin:0;font-size:24px;font-weight:700;letter-spacing:-.5px">Yara Hassan</h1><span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:{{ t.indigoInk }};background:{{ t.tint }};border:1px solid {{ t.tintBd }};padding:3px 9px;border-radius:999px"><svg width="12" height="12" viewBox="0 0 24 24" fill="#6366f1"><path d="m12 2 2.4 2.1 3.1-.6 1 3 2.7 1.6-1 3 1 3-2.7 1.6-1 3-3.1-.6L12 22l-2.4-2.1-3.1.6-1-3L2.8 14l1-3-1-3 2.7-1.6 1-3 3.1.6z"/><path d="m8.5 12 2.3 2.3L15.6 9.5" stroke="#fff" stroke-width="2" fill="none"/></svg>Top Talent</span></div>
+              <p style="margin:5px 0 0;font-size:15px;color:{{ t.text2 }};font-weight:500">Frontend Developer & UI Designer</p>
+              <div style="display:flex;align-items:center;gap:13px;margin-top:7px;font-size:13px;color:{{ t.text3 }}"><span style="display:inline-flex;align-items:center;gap:4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="{{ t.text3 }}" stroke-width="2"><path d="M22 10 12 4 2 10l10 6 10-6Z"/><path d="M6 12v5c0 1 3 3 6 3s6-2 6-3v-5"/></svg>Cairo University</span><span style="display:inline-flex;align-items:center;gap:4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="{{ t.text3 }}" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>Cairo, Egypt</span></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:9px;padding-bottom:6px">
+            <button style="background:{{ t.surface }};color:{{ t.text2 }};border:1px solid {{ t.border }};border-radius:10px;padding:10px 16px;font-weight:600;font-size:13.5px;cursor:pointer">Message</button>
+            <button style="background:#6366f1;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-weight:600;font-size:13.5px;cursor:pointer;box-shadow:0 4px 12px -4px rgba(99,102,241,.5)">Hire Yara</button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:32px;margin-top:22px;padding-top:20px;border-top:1px solid {{ t.divider }}">
+          <div><div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600">27</div><div style="font-size:12.5px;color:{{ t.text3 }}">Jobs completed</div></div>
+          <div><div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600">4.9★</div><div style="font-size:12.5px;color:{{ t.text3 }}">Avg rating</div></div>
+          <div><div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600">100%</div><div style="font-size:12.5px;color:{{ t.text3 }}">On-time</div></div>
+          <div><div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600">$14.2k</div><div style="font-size:12.5px;color:{{ t.text3 }}">Earned</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:22px;margin-top:22px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;padding:22px;box-shadow:{{ t.shadow }}">
+          <h2 style="margin:0 0 10px;font-size:16px;font-weight:600">About</h2>
+          <p style="margin:0;font-size:14px;line-height:1.65;color:{{ t.text2 }}">Final-year Computer Science student who builds fast, accessible web interfaces. I've shipped production React apps for two startups and love turning messy Figma files into pixel-perfect, performant products. Currently open to part-time frontend and UI work.</p>
+        </div>
+
+        <div style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;padding:22px;box-shadow:{{ t.shadow }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><h2 style="margin:0;font-size:16px;font-weight:600">Verified skills</h2><span style="font-size:12px;color:{{ t.greenInk }};font-weight:600;background:{{ t.greenBg }};border:1px solid {{ t.greenBd }};padding:3px 9px;border-radius:999px">AI-verified</span></div>
+          <div style="display:flex;flex-direction:column;gap:11px">
+            <sc-for list="{{ skills }}" as="s" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:150px;display:flex;align-items:center;gap:7px;flex-shrink:0"><span style="font-size:13.5px;font-weight:600;color:{{ t.text }}">{{ s.name }}</span><sc-if value="{{ s.verified }}" hint-placeholder-val="{{ true }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="#16a34a"><circle cx="12" cy="12" r="11"/><path d="m7 12 3.5 3.5L17 9" stroke="#fff" stroke-width="2.4" fill="none"/></svg></sc-if></div>
+                <div style="flex:1;height:7px;border-radius:5px;background:{{ t.track }};overflow:hidden"><div style="height:100%;border-radius:5px;background:linear-gradient(90deg,#6366f1,#818cf8);width:{{ s.pct }}"></div></div>
+                <span style="width:38px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:{{ t.text2 }}">{{ s.score }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;padding:22px;box-shadow:{{ t.shadow }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><h2 style="margin:0;font-size:16px;font-weight:600">Portfolio</h2><span style="font-size:13px;color:{{ t.indigoInk }};font-weight:600;cursor:pointer">+ Add project</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <sc-for list="{{ portfolio }}" as="p" hint-placeholder-count="4">
+              <div style="border:1px solid {{ t.border }};border-radius:13px;overflow:hidden">
+                <div style="height:118px;background-image:repeating-linear-gradient(135deg,{{ t.surface3 }} 0 12px,{{ t.surface2 }} 12px 24px);display:flex;align-items:center;justify-content:center"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:{{ t.text3 }}">{{ p.ph }}</span></div>
+                <div style="padding:12px 14px"><div style="font-weight:600;font-size:13.5px">{{ p.title }}</div><div style="font-size:12px;color:{{ t.text3 }};margin-top:2px">{{ p.tag }}</div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;padding:22px;box-shadow:{{ t.shadow }}">
+          <h2 style="margin:0 0 14px;font-size:16px;font-weight:600">Experience</h2>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;gap:13px"><div style="width:40px;height:40px;border-radius:11px;background:#111014;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">N</div><div><div style="font-weight:600;font-size:14px">Frontend Developer (Part-time)</div><div style="font-size:13px;color:{{ t.text3 }}">Nimbus Labs · 2024 — Present</div><p style="margin:6px 0 0;font-size:13px;color:{{ t.text2 }};line-height:1.55">Built the customer dashboard in React & TypeScript, cut load time by 40%.</p></div></div>
+            <div style="display:flex;gap:13px"><div style="width:40px;height:40px;border-radius:11px;background:#6366f1;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">F</div><div><div style="font-weight:600;font-size:14px">UI Design Intern</div><div style="font-size:13px;color:{{ t.text3 }}">Fenix Studio · 2023 — 2024</div><p style="margin:6px 0 0;font-size:13px;color:{{ t.text2 }};line-height:1.55">Designed marketing pages and a component library used across 3 products.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;padding:18px;box-shadow:{{ t.shadow }}">
+          <h3 style="margin:0 0 12px;font-size:14px;font-weight:600">Verifications</h3>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:9px;font-size:13px;color:{{ t.text2 }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="#16a34a"><circle cx="12" cy="12" r="11"/><path d="m7 12 3.5 3.5L17 9" stroke="#fff" stroke-width="2.4" fill="none"/></svg>Identity verified</div>
+            <div style="display:flex;align-items:center;gap:9px;font-size:13px;color:{{ t.text2 }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="#16a34a"><circle cx="12" cy="12" r="11"/><path d="m7 12 3.5 3.5L17 9" stroke="#fff" stroke-width="2.4" fill="none"/></svg>University enrollment</div>
+            <div style="display:flex;align-items:center;gap:9px;font-size:13px;color:{{ t.text2 }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="#16a34a"><circle cx="12" cy="12" r="11"/><path d="m7 12 3.5 3.5L17 9" stroke="#fff" stroke-width="2.4" fill="none"/></svg>3 AI skill interviews</div>
+          </div>
+        </div>
+        <div style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;padding:18px;box-shadow:{{ t.shadow }}">
+          <h3 style="margin:0 0 12px;font-size:14px;font-weight:600">Documents</h3>
+          <div style="display:flex;align-items:center;gap:11px;padding:11px;border:1px solid {{ t.border }};border-radius:11px"><div style="width:34px;height:34px;border-radius:8px;background:rgba(225,29,72,.14);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div><div style="flex:1"><div style="font-weight:600;font-size:13px">Yara_Hassan_CV.pdf</div><div style="font-size:11.5px;color:{{ t.text3 }}">Updated 2 weeks ago</div></div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{ t.text3 }}" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg></div>
+        </div>
+        <div style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:16px;padding:18px;box-shadow:{{ t.shadow }}">
+          <h3 style="margin:0 0 12px;font-size:14px;font-weight:600">Languages</h3>
+          <div style="display:flex;flex-direction:column;gap:9px;font-size:13px;color:{{ t.text2 }}"><div style="display:flex;justify-content:space-between"><span>Arabic</span><span style="color:{{ t.text3 }}">Native</span></div><div style="display:flex;justify-content:space-between"><span>English</span><span style="color:{{ t.text3 }}">Fluent</span></div><div style="display:flex;justify-content:space-between"><span>French</span><span style="color:{{ t.text3 }}">Basic</span></div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+  </sc-if>
+
+  <!-- ============ AI VOICE INTERVIEW ============ -->
+  <sc-if value="{{ isInterview }}" hint-placeholder-val="{{ true }}">
+  <main style="animation:fadeUp .4s cubic-bezier(.22,1,.36,1) both;position:relative;min-height:calc(100vh - 64px);background:radial-gradient(circle at 50% 30%,{{ t.iglow }} 0%,{{ t.bg }} 55%);overflow:hidden">
+    <div style="max-width:900px;margin:0 auto;padding:26px 28px 40px;position:relative;z-index:2">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:11px">
+          <div style="width:36px;height:36px;border-radius:10px;background:{{ t.tint }};display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="m12 2 2.4 2.1 3.1-.6 1 3 2.7 1.6-1 3 1 3-2.7 1.6-1 3-3.1-.6L12 22l-2.4-2.1-3.1.6-1-3L2.8 14l1-3-1-3 2.7-1.6 1-3 3.1.6z"/></svg></div>
+          <div><div style="font-weight:600;font-size:15px">React Developer Verification</div><div style="font-size:12.5px;color:{{ t.text3 }}">Question 3 of 8 · AI-proctored</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:{{ t.text2 }};background:{{ t.surface }};border:1px solid {{ t.border }};padding:7px 12px;border-radius:9px"><span style="width:8px;height:8px;border-radius:50%;background:#f43f5e"></span>02:14</span>
+          <button onClick="{{ goDash }}" style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:9px;padding:7px 14px;font-size:13px;font-weight:600;color:#e11d48;cursor:pointer">End</button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:4px;margin:14px 0 6px">
+        <sc-for list="{{ dots }}" as="d" hint-placeholder-count="8">
+          <div style="flex:1;height:5px;border-radius:5px;background:{{ d.color }}"></div>
+        </sc-for>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 260px;gap:24px;margin-top:26px;align-items:start">
+        <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:14px">
+          <div style="position:relative;width:190px;height:190px;display:flex;align-items:center;justify-content:center;margin-bottom:8px">
+            <div style="position:absolute;inset:-18px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,.35),transparent 68%);animation:orbglow 3.2s ease-in-out infinite"></div>
+            <div style="position:absolute;inset:14px;border-radius:50%;border:1px solid rgba(99,102,241,.25);animation:orbpulse 3.2s ease-in-out infinite"></div>
+            <div style="width:120px;height:120px;border-radius:50%;background:conic-gradient(from 120deg,#818cf8,#6366f1,#4f46e5,#818cf8);box-shadow:0 20px 50px -18px rgba(99,102,241,.7);animation:orbpulse 2.6s ease-in-out infinite"></div>
+          </div>
+          <div style="display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:{{ t.indigoInk }};background:{{ t.tint }};border:1px solid {{ t.tintBd }};padding:5px 13px;border-radius:999px;margin-bottom:20px"><span style="width:7px;height:7px;border-radius:50%;background:#6366f1;animation:orbglow 1.4s ease-in-out infinite"></span>Shaghalny AI is speaking…</div>
+          <h1 style="margin:0;font-size:24px;font-weight:600;line-height:1.4;letter-spacing:-.4px;max-width:560px">Can you explain the difference between <span style="color:{{ t.indigoInk }}">useMemo</span> and <span style="color:{{ t.indigoInk }}">useCallback</span>, and when you'd reach for each?</h1>
+
+          <div style="display:flex;align-items:flex-end;gap:4px;height:44px;margin-top:26px">
+            <sc-for list="{{ bars }}" as="b" hint-placeholder-count="24">
+              <span style="width:4px;border-radius:4px;background:linear-gradient(180deg,#818cf8,#6366f1);transform-origin:bottom;animation:wave 1s ease-in-out infinite;{{ b.s }}"></span>
+            </sc-for>
+          </div>
+          <div style="font-size:12.5px;color:{{ t.text3 }};margin-top:8px">Listening to your answer…</div>
+
+          <div style="display:flex;align-items:center;gap:12px;margin-top:30px">
+            <button style="width:52px;height:52px;border-radius:50%;background:{{ t.surface }};border:1px solid {{ t.border }};display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="{{ t.text2 }}" stroke-width="2"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
+            <button style="width:66px;height:66px;border-radius:50%;background:linear-gradient(145deg,#6366f1,#4f46e5);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 12px 30px -8px rgba(99,102,241,.7)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+            <button style="width:52px;height:52px;border-radius:50%;background:{{ t.surface }};border:1px solid {{ t.border }};display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="{{ t.text2 }}" stroke-width="2"><path d="m5 4 10 8-10 8zM19 5v14"/></svg></button>
+          </div>
+          <div style="font-size:12px;color:{{ t.text4 }};margin-top:12px">Tap the mic to pause · answer naturally, out loud</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="border-radius:14px;overflow:hidden;border:1px solid {{ t.border }};background:#111014">
+            <div style="height:150px;background-image:repeating-linear-gradient(135deg,#1b1b22 0 14px,#191920 14px 28px);position:relative;display:flex;align-items:center;justify-content:center"><div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#6366f1);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">YH</div><span style="position:absolute;bottom:9px;left:10px;display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#fff;background:rgba(0,0,0,.5);padding:3px 8px;border-radius:6px"><span style="width:6px;height:6px;border-radius:50%;background:#f43f5e"></span>REC</span><span style="position:absolute;bottom:9px;right:10px;font-size:11px;color:#c9c9d6;font-family:'JetBrains Mono',monospace">Camera on</span></div>
+          </div>
+          <div style="background:{{ t.surface }};border:1px solid {{ t.border }};border-radius:14px;padding:16px 18px;box-shadow:{{ t.shadow }}">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:11px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2Z"/></svg><span style="font-weight:600;font-size:13.5px">Tips</span></div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ tips }}" as="t2" hint-placeholder-count="3">
+                <div style="display:flex;gap:8px;font-size:12.5px;color:{{ t.text2 }};line-height:1.5"><span style="color:{{ t.indigoInk }};font-weight:700">·</span>{{ t2 }}</div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:{{ t.tint }};border:1px solid {{ t.tintBd }};border-radius:14px;padding:15px 17px">
+            <div style="font-size:12.5px;color:{{ t.text2 }};font-weight:600;margin-bottom:4px">Live confidence</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:600;color:{{ t.indigoInk }}">Strong</div>
+            <div style="font-size:12px;color:{{ t.text3 }};margin-top:2px">Clear, well-structured answers so far.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:860},&quot;defaultScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dashboard&quot;,&quot;jobs&quot;,&quot;verify&quot;,&quot;profile&quot;,&quot;interview&quot;],&quot;default&quot;:&quot;dashboard&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Prototype&quot;}}">
+class Component extends DCLogic {
+  state = { view: null, saved: {}, dark: false };
+
+  get view() { return this.state.view || this.props.defaultScreen || 'dashboard'; }
+  setView = (v) => { this.setState({ view: v }); if (typeof window !== 'undefined') window.scrollTo(0, 0); };
+  toggleSave = (id) => this.setState(s => ({ saved: { ...s.saved, [id]: !s.saved[id] } }));
+  toggleTheme = () => this.setState(s => ({ dark: !s.dark }));
+
+  _syncBody() {
+    if (typeof document === 'undefined') return;
+    const t = this.state.dark ? '#0a0a0e' : '#fbfbfc';
+    document.body.style.background = t;
+    document.documentElement.style.colorScheme = this.state.dark ? 'dark' : 'light';
+  }
+  componentDidMount() { this._syncBody(); }
+  componentDidUpdate() { this._syncBody(); }
+
+  renderVals() {
+    const view = this.view;
+    const dark = this.state.dark;
+    const t = dark ? {
+      bg:'#0a0a0e', header:'rgba(12,12,16,.86)', surface:'#141419', surface2:'#1c1c23', surface3:'#20202a',
+      border:'#282830', divider:'#222229', track:'#2a2a34', text:'#f3f3f6', text2:'#b4b4c0', text3:'#82828e', text4:'#5e5e6a',
+      tint:'rgba(99,102,241,.18)', tintBd:'rgba(99,102,241,.36)', green:'#22c55e', greenBg:'rgba(34,197,94,.15)', greenBd:'rgba(34,197,94,.32)',
+      greenInk:'#4ade80', indigoInk:'#a5b4fc', iglow:'#14142e', shadow:'0 1px 2px rgba(0,0,0,.5)',
+      amberBg:'rgba(245,158,11,.12)', amberBd:'rgba(245,158,11,.32)', amberInk:'#fbbf24', navPill:'rgba(26,26,34,.72)'
+    } : {
+      bg:'#fbfbfc', header:'rgba(251,251,252,.82)', surface:'#ffffff', surface2:'#f1f1f5', surface3:'#f4f4f7',
+      border:'#ececf0', divider:'#f2f2f5', track:'#edeef3', text:'#16161a', text2:'#54545f', text3:'#8a8a94', text4:'#b6b6c0',
+      tint:'#eef0ff', tintBd:'#e0e3ff', green:'#16a34a', greenBg:'#eafaf0', greenBd:'#d6f2df',
+      greenInk:'#15803d', indigoInk:'#4f46e5', iglow:'#f2f2ff', shadow:'0 1px 2px rgba(16,16,20,.04)',
+      amberBg:'#fff8ec', amberBd:'#fbe3ad', amberInk:'#a16207', navPill:'rgba(244,244,248,.72)'
+    };
+
+    const EASE = 'transition:all .3s cubic-bezier(.22,1,.36,1)';
+    const ACTIVE = `white-space:nowrap;padding:8px 15px;border:none;background:${t.surface};color:${t.text};font-weight:600;font-size:13.5px;border-radius:999px;cursor:pointer;box-shadow:0 1px 2px rgba(16,16,20,.1),0 4px 14px -6px rgba(99,102,241,.45);${EASE}`;
+    const IDLE = `white-space:nowrap;padding:8px 15px;border:none;background:transparent;color:${t.text3};font-weight:500;font-size:13.5px;border-radius:999px;cursor:pointer;${EASE}`;
+    const hoverBg = dark ? 'rgba(255,255,255,.06)' : 'rgba(16,16,20,.05)';
+    const mk = (key, label) => ({ key, label, go: () => this.setView(key), style: view === key ? ACTIVE : IDLE, hover: view === key ? '' : `color:${t.text};background:${hoverBg}` });
+    const nav = [ mk('dashboard', 'Dashboard'), mk('jobs', 'Job Board'), mk('verify', 'Verify'), mk('profile', 'Profile'), mk('wallet', 'Wallet') ];
+
+    const ring = (p) => `conic-gradient(#6366f1 ${p}%,${t.track} 0)`;
+    const rawJobs = [
+      { id:'j1', title:'React Developer for SaaS Dashboard', company:'Nimbus Labs', initial:'N', logoBg:'#111014', location:'Remote', posted:'2h ago', budget:'$800–$1.5k', budgetNote:'Fixed price', match:96, type:'Fixed price', skills:['React','TypeScript','Tailwind'], desc:'We need a frontend dev to build a responsive analytics dashboard from an existing Figma design. Clean component architecture and attention to detail matter.' },
+      { id:'j2', title:'UI Designer — Mobile Fintech App', company:'Baraka', initial:'B', logoBg:'#0ea5e9', location:'Cairo, hybrid', posted:'5h ago', budget:'$600–$1.2k', budgetNote:'Fixed price', match:91, type:'Part-time', skills:['Figma','UI Design','Prototyping'], desc:'Design 8 key screens for our savings app including onboarding and portfolio views. Strong visual hierarchy and a modern, trustworthy feel required.' },
+      { id:'j3', title:'Landing Page in Framer', company:'Orbit', initial:'O', logoBg:'#6366f1', location:'Remote', posted:'Yesterday', budget:'$450', budgetNote:'Fixed price', match:88, type:'Fixed price', skills:['Framer','Copywriting','Animation'], desc:'Build a high-converting marketing site for our developer tool. We have brand assets ready; you bring the motion and polish.' },
+      { id:'j4', title:'Next.js + Supabase Marketplace MVP', company:'Vela', initial:'V', logoBg:'#16a34a', location:'Remote', posted:'1d ago', budget:'$18/hr', budgetNote:'Hourly', match:84, type:'Hourly', skills:['Next.js','Supabase','Stripe'], desc:'Junior-friendly build for a two-sided marketplace MVP. Auth, listings, and payments. Mentorship provided by our senior engineer.' },
+      { id:'j5', title:'Social Media Motion Designer', company:'Frame', initial:'F', logoBg:'#f59e0b', location:'Remote', posted:'2d ago', budget:'$300–$700', budgetNote:'Fixed price', match:79, type:'Part-time', skills:['After Effects','Motion','Branding'], desc:'Produce a set of 10 short animated posts for a product launch. Bold, clean, on-brand motion in a modern startup style.' },
+    ];
+    const jobs = rawJobs.map(j => ({ ...j, ring: ring(j.match), save: () => this.toggleSave(j.id), saveFill: this.state.saved[j.id] ? '#6366f1' : 'none', saveStroke: this.state.saved[j.id] ? '#6366f1' : t.text3 }));
+    const recJobs = jobs.slice(0, 3);
+
+    const applications = [
+      { title:'React Developer for SaaS Dashboard', company:'Nimbus Labs', initial:'N', logoBg:'#111014', when:'2d ago', status:'In review', statusColor:t.indigoInk, statusBg:t.tint },
+      { title:'UI Designer — Fintech App', company:'Baraka', initial:'B', logoBg:'#0ea5e9', when:'4d ago', status:'Interview', statusColor:t.greenInk, statusBg:t.greenBg },
+      { title:'Framer Landing Page', company:'Orbit', initial:'O', logoBg:'#6366f1', when:'1w ago', status:'Not selected', statusColor:t.text3, statusBg:t.surface2 },
+    ];
+
+    const skills = [
+      { name:'React', verified:true, score:'94', pct:'94%' },
+      { name:'TypeScript', verified:true, score:'89', pct:'89%' },
+      { name:'UI Design', verified:true, score:'92', pct:'92%' },
+      { name:'Node.js', verified:false, score:'—', pct:'62%' },
+    ];
+    const portfolio = [
+      { title:'Analytics Dashboard', tag:'React · Web app', ph:'project shot' },
+      { title:'Savings App UI', tag:'Figma · Mobile', ph:'mobile mockup' },
+      { title:'Orbit Marketing Site', tag:'Framer · Landing', ph:'landing page' },
+      { title:'Design System', tag:'Component library', ph:'ui kit' },
+    ];
+
+    const skillCards = [
+      { name:'React', desc:'Components, hooks, state management, and rendering performance.', verified:true, score:'94' },
+      { name:'UI Design', desc:'Interface design, design systems, and Figma workflows.', verified:true, score:'92' },
+      { name:'Content Writing', desc:'Arabic and English product content, copy, and documentation.', verified:false },
+      { name:'Data Analysis', desc:'Dashboards, spreadsheets, and business reporting.', verified:false },
+      { name:'DevOps', desc:'CI/CD, Docker, deployment pipelines, and observability.', verified:false },
+      { name:'Flutter', desc:'Cross-platform mobile application development.', verified:true, score:'80' },
+    ].map(c => ({ ...c, notVerified: !c.verified, go: () => this.setView('interview'), ring: c.verified ? `conic-gradient(#16a34a ${c.score}%,${t.track} 0)` : '' }));
+
+    const transactions = [
+      { title:'Payment — SaaS Dashboard milestone 2', from:'Nimbus Labs', when:'Jul 2, 2026', amount:'+$450.00', incoming:true, status:'Cleared' },
+      { title:'Withdrawal to Instapay', from:'Wallet •••• 4521', when:'Jun 28, 2026', amount:'−$600.00', incoming:false, status:'Sent' },
+      { title:'Payment — Fintech app screens', from:'Baraka', when:'Jun 24, 2026', amount:'+$520.00', incoming:true, status:'Cleared' },
+      { title:'Payment — Landing page in Framer', from:'Orbit', when:'Jun 15, 2026', amount:'+$450.00', incoming:true, status:'Pending' },
+      { title:'Platform fee (10%)', from:'Shaghalny', when:'Jun 15, 2026', amount:'−$45.00', incoming:false, status:'Cleared' },
+    ].map(x => ({ ...x,
+      amountColor: x.incoming ? t.greenInk : t.text,
+      iconBg: x.incoming ? t.greenBg : t.surface2,
+      iconStroke: x.incoming ? t.green : t.text3,
+      arrow: x.incoming ? 'M12 19V5m0 0-6 6m6-6 6 6' : 'M12 5v14m0 0 6-6m-6 6-6-6',
+      statusColor: x.status==='Cleared' ? t.greenInk : (x.status==='Pending' ? t.amberInk : t.indigoInk),
+      statusBg: x.status==='Cleared' ? t.greenBg : (x.status==='Pending' ? t.amberBg : t.tint),
+    }));
+
+    const dots = [0,1,2,3,4,5,6,7].map(i => ({ color: i < 2 ? '#16a34a' : (i === 2 ? '#6366f1' : t.track) }));
+    const bars = Array.from({ length: 24 }, (_, i) => {
+      const h = 12 + Math.round(20 * Math.abs(Math.sin(i * 1.1)));
+      const d = -(i % 7) * 0.13;
+      return { s: `height:${h}px;animation-delay:${d}s` };
+    });
+    const tips = [
+      'Think out loud — the AI scores your reasoning, not just the final answer.',
+      'Use a real example from a project you\u2019ve built.',
+      'It\u2019s fine to pause. Say \u201clet me think\u201d and take a breath.',
+    ];
+
+    return {
+      t, nav, view, isDark: dark, isLight: !dark, toggleTheme: this.toggleTheme,
+      ring78: `conic-gradient(#6366f1 78%,${t.track} 0)`,
+      isJobs: view === 'jobs', isDash: view === 'dashboard', isProfile: view === 'profile', isInterview: view === 'interview', isVerify: view === 'verify', skillCards, isWallet: view === 'wallet', transactions, goWallet: () => this.setView('wallet'),
+      goHome: () => this.setView('dashboard'), goDash: () => this.setView('dashboard'), goJobs: () => this.setView('jobs'),
+      goProfile: () => this.setView('profile'), goInterview: () => this.setView('interview'),
+      jobs, recJobs, applications, skills, portfolio, dots, bars, tips,
+    };
+  }
+}
+</script>
+</body>
+</html>

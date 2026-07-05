@@ -3,20 +3,20 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 export const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:pointer-events-none disabled:opacity-50 active:scale-[0.985] dark:focus-visible:ring-offset-ink-dark-bg',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[10px] font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:pointer-events-none disabled:opacity-50 active:scale-[0.985] dark:focus-visible:ring-offset-ink-dark-bg',
   {
     variants: {
       variant: {
         default:
-          'bg-brand-600 text-white shadow-[0_10px_24px_-12px_rgba(37,99,235,0.9)] hover:bg-brand-700 hover:shadow-[0_14px_30px_-14px_rgba(37,99,235,0.95)] dark:bg-brand-600 dark:hover:bg-brand-700',
+          'bg-brand-500 text-white shadow-[0_4px_12px_-4px_rgba(99,102,241,0.55)] hover:bg-brand-600 hover:shadow-[0_8px_18px_-8px_rgba(99,102,241,0.7)] dark:bg-brand-500 dark:hover:bg-brand-600',
         primary:
-          'bg-brand-600 text-white shadow-[0_10px_24px_-12px_rgba(37,99,235,0.9)] hover:bg-brand-700',
+          'bg-brand-500 text-white shadow-[0_4px_12px_-4px_rgba(99,102,241,0.55)] hover:bg-brand-600',
         secondary:
           'bg-ink-900 text-white shadow-soft hover:bg-ink-800 dark:border dark:border-white/10 dark:bg-white/10 dark:text-ink-dark-text dark:hover:bg-white/15',
         soft:
-          'border border-brand-200/80 bg-brand-50 text-brand-700 hover:border-brand-300 hover:bg-brand-100 dark:border-brand-700/40 dark:bg-brand-900/30 dark:text-brand-300 dark:hover:bg-brand-900/50',
+          'border border-brand-100 bg-brand-50 text-brand-600 hover:border-brand-200 hover:bg-brand-100 dark:border-brand-500/25 dark:bg-brand-500/15 dark:text-brand-300 dark:hover:bg-brand-500/20',
         outline:
-          'border border-ink-200/80 bg-white/80 text-ink-700 shadow-soft backdrop-blur hover:border-ink-300 hover:bg-white dark:border-white/10 dark:bg-white/[0.07] dark:text-ink-200 dark:hover:bg-white/12',
+          'border border-ink-200 bg-white text-ink-700 shadow-soft hover:border-brand-200 hover:text-ink-900 dark:border-ink-dark-border dark:bg-white/[0.055] dark:text-ink-200 dark:hover:border-brand-500/35 dark:hover:bg-white/[0.1]',
         ghost:
           'bg-transparent text-ink-600 hover:bg-ink-100/80 hover:text-ink-900 dark:text-ink-300 dark:hover:bg-white/10 dark:hover:text-ink-dark-text',
         danger:

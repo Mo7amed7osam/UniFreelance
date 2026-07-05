@@ -84,7 +84,7 @@ const SkillVerification: React.FC = () => {
   const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.06 } } };
 
   return (
-    <motion.div className="space-y-5" initial="hidden" animate="visible" variants={stagger}>
+    <motion.div className="space-y-[30px]" initial="hidden" animate="visible" variants={stagger}>
       <motion.div variants={fadeUp}><PageHeader
         eyebrow="Mandatory verification"
         title="Skill verification interviews"
@@ -92,13 +92,13 @@ const SkillVerification: React.FC = () => {
       /></motion.div>
 
       <motion.div variants={fadeUp}>
-        <div className="rounded-2xl border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-sm font-medium text-amber-800 shadow-soft backdrop-blur dark:border-amber-400/25 dark:bg-amber-400/10 dark:text-amber-100">
+        <div className="rounded-[18px] border border-amber-200 bg-[#fff8ec] px-6 py-4 text-[15px] font-semibold text-[#a16207] shadow-soft dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
           Start the live interview from a desktop or laptop. The verification flow needs camera, microphone, and entire-screen sharing.
         </div>
       </motion.div>
 
-      <motion.div variants={fadeUp}><section className="relative overflow-hidden rounded-2xl border border-brand-300/20 bg-brand-700 text-white shadow-glass dark:border-brand-400/20 dark:bg-[#1d4ed8]">
-        <CardContent className="relative grid gap-3 p-4 md:grid-cols-3 lg:p-5">
+      <motion.div variants={fadeUp}><section className="relative overflow-hidden rounded-[20px] border border-brand-400/20 bg-[#2554d8] p-5 text-white shadow-glass dark:border-brand-400/20 dark:bg-brand-600">
+        <CardContent className="relative grid gap-4 p-0 md:grid-cols-3">
           {[
             {
               title: 'AI-guided interview',
@@ -116,19 +116,19 @@ const SkillVerification: React.FC = () => {
               Icon: Sparkles,
             },
           ].map(({ title, body, Icon }) => (
-            <div key={title} className="rounded-xl border border-white/15 bg-white/[0.08] p-4 shadow-[0_1px_0_rgba(255,255,255,0.12)_inset] backdrop-blur">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 text-white">
+            <div key={title} className="rounded-2xl border border-white/15 bg-white/[0.08] p-5 shadow-[0_1px_0_rgba(255,255,255,0.12)_inset] backdrop-blur">
+              <div className="flex h-[52px] w-[52px] items-center justify-center rounded-2xl bg-white/15 text-white">
                 <Icon size={18} />
               </div>
-              <p className="mt-3 text-sm font-semibold text-white sm:text-base">{title}</p>
-              <p className="mt-1 text-sm leading-6 text-white/80">{body}</p>
+              <p className="mt-6 text-lg font-bold text-white">{title}</p>
+              <p className="mt-2 text-[15px] leading-7 text-white/80">{body}</p>
             </div>
           ))}
         </CardContent>
       </section></motion.div>
 
       {isLoading ? (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-72 w-full rounded-xl" />
           ))}
@@ -136,29 +136,29 @@ const SkillVerification: React.FC = () => {
       ) : (skills || []).length === 0 ? (
         <EmptyState title="No skills available" description="Verification tracks will appear here once the skill library is ready." />
       ) : (
-        <motion.div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" variants={stagger} initial="hidden" animate="visible">
+        <motion.div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4" variants={stagger} initial="hidden" animate="visible">
           {(skills || []).map((skill: any) => (
             <motion.div key={skill._id} variants={fadeUp}>
-            <Card className="interactive-card flex min-h-full flex-col overflow-hidden p-0 hover:border-brand-200/80 dark:hover:border-brand-500/25">
-              <CardHeader className="space-y-3 p-4 pb-3">
+            <Card className="interactive-card flex min-h-[410px] flex-col overflow-hidden rounded-[20px] p-0 hover:border-brand-200/80 dark:hover:border-brand-500/25">
+              <CardHeader className="space-y-7 p-6 pb-3">
                 <div className="flex items-start justify-between gap-3">
-                  <CardTitle className="min-w-0 text-lg leading-7">{skill.name}</CardTitle>
+                  <CardTitle className="min-w-0 text-xl leading-7">{skill.name}</CardTitle>
                   <Badge variant="brand" className="shrink-0">AI</Badge>
                 </div>
-                <p className="line-clamp-3 min-h-[4.5rem] text-sm leading-6 text-ink-600 dark:text-ink-300">
+                <p className="line-clamp-4 min-h-[5.5rem] text-[15px] leading-7 text-ink-600 dark:text-ink-300">
                   {skill.description || 'No description provided.'}
                 </p>
               </CardHeader>
 
-              <CardContent className="flex flex-1 flex-col space-y-4 p-4 pt-0">
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <div className="muted-panel p-3 dark:bg-white/[0.055]">
+              <CardContent className="flex flex-1 flex-col space-y-5 p-6 pt-0">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="muted-panel p-4 dark:bg-white/[0.055]">
                     <p className="label-muted">Interview mode</p>
-                    <p className="mt-2 text-sm font-semibold text-ink-900 dark:text-white">Live with Gravis</p>
+                    <p className="mt-3 text-sm font-bold text-ink-900 dark:text-white">Live with Gravis</p>
                   </div>
-                  <div className="muted-panel p-3 dark:bg-white/[0.055]">
+                  <div className="muted-panel p-4 dark:bg-white/[0.055]">
                     <p className="label-muted">Outcome</p>
-                    <p className="mt-2 text-sm font-semibold text-ink-900 dark:text-white">Verified skill badge</p>
+                    <p className="mt-3 text-sm font-bold text-ink-900 dark:text-white">Verified skill badge</p>
                   </div>
                 </div>
 

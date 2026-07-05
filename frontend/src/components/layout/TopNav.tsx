@@ -31,6 +31,10 @@ export const TopNav = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const items = user ? navByRole[user.role] || [] : [];
+  const primaryItems = user?.role === 'Student'
+    ? ['Dashboard', 'Job Board', 'Skill Verification', 'Profile', 'Wallet']
+      .flatMap((label) => items.filter((item) => item.label === label))
+    : items;
 
   const roleCopy = user?.role === 'Admin' ? 'Admin' : user?.role === 'Client' ? 'Client' : 'Student';
 
@@ -77,8 +81,8 @@ export const TopNav = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-white/60 bg-white/72 shadow-[0_1px_0_rgba(15,23,42,0.035),0_18px_44px_-32px_rgba(15,23,42,0.42)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/72 dark:border-white/10 dark:bg-[#0d141f]/82 dark:shadow-[0_1px_0_rgba(255,255,255,0.04),0_18px_44px_-32px_rgba(0,0,0,0.9)] dark:supports-[backdrop-filter]:bg-[#0d141f]/82">
-        <div className="mx-auto grid h-[3.75rem] w-full max-w-screen-2xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 px-4 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-40 border-b border-ink-200 bg-white/80 shadow-soft backdrop-blur-xl supports-[backdrop-filter]:bg-white/80 dark:border-ink-dark-border dark:bg-ink-dark-bg/85 dark:supports-[backdrop-filter]:bg-ink-dark-bg/85">
+        <div className="mx-auto grid h-[66px] w-full max-w-[1280px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 px-4 sm:px-6 lg:px-7">
           <div className="flex min-w-0 items-center gap-3">
             <button
               type="button"
@@ -90,21 +94,24 @@ export const TopNav = () => {
               <Menu size={18} />
             </button>
 
-            <NavLink to={homePath} className="flex shrink-0 items-center rounded-xl no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" aria-label="Go to dashboard">
-              <Logo className="gap-2 [&>span]:hidden min-[430px]:[&>span]:inline" markClassName="h-7 w-7" />
+            <NavLink to={homePath} className="flex shrink-0 items-center gap-2.5 rounded-xl no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" aria-label="Go to dashboard">
+              <span className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-gradient-to-br from-brand-500 to-brand-600 text-[17px] font-extrabold leading-none text-white shadow-[0_4px_14px_-3px_rgba(99,102,241,0.65)]">
+                ش
+              </span>
+              <span className="hidden text-[17px] font-bold tracking-[-0.025em] text-ink-900 min-[430px]:inline dark:text-ink-dark-text">Shaghalny</span>
             </NavLink>
           </div>
 
-          <nav className="hidden min-w-0 items-center justify-center gap-1 rounded-2xl border border-ink-200/60 bg-white/72 p-1 shadow-soft backdrop-blur-xl xl:flex dark:border-white/10 dark:bg-white/[0.055]" aria-label="Primary">
-            {items.map((item) => (
+          <nav className="hidden min-w-0 items-center justify-center gap-[3px] rounded-full border border-ink-200 bg-ink-100/70 p-1 shadow-soft backdrop-blur-xl xl:flex dark:border-ink-dark-border dark:bg-white/[0.055]" aria-label="Primary">
+            {primaryItems.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
                   cn(
-                    'relative isolate rounded-xl px-2.5 py-2 text-[13px] font-semibold leading-none no-underline transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 2xl:px-3',
+                    'relative isolate rounded-full px-[15px] py-2 text-[13.5px] font-medium leading-none no-underline transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500',
                     isActive
-                      ? 'text-ink-950 dark:text-white'
+                      ? 'text-ink-900 dark:text-white'
                       : 'text-ink-500 hover:text-ink-900 dark:text-ink-dark-muted dark:hover:text-white'
                   )
                 }
@@ -114,13 +121,13 @@ export const TopNav = () => {
                     {isActive ? (
                       <motion.span
                         layoutId="topnav-active"
-                        className="absolute inset-0 -z-10 rounded-xl border border-ink-200/80 bg-white shadow-[0_8px_20px_-14px_rgba(15,23,42,0.45),0_1px_0_rgba(255,255,255,0.9)_inset] dark:border-white/12 dark:bg-white/[0.14]"
+                        className="absolute inset-0 -z-10 rounded-full bg-white shadow-[0_1px_2px_rgba(16,16,20,0.1),0_4px_14px_-6px_rgba(99,102,241,0.45)] dark:bg-white/[0.13]"
                         transition={{ type: 'spring', stiffness: 420, damping: 34 }}
                       />
                     ) : (
-                      <span className="absolute inset-0 -z-10 rounded-xl opacity-0 transition-opacity duration-150 hover:opacity-100 hover:bg-ink-100/70 dark:hover:bg-white/10" />
+                      <span className="absolute inset-0 -z-10 rounded-full opacity-0 transition-opacity duration-150 hover:opacity-100 hover:bg-ink-200/50 dark:hover:bg-white/10" />
                     )}
-                    <span className="whitespace-nowrap">{item.label}</span>
+                    <span className="whitespace-nowrap">{item.label === 'Skill Verification' ? 'Verify' : item.label}</span>
                   </>
                 )}
               </NavLink>
@@ -128,20 +135,21 @@ export const TopNav = () => {
           </nav>
 
           <div className="flex min-w-0 shrink-0 items-center justify-end gap-1.5">
-            <label className="hidden h-10 items-center gap-2 rounded-2xl border border-ink-200/70 bg-white/70 px-3 text-sm shadow-soft backdrop-blur transition-colors focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-100 2xl:flex dark:border-white/10 dark:bg-white/[0.045] dark:focus-within:border-brand-500 dark:focus-within:ring-brand-500/20">
+            <label className="hidden h-[38px] items-center gap-2 rounded-[10px] border border-ink-200 bg-white px-3 text-sm shadow-soft transition-colors focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-100 lg:flex dark:border-ink-dark-border dark:bg-white/[0.055] dark:focus-within:border-brand-500 dark:focus-within:ring-brand-500/20">
               <Search size={13} className="shrink-0 text-ink-400 dark:text-ink-dark-muted" />
               <input
                 type="search"
                 placeholder="Search"
                 aria-label="Search"
-                className="w-36 bg-transparent text-sm text-ink-800 outline-none placeholder:text-ink-400 dark:text-ink-dark-text dark:placeholder:text-ink-dark-muted"
+                className="hidden w-20 bg-transparent text-sm text-ink-800 outline-none placeholder:text-ink-400 2xl:block dark:text-ink-dark-text dark:placeholder:text-ink-dark-muted"
               />
+              <span className="rounded-[5px] border border-ink-200 bg-ink-100 px-1.5 py-0.5 font-mono text-[11px] text-ink-500 dark:border-ink-dark-border dark:bg-white/[0.06]">⌘K</span>
             </label>
 
             {user?.role === 'Student' ? <StudentPwaInstallButton /> : null}
             {user?.role === 'Student' ? <NotificationBell /> : null}
 
-            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-2xl" onClick={toggleTheme} aria-label="Toggle theme">
+            <Button variant="outline" size="icon" className="h-[38px] w-[38px] rounded-[10px] p-0" onClick={toggleTheme} aria-label="Toggle theme">
               {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
             </Button>
 
@@ -149,11 +157,11 @@ export const TopNav = () => {
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  className="flex items-center gap-2 rounded-2xl border border-transparent p-1 pr-2 transition-colors hover:border-ink-200/70 hover:bg-white/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:hover:border-white/10 dark:hover:bg-white/10"
+                  className="flex items-center gap-2 rounded-full border border-ink-200 bg-white p-[3px] pr-2 transition-colors hover:border-brand-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-ink-dark-border dark:bg-white/[0.055] dark:hover:border-brand-500/35"
                   aria-label="Open account menu"
                 >
                   <Avatar className="h-7 w-7">
-                    <AvatarFallback className="text-[10px]">{getInitials(user?.name)}</AvatarFallback>
+                    <AvatarFallback className="bg-gradient-to-br from-brand-300 to-brand-500 text-[10px] font-bold text-white">{getInitials(user?.name)}</AvatarFallback>
                   </Avatar>
                   <ChevronDown size={12} className="hidden text-ink-400 sm:block dark:text-ink-dark-muted" />
                 </button>
