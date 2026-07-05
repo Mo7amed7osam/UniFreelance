@@ -43,28 +43,26 @@ const StudentPublicProfile: React.FC = () => {
     <div className="min-w-0 space-y-4 sm:space-y-5">
       <section className="min-w-0 overflow-hidden rounded-2xl border border-white/70 bg-white/95 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/90 sm:rounded-[1.75rem]">
         <div
-          className="h-32 bg-[linear-gradient(135deg,#2563eb_0%,#1e40af_46%,#0f172a_100%)] bg-cover bg-center sm:h-40"
+          className="h-28 bg-[linear-gradient(135deg,#2563eb_0%,#1e40af_48%,#0f172a_100%)] bg-cover bg-center sm:h-32 lg:h-36"
           style={coverStyle}
         />
-        <div className="grid min-w-0 gap-4 px-4 pb-4 sm:gap-5 sm:px-5 sm:pb-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-7">
-          <div className="-mt-10 flex min-w-0 flex-col gap-3 sm:-mt-12 sm:flex-row sm:items-end sm:gap-4">
-            <div className="h-24 w-24 shrink-0 overflow-hidden rounded-full border-4 border-white bg-brand-50 shadow-elevated ring-1 ring-ink-200 dark:border-ink-dark-surface dark:bg-white/10 dark:ring-white/10 sm:h-28 sm:w-28">
-              {photoUrl ? (
-                <img src={photoUrl} alt={`${profile.name} profile`} className="h-full w-full object-cover" />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center text-2xl font-semibold text-brand-600 dark:text-brand-300 sm:text-3xl">{getInitials(profile.name)}</div>
-              )}
+        <div className="relative grid min-w-0 gap-4 px-4 pb-4 pt-14 sm:gap-5 sm:px-6 sm:pb-5 sm:pt-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-7">
+          <div className="absolute left-4 top-0 h-24 w-24 -translate-y-1/2 overflow-hidden rounded-full border-4 border-white bg-brand-50 shadow-elevated ring-1 ring-ink-200 dark:border-ink-dark-surface dark:bg-white/10 dark:ring-white/10 sm:left-6 sm:h-28 sm:w-28 lg:left-7">
+            {photoUrl ? (
+              <img src={photoUrl} alt={`${profile.name} profile`} className="h-full w-full object-cover" />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-2xl font-semibold text-brand-600 dark:text-brand-300 sm:text-3xl">{getInitials(profile.name)}</div>
+            )}
+          </div>
+          <div className="min-w-0 sm:pl-36">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="min-w-0 max-w-full break-words text-2xl font-semibold tracking-tight text-ink-950 dark:text-white sm:text-3xl">{profile.name}</h1>
+              {(profile.verifiedSkills || []).length ? <Badge variant="brand">Verified</Badge> : null}
             </div>
-            <div className="min-w-0 flex-1 pt-1 sm:pb-2">
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="min-w-0 max-w-full break-words text-2xl font-semibold tracking-tight text-ink-950 dark:text-white sm:text-3xl">{profile.name}</h1>
-                {(profile.verifiedSkills || []).length ? <Badge variant="brand">Verified</Badge> : null}
-              </div>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-600 dark:text-ink-300">
-                {profile.description || 'Student profile overview and verified skill history.'}
-              </p>
-              {profile.university ? <p className="mt-2 break-words text-sm font-medium text-ink-500 dark:text-ink-dark-muted">{profile.university}</p> : null}
-            </div>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-600 dark:text-ink-300">
+              {profile.description || 'Student profile overview and verified skill history.'}
+            </p>
+            {profile.university ? <p className="mt-2 break-words text-sm font-medium text-ink-500 dark:text-ink-dark-muted">{profile.university}</p> : null}
           </div>
           <div className="grid min-w-0 grid-cols-3 gap-2 self-end sm:gap-3">
             {[

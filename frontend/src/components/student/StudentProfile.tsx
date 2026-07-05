@@ -119,9 +119,9 @@ const EditSection = ({
 );
 
 const ProfileStat = ({ label, value }: { label: string; value: React.ReactNode }) => (
-  <div className="min-w-0 rounded-2xl border border-ink-200/80 bg-white/75 px-2 py-2.5 text-center shadow-soft dark:border-white/10 dark:bg-white/[0.05] sm:px-4 sm:py-3">
-    <p className="text-xl font-semibold tracking-tight text-ink-950 dark:text-white sm:text-2xl">{value}</p>
-    <p className="mt-1 truncate text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-500 dark:text-ink-dark-muted sm:text-[11px] sm:tracking-[0.16em]">{label}</p>
+  <div className="min-w-0 rounded-xl border border-ink-200/75 bg-ink-50/70 px-2 py-2.5 text-center shadow-soft dark:border-white/10 dark:bg-white/[0.045] sm:rounded-2xl sm:px-4 sm:py-3">
+    <p className="text-lg font-semibold tracking-tight text-ink-950 dark:text-white sm:text-2xl">{value}</p>
+    <p className="mt-0.5 truncate text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-500 dark:text-ink-dark-muted sm:mt-1 sm:text-[11px] sm:tracking-[0.16em]">{label}</p>
   </div>
 );
 
@@ -354,12 +354,12 @@ const StudentProfile: React.FC = () => {
 
       <motion.section variants={fadeUp} className="min-w-0 overflow-hidden rounded-2xl border border-white/70 bg-white/95 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/90 sm:rounded-[1.75rem]">
         <div
-          className="relative h-32 bg-[linear-gradient(135deg,#2563eb_0%,#1e40af_46%,#0f172a_100%)] bg-cover bg-center sm:h-40"
+          className="relative h-28 bg-[linear-gradient(135deg,#2563eb_0%,#1e40af_48%,#0f172a_100%)] bg-cover bg-center sm:h-32 lg:h-36"
           style={coverStyle}
         >
           {viewMode === 'edit' ? (
             <div className="absolute right-3 top-3 flex items-center gap-2 sm:right-4 sm:top-4">
-              <Button type="button" size="sm" variant="secondary" className="h-8 bg-white/90 px-3 text-xs shadow-soft backdrop-blur hover:bg-white sm:h-9 sm:text-sm" disabled={isUploadingCover} onClick={() => coverInputRef.current?.click()}>
+              <Button type="button" size="sm" variant="secondary" className="h-8 border border-white/20 bg-ink-950/35 px-3 text-xs text-white shadow-soft backdrop-blur hover:bg-ink-950/45 hover:text-white sm:h-9 sm:text-sm" disabled={isUploadingCover} onClick={() => coverInputRef.current?.click()}>
                 {isUploadingCover ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
                 {isUploadingCover ? 'Uploading...' : coverUrl ? 'Change cover' : 'Add cover'}
               </Button>
@@ -374,54 +374,52 @@ const StudentProfile: React.FC = () => {
           ) : null}
         </div>
 
-        <div className="grid min-w-0 gap-4 px-4 pb-4 sm:gap-5 sm:px-5 sm:pb-5 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-7">
-          <div className="-mt-10 flex min-w-0 flex-col gap-3 sm:-mt-12 sm:flex-row sm:items-end sm:gap-4">
-            <div className="relative shrink-0">
-              <Avatar className="h-24 w-24 border-4 border-white bg-white shadow-elevated ring-1 ring-ink-200 dark:border-ink-dark-surface dark:bg-ink-dark-surface dark:ring-white/10 sm:h-28 sm:w-28">
-                {photoUrl && !photoLoadError ? (
-                  <AvatarImage src={photoUrl} alt={profile.name} onError={() => setPhotoLoadError(true)} />
-                ) : null}
-                <AvatarFallback className="text-3xl">
-                  {photoLoadError ? <ImageOff size={26} /> : getInitials(formValues.name || profile.name)}
-                </AvatarFallback>
-              </Avatar>
-              {viewMode === 'edit' ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => photoInputRef.current?.click()}
-                    disabled={isUploadingPhoto}
-                    className="absolute bottom-1 right-1 flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-brand-600 text-white shadow-card transition-colors hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-60 dark:border-ink-dark-surface"
-                    aria-label="Upload profile photo"
-                  >
-                    {isUploadingPhoto ? <Loader2 size={15} className="animate-spin" /> : <Camera size={15} />}
-                  </button>
-                  <input
-                    ref={photoInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => void handlePhotoSelect(e.target.files?.[0])}
-                  />
-                </>
+        <div className="relative grid min-w-0 gap-4 px-4 pb-4 pt-14 sm:gap-5 sm:px-6 sm:pb-5 sm:pt-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-7">
+          <div className="absolute left-4 top-0 -translate-y-1/2 sm:left-6 lg:left-7">
+            <Avatar className="h-24 w-24 border-4 border-white bg-white shadow-elevated ring-1 ring-ink-200 dark:border-ink-dark-surface dark:bg-ink-dark-surface dark:ring-white/10 sm:h-28 sm:w-28">
+              {photoUrl && !photoLoadError ? (
+                <AvatarImage src={photoUrl} alt={profile.name} onError={() => setPhotoLoadError(true)} />
+              ) : null}
+              <AvatarFallback className="text-3xl">
+                {photoLoadError ? <ImageOff size={26} /> : getInitials(formValues.name || profile.name)}
+              </AvatarFallback>
+            </Avatar>
+            {viewMode === 'edit' ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => photoInputRef.current?.click()}
+                  disabled={isUploadingPhoto}
+                  className="absolute bottom-1 right-1 flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-brand-600 text-white shadow-card transition-colors hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-60 dark:border-ink-dark-surface"
+                  aria-label="Upload profile photo"
+                >
+                  {isUploadingPhoto ? <Loader2 size={15} className="animate-spin" /> : <Camera size={15} />}
+                </button>
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => void handlePhotoSelect(e.target.files?.[0])}
+                />
+              </>
+            ) : null}
+          </div>
+
+          <div className="min-w-0 sm:pl-36">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="min-w-0 max-w-full break-words text-2xl font-semibold tracking-tight text-ink-950 dark:text-white sm:text-3xl">{formValues.name || profile.name}</h2>
+              {verifiedSkills.length ? (
+                <span className="inline-flex items-center gap-1 rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 dark:border-brand-700/40 dark:bg-brand-900/30 dark:text-brand-300">
+                  <BadgeCheck size={13} />
+                  Verified
+                </span>
               ) : null}
             </div>
-
-            <div className="min-w-0 flex-1 pt-1 sm:pb-2">
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="min-w-0 max-w-full break-words text-2xl font-semibold tracking-tight text-ink-950 dark:text-white sm:text-3xl">{formValues.name || profile.name}</h2>
-                {verifiedSkills.length ? (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 dark:border-brand-700/40 dark:bg-brand-900/30 dark:text-brand-300">
-                    <BadgeCheck size={13} />
-                    Verified
-                  </span>
-                ) : null}
-              </div>
-              <p className="mt-1 break-words text-sm font-medium text-ink-700 dark:text-ink-200 sm:text-base">{profileTitle}</p>
-              <div className="mt-3 flex min-w-0 flex-col gap-1.5 text-sm text-ink-500 dark:text-ink-400 sm:flex-row sm:flex-wrap sm:gap-x-5 sm:gap-y-2">
-                <span className="inline-flex min-w-0 items-center gap-1.5"><Mail size={14} className="shrink-0" /><span className="min-w-0 break-all">{profile.email}</span></span>
-                {formValues.university ? <span className="inline-flex min-w-0 items-center gap-1.5"><GraduationCap size={14} className="shrink-0" /><span className="min-w-0 break-words">{formValues.university}</span></span> : null}
-              </div>
+            <p className="mt-1 break-words text-sm font-medium text-ink-700 dark:text-ink-200 sm:text-base">{profileTitle}</p>
+            <div className="mt-3 flex min-w-0 flex-col gap-1.5 text-sm text-ink-500 dark:text-ink-400 sm:flex-row sm:flex-wrap sm:gap-x-5 sm:gap-y-2">
+              <span className="inline-flex min-w-0 items-center gap-1.5"><Mail size={14} className="shrink-0" /><span className="min-w-0 break-all">{profile.email}</span></span>
+              {formValues.university ? <span className="inline-flex min-w-0 items-center gap-1.5"><GraduationCap size={14} className="shrink-0" /><span className="min-w-0 break-words">{formValues.university}</span></span> : null}
             </div>
           </div>
 
