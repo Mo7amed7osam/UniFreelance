@@ -72,7 +72,7 @@ export const NotificationBell = () => {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-11 z-50 w-80 rounded-xl border border-ink-200 bg-white shadow-lg dark:border-ink-dark-border dark:bg-ink-dark-surface">
+        <div className="absolute right-0 top-11 z-50 w-[calc(100vw-2rem)] max-w-80 rounded-xl border border-ink-200 bg-white shadow-lg dark:border-ink-dark-border dark:bg-ink-dark-surface">
           <div className="flex items-center justify-between border-b border-ink-200 px-4 py-3 dark:border-ink-dark-border">
             <span className="font-semibold text-ink-900 dark:text-white">Notifications</span>
             {unreadCount > 0 && (

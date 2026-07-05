@@ -99,29 +99,29 @@ const EditSection = ({
   action?: React.ReactNode;
   className?: string;
 }) => (
-  <Card className={`overflow-hidden p-0 ${className}`}>
-    <CardHeader className="mb-0 border-b border-ink-100/80 bg-white/70 p-5 dark:border-white/10 dark:bg-white/[0.025]">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 ring-1 ring-brand-100 dark:bg-brand-900/25 dark:text-brand-300 dark:ring-brand-500/20">
+  <Card className={`min-w-0 overflow-hidden p-0 ${className}`}>
+    <CardHeader className="mb-0 border-b border-ink-100/80 bg-white/70 p-4 dark:border-white/10 dark:bg-white/[0.025] sm:p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3 sm:gap-4">
+        <div className="flex min-w-0 items-start gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 ring-1 ring-brand-100 dark:bg-brand-900/25 dark:text-brand-300 dark:ring-brand-500/20 sm:h-10 sm:w-10">
             {icon}
           </span>
-          <div>
-            <CardTitle className="text-lg tracking-tight">{title}</CardTitle>
+          <div className="min-w-0">
+            <CardTitle className="text-base tracking-tight sm:text-lg">{title}</CardTitle>
             {description ? <p className="mt-1 text-sm leading-6 text-ink-500 dark:text-ink-dark-muted">{description}</p> : null}
           </div>
         </div>
-        {action}
+        {action ? <div className="flex w-full sm:w-auto sm:justify-end [&>button]:w-full [&>button]:sm:w-auto">{action}</div> : null}
       </div>
     </CardHeader>
-    <CardContent className="p-5 sm:p-6">{children}</CardContent>
+    <CardContent className="p-4 sm:p-6">{children}</CardContent>
   </Card>
 );
 
 const ProfileStat = ({ label, value }: { label: string; value: React.ReactNode }) => (
-  <div className="rounded-2xl border border-ink-200/80 bg-white/75 px-4 py-3 text-center shadow-soft dark:border-white/10 dark:bg-white/[0.05]">
-    <p className="text-2xl font-semibold tracking-tight text-ink-950 dark:text-white">{value}</p>
-    <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-500 dark:text-ink-dark-muted">{label}</p>
+  <div className="min-w-0 rounded-2xl border border-ink-200/80 bg-white/75 px-2 py-2.5 text-center shadow-soft dark:border-white/10 dark:bg-white/[0.05] sm:px-4 sm:py-3">
+    <p className="text-xl font-semibold tracking-tight text-ink-950 dark:text-white sm:text-2xl">{value}</p>
+    <p className="mt-1 truncate text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-500 dark:text-ink-dark-muted sm:text-[11px] sm:tracking-[0.16em]">{label}</p>
   </div>
 );
 
@@ -320,30 +320,30 @@ const StudentProfile: React.FC = () => {
     : undefined;
 
   return (
-    <motion.div className="mx-auto w-full max-w-6xl space-y-5" initial="hidden" animate="visible" variants={stagger}>
+    <motion.div className="mx-auto w-full max-w-6xl space-y-4 sm:space-y-5" initial="hidden" animate="visible" variants={stagger}>
       <motion.div variants={fadeUp} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+        <div className="min-w-0">
           <p className="page-eyebrow">Profile workspace</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-ink-950 dark:text-white">Portfolio profile</h1>
+          <h1 className="mt-1 truncate text-2xl font-semibold tracking-tight text-ink-950 dark:text-white">Portfolio profile</h1>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex rounded-full border border-ink-200/80 bg-white/80 p-1 shadow-soft dark:border-white/10 dark:bg-white/[0.05]">
-            <Button type="button" size="sm" variant={viewMode === 'edit' ? 'default' : 'ghost'} className="rounded-full" onClick={() => setViewMode('edit')}>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="inline-flex w-full rounded-full border border-ink-200/80 bg-white/80 p-1 shadow-soft dark:border-white/10 dark:bg-white/[0.05] sm:w-auto">
+            <Button type="button" size="sm" variant={viewMode === 'edit' ? 'default' : 'ghost'} className="flex-1 rounded-full sm:flex-none" onClick={() => setViewMode('edit')}>
               <PencilLine size={14} />
               Edit
             </Button>
-            <Button type="button" size="sm" variant={viewMode === 'public' ? 'default' : 'ghost'} className="rounded-full" onClick={() => setViewMode('public')}>
+            <Button type="button" size="sm" variant={viewMode === 'public' ? 'default' : 'ghost'} className="flex-1 rounded-full sm:flex-none" onClick={() => setViewMode('public')}>
               <Eye size={14} />
               View as
             </Button>
           </div>
           {viewMode === 'edit' ? (
-            <Button type="button" onClick={handleSave} disabled={isSaving}>
+            <Button type="button" onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto">
               {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
               {isSaving ? 'Saving...' : 'Save changes'}
             </Button>
           ) : (
-            <Button type="button" variant="outline" asChild>
+            <Button type="button" variant="outline" className="w-full sm:w-auto" asChild>
               <a href={`/students/${userId}`} target="_blank" rel="noreferrer">
                 Open public page <ExternalLink size={14} />
               </a>
@@ -352,14 +352,14 @@ const StudentProfile: React.FC = () => {
         </div>
       </motion.div>
 
-      <motion.section variants={fadeUp} className="overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/95 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/90">
+      <motion.section variants={fadeUp} className="min-w-0 overflow-hidden rounded-2xl border border-white/70 bg-white/95 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/90 sm:rounded-[1.75rem]">
         <div
-          className="relative h-36 bg-[linear-gradient(135deg,#2563eb_0%,#1e40af_46%,#0f172a_100%)] bg-cover bg-center sm:h-40"
+          className="relative h-32 bg-[linear-gradient(135deg,#2563eb_0%,#1e40af_46%,#0f172a_100%)] bg-cover bg-center sm:h-40"
           style={coverStyle}
         >
           {viewMode === 'edit' ? (
-            <div className="absolute right-4 top-4 flex items-center gap-2">
-              <Button type="button" size="sm" variant="secondary" className="bg-white/90 shadow-soft backdrop-blur hover:bg-white" disabled={isUploadingCover} onClick={() => coverInputRef.current?.click()}>
+            <div className="absolute right-3 top-3 flex items-center gap-2 sm:right-4 sm:top-4">
+              <Button type="button" size="sm" variant="secondary" className="h-8 bg-white/90 px-3 text-xs shadow-soft backdrop-blur hover:bg-white sm:h-9 sm:text-sm" disabled={isUploadingCover} onClick={() => coverInputRef.current?.click()}>
                 {isUploadingCover ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
                 {isUploadingCover ? 'Uploading...' : coverUrl ? 'Change cover' : 'Add cover'}
               </Button>
@@ -374,10 +374,10 @@ const StudentProfile: React.FC = () => {
           ) : null}
         </div>
 
-        <div className="grid gap-5 px-5 pb-5 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-7">
-          <div className="-mt-12 flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end">
+        <div className="grid min-w-0 gap-4 px-4 pb-4 sm:gap-5 sm:px-5 sm:pb-5 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-7">
+          <div className="-mt-10 flex min-w-0 flex-col gap-3 sm:-mt-12 sm:flex-row sm:items-end sm:gap-4">
             <div className="relative shrink-0">
-              <Avatar className="h-28 w-28 border-4 border-white bg-white shadow-elevated ring-1 ring-ink-200 dark:border-ink-dark-surface dark:bg-ink-dark-surface dark:ring-white/10">
+              <Avatar className="h-24 w-24 border-4 border-white bg-white shadow-elevated ring-1 ring-ink-200 dark:border-ink-dark-surface dark:bg-ink-dark-surface dark:ring-white/10 sm:h-28 sm:w-28">
                 {photoUrl && !photoLoadError ? (
                   <AvatarImage src={photoUrl} alt={profile.name} onError={() => setPhotoLoadError(true)} />
                 ) : null}
@@ -409,7 +409,7 @@ const StudentProfile: React.FC = () => {
 
             <div className="min-w-0 flex-1 pt-1 sm:pb-2">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-3xl font-semibold tracking-tight text-ink-950 dark:text-white">{formValues.name || profile.name}</h2>
+                <h2 className="min-w-0 max-w-full break-words text-2xl font-semibold tracking-tight text-ink-950 dark:text-white sm:text-3xl">{formValues.name || profile.name}</h2>
                 {verifiedSkills.length ? (
                   <span className="inline-flex items-center gap-1 rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 dark:border-brand-700/40 dark:bg-brand-900/30 dark:text-brand-300">
                     <BadgeCheck size={13} />
@@ -417,15 +417,15 @@ const StudentProfile: React.FC = () => {
                   </span>
                 ) : null}
               </div>
-              <p className="mt-1 text-base font-medium text-ink-700 dark:text-ink-200">{profileTitle}</p>
-              <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink-500 dark:text-ink-400">
-                <span className="inline-flex items-center gap-1.5"><Mail size={14} />{profile.email}</span>
-                {formValues.university ? <span className="inline-flex items-center gap-1.5"><GraduationCap size={14} />{formValues.university}</span> : null}
+              <p className="mt-1 break-words text-sm font-medium text-ink-700 dark:text-ink-200 sm:text-base">{profileTitle}</p>
+              <div className="mt-3 flex min-w-0 flex-col gap-1.5 text-sm text-ink-500 dark:text-ink-400 sm:flex-row sm:flex-wrap sm:gap-x-5 sm:gap-y-2">
+                <span className="inline-flex min-w-0 items-center gap-1.5"><Mail size={14} className="shrink-0" /><span className="min-w-0 break-all">{profile.email}</span></span>
+                {formValues.university ? <span className="inline-flex min-w-0 items-center gap-1.5"><GraduationCap size={14} className="shrink-0" /><span className="min-w-0 break-words">{formValues.university}</span></span> : null}
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 self-end">
+          <div className="grid min-w-0 grid-cols-3 gap-2 self-end sm:gap-3">
             <ProfileStat label="Skills" value={verifiedSkills.length} />
             <ProfileStat label="Projects" value={portfolioLinks.length} />
             <ProfileStat label="Reviews" value={reviews.length} />
@@ -448,20 +448,20 @@ const StudentProfile: React.FC = () => {
       ) : (
         <motion.div variants={fadeUp} className="space-y-4">
           <Card className="p-0">
-            <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
               <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                  <div className="min-w-0">
                     <p className="page-eyebrow">Profile strength</p>
                     <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink-950 dark:text-white">{completionPct}% complete</h2>
                   </div>
-                  <span className="rounded-full border border-brand-100 bg-brand-50 px-3 py-1 text-sm font-semibold text-brand-700 dark:border-brand-500/20 dark:bg-brand-900/20 dark:text-brand-300">
+                  <span className="w-fit rounded-full border border-brand-100 bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 dark:border-brand-500/20 dark:bg-brand-900/20 dark:text-brand-300 sm:text-sm">
                     Client-ready profile
                   </span>
                 </div>
                 <Progress value={completionPct} className="mt-4" />
               </div>
-              <Button type="button" onClick={handleSave} disabled={isSaving} className="sm:w-auto">
+              <Button type="button" onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto">
                 {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
                 {isSaving ? 'Saving...' : 'Save changes'}
               </Button>
@@ -565,9 +565,9 @@ const StudentProfile: React.FC = () => {
                     </Button>
                   </div>
                 ))}
-                <p className="flex items-center gap-2 text-sm text-ink-500 dark:text-ink-400">
-                  <Link2 size={14} />
-                  GitHub, Behance, live demos, LinkedIn, and case studies work best.
+                <p className="flex items-start gap-2 text-sm leading-6 text-ink-500 dark:text-ink-400">
+                  <Link2 size={14} className="mt-1 shrink-0" />
+                  <span className="min-w-0">GitHub, Behance, live demos, LinkedIn, and case studies work best.</span>
                 </p>
               </div>
             </EditSection>
@@ -633,9 +633,9 @@ function PublicProfileView({
   const featuredLinks = portfolioLinks.slice(0, 6);
 
   return (
-    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
-      <main className="space-y-4">
-        <Card className="p-0">
+    <div className="grid min-w-0 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <main className="min-w-0 space-y-4">
+        <Card className="min-w-0 p-0">
           <CardContent className="p-5 sm:p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -659,7 +659,7 @@ function PublicProfileView({
           </CardContent>
         </Card>
 
-        <Card className="p-0">
+        <Card className="min-w-0 p-0">
           <CardHeader className="mb-0 border-b border-ink-100/80 p-5 dark:border-white/10">
             <div className="flex items-center justify-between gap-4">
               <div>
@@ -671,7 +671,7 @@ function PublicProfileView({
           </CardHeader>
           <CardContent className="p-5">
             {featuredLinks.length ? (
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {featuredLinks.map((link, index) => (
                   <a
                     key={`${link}-${index}`}
@@ -708,7 +708,7 @@ function PublicProfileView({
         </Card>
 
         <section className="space-y-3">
-          <div>
+          <div className="min-w-0">
             <h2 className="text-xl font-semibold text-ink-900 dark:text-white">Client reviews</h2>
             <p className="text-sm text-ink-500 dark:text-ink-400">Completed engagements and client feedback.</p>
           </div>
@@ -733,8 +733,8 @@ function PublicProfileView({
         </section>
       </main>
 
-      <aside className="space-y-4 lg:sticky lg:top-20">
-        <Card className="p-0">
+      <aside className="min-w-0 space-y-4 lg:sticky lg:top-20">
+        <Card className="min-w-0 p-0">
           <CardHeader className="mb-0 border-b border-ink-100/80 p-5 dark:border-white/10">
             <CardTitle className="text-lg">Proof and credentials</CardTitle>
           </CardHeader>

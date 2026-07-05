@@ -40,49 +40,49 @@ const StudentPublicProfile: React.FC = () => {
     : undefined;
 
   return (
-    <div className="space-y-5">
-      <section className="overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/95 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/90">
+    <div className="min-w-0 space-y-4 sm:space-y-5">
+      <section className="min-w-0 overflow-hidden rounded-2xl border border-white/70 bg-white/95 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/90 sm:rounded-[1.75rem]">
         <div
-          className="h-36 bg-[linear-gradient(135deg,#2563eb_0%,#1e40af_46%,#0f172a_100%)] bg-cover bg-center sm:h-40"
+          className="h-32 bg-[linear-gradient(135deg,#2563eb_0%,#1e40af_46%,#0f172a_100%)] bg-cover bg-center sm:h-40"
           style={coverStyle}
         />
-        <div className="grid gap-5 px-5 pb-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-7">
-          <div className="-mt-12 flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end">
-            <div className="h-28 w-28 shrink-0 overflow-hidden rounded-full border-4 border-white bg-brand-50 shadow-elevated ring-1 ring-ink-200 dark:border-ink-dark-surface dark:bg-white/10 dark:ring-white/10">
+        <div className="grid min-w-0 gap-4 px-4 pb-4 sm:gap-5 sm:px-5 sm:pb-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-7">
+          <div className="-mt-10 flex min-w-0 flex-col gap-3 sm:-mt-12 sm:flex-row sm:items-end sm:gap-4">
+            <div className="h-24 w-24 shrink-0 overflow-hidden rounded-full border-4 border-white bg-brand-50 shadow-elevated ring-1 ring-ink-200 dark:border-ink-dark-surface dark:bg-white/10 dark:ring-white/10 sm:h-28 sm:w-28">
               {photoUrl ? (
                 <img src={photoUrl} alt={`${profile.name} profile`} className="h-full w-full object-cover" />
               ) : (
-                <div className="flex h-full w-full items-center justify-center text-3xl font-semibold text-brand-600 dark:text-brand-300">{getInitials(profile.name)}</div>
+                <div className="flex h-full w-full items-center justify-center text-2xl font-semibold text-brand-600 dark:text-brand-300 sm:text-3xl">{getInitials(profile.name)}</div>
               )}
             </div>
             <div className="min-w-0 flex-1 pt-1 sm:pb-2">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-3xl font-semibold tracking-tight text-ink-950 dark:text-white">{profile.name}</h1>
+                <h1 className="min-w-0 max-w-full break-words text-2xl font-semibold tracking-tight text-ink-950 dark:text-white sm:text-3xl">{profile.name}</h1>
                 {(profile.verifiedSkills || []).length ? <Badge variant="brand">Verified</Badge> : null}
               </div>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-600 dark:text-ink-300">
                 {profile.description || 'Student profile overview and verified skill history.'}
               </p>
-              {profile.university ? <p className="mt-2 text-sm font-medium text-ink-500 dark:text-ink-dark-muted">{profile.university}</p> : null}
+              {profile.university ? <p className="mt-2 break-words text-sm font-medium text-ink-500 dark:text-ink-dark-muted">{profile.university}</p> : null}
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-3 self-end">
+          <div className="grid min-w-0 grid-cols-3 gap-2 self-end sm:gap-3">
             {[
               { label: 'Skills', value: (profile.verifiedSkills || []).length },
               { label: 'Projects', value: (profile.portfolioLinks || []).length },
               { label: 'Reviews', value: (profile.reviews || []).length },
             ].map((item) => (
-              <div key={item.label} className="rounded-2xl border border-ink-200/80 bg-white/75 px-3 py-3 text-center shadow-soft dark:border-white/10 dark:bg-white/[0.05]">
-                <p className="text-xl font-semibold tracking-tight text-ink-950 dark:text-white">{item.value}</p>
-                <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-500 dark:text-ink-dark-muted">{item.label}</p>
+              <div key={item.label} className="min-w-0 rounded-2xl border border-ink-200/80 bg-white/75 px-2 py-2.5 text-center shadow-soft dark:border-white/10 dark:bg-white/[0.05] sm:px-3 sm:py-3">
+                <p className="text-lg font-semibold tracking-tight text-ink-950 dark:text-white sm:text-xl">{item.value}</p>
+                <p className="mt-1 truncate text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-500 dark:text-ink-dark-muted sm:tracking-[0.14em]">{item.label}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <div className="grid gap-5 xl:grid-cols-[0.85fr_1.15fr]">
-        <Card>
+      <div className="grid min-w-0 gap-4 sm:gap-5 xl:grid-cols-[0.85fr_1.15fr]">
+        <Card className="min-w-0">
           <CardContent className="space-y-4 p-4">
             <p className="text-sm text-ink-500 dark:text-ink-300">Jobs completed: {profile.jobsCompleted || 0}</p>
 
@@ -91,8 +91,8 @@ const StudentPublicProfile: React.FC = () => {
               {(profile.portfolioLinks || []).length ? (
                 <ul className="mt-3 space-y-2 text-sm">
                   {(profile.portfolioLinks || []).map((link: string, index: number) => (
-                    <li key={`${link}-${index}`}>
-                      <a href={link} target="_blank" rel="noreferrer">
+                    <li key={`${link}-${index}`} className="min-w-0">
+                      <a href={link} target="_blank" rel="noreferrer" className="break-all">
                         {link}
                       </a>
                     </li>
@@ -105,10 +105,10 @@ const StudentPublicProfile: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-w-0">
           <CardContent className="space-y-4 p-4">
             <div>
-              <h2 className="text-2xl font-semibold">Verified skills</h2>
+              <h2 className="text-xl font-semibold sm:text-2xl">Verified skills</h2>
               <div className="mt-4 flex flex-wrap gap-2">
                 {(profile.verifiedSkills || []).length ? (
                   (profile.verifiedSkills || []).map((skill: any) => (
@@ -148,7 +148,7 @@ const StudentPublicProfile: React.FC = () => {
 
             {profile.proposalHistory ? (
               <div>
-                <h2 className="text-2xl font-semibold">Proposal history for this job</h2>
+                <h2 className="text-xl font-semibold sm:text-2xl">Proposal history for this job</h2>
                 {(profile.proposalHistory || []).length ? (
                   <div className="mt-4 space-y-4">
                     {(profile.proposalHistory || []).map((proposal: any) => (
