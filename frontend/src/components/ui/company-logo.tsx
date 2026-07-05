@@ -17,6 +17,21 @@ const knownCompanyDomains: Array<[RegExp, string]> = [
   [/valeo/i, 'valeo.com'],
 ];
 
+function companyFaviconUrl(domain: string) {
+  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`;
+}
+
+function normalizeLogoUrl(value: string) {
+  if (!value.includes('logo.clearbit.com')) return value;
+
+  try {
+    const domain = new URL(value).pathname.replace(/^\/+/, '');
+    return domain ? companyFaviconUrl(domain) : value;
+  } catch {
+    return value;
+  }
+}
+
 export function getCompanyName(job: any) {
   return job?.employer?.name || job?.clientId?.name || job?.client?.name || job?.company || 'Client';
 }
@@ -31,12 +46,12 @@ export function getCompanyLogoUrl(job: any) {
     job?.client?.logoUrl ||
     job?.companyLogoUrl;
 
-  if (explicit) return explicit;
+  if (explicit) return normalizeLogoUrl(explicit);
 
   const website = job?.employer?.website || job?.clientId?.website || job?.client?.website || job?.companyWebsite;
   if (website) {
     try {
-      return `https://logo.clearbit.com/${new URL(website).hostname.replace(/^www\./, '')}`;
+      return companyFaviconUrl(new URL(website).hostname.replace(/^www\./, ''));
     } catch {
       return null;
     }
@@ -44,7 +59,7 @@ export function getCompanyLogoUrl(job: any) {
 
   const name = getCompanyName(job);
   const match = knownCompanyDomains.find(([pattern]) => pattern.test(name));
-  return match ? `https://logo.clearbit.com/${match[1]}` : null;
+  return match ? companyFaviconUrl(match[1]) : null;
 }
 
 export function isCompanyVerified(job: any) {

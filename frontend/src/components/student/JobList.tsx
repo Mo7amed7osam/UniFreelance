@@ -61,6 +61,66 @@ const stagger = {
   visible: { transition: { staggerChildren: 0.05 } },
 };
 
+const categoryFilters = [
+  { label: 'All', skills: [] },
+  { label: 'Development', skills: ['react', 'node', 'mongodb', 'python', 'next', 'flutter'] },
+  { label: 'Design', skills: ['ui', 'ux', 'figma', 'motion', 'design'] },
+  { label: 'Writing', skills: ['content', 'copywriting', 'writing'] },
+  { label: 'Data', skills: ['data', 'analysis', 'python'] },
+];
+
+const workTypeFilters = ['All', 'Fixed project', 'Quick task', 'Flexible'] as const;
+
+const budgetFilters = [
+  { label: 'Any budget', value: 'any' },
+  { label: 'Under 15k', value: 'under-15k' },
+  { label: '15k-25k', value: '15k-25k' },
+  { label: '25k+', value: '25k-plus' },
+] as const;
+
+function getSkillName(skill: any) {
+  return String(skill?.name || skill || '').trim();
+}
+
+function getJobSkillNames(job: any) {
+  return (Array.isArray(job?.requiredSkills) ? job.requiredSkills : []).map(getSkillName).filter(Boolean);
+}
+
+function getWorkType(job: any) {
+  const explicit = String(job?.type || job?.jobType || '').trim();
+  if (explicit) return explicit;
+
+  const duration = String(job?.duration || '').toLowerCase();
+  if (duration.includes('day')) return 'Quick task';
+  if (duration.includes('week')) return 'Fixed project';
+  return 'Flexible';
+}
+
+function getMaxBudget(job: any) {
+  const value = job?.budgetMax ?? job?.budget ?? job?.budgetMin;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function matchesCategory(job: any, category: string) {
+  if (category === 'All') return true;
+  const categoryConfig = categoryFilters.find((item) => item.label === category);
+  if (!categoryConfig) return true;
+
+  const skillNames = getJobSkillNames(job).map((skill) => skill.toLowerCase());
+  return skillNames.some((skill) => categoryConfig.skills.some((keyword) => skill.includes(keyword)));
+}
+
+function matchesBudget(job: any, budgetBand: string) {
+  if (budgetBand === 'any') return true;
+  const maxBudget = getMaxBudget(job);
+  if (!maxBudget) return true;
+  if (budgetBand === 'under-15k') return maxBudget < 15000;
+  if (budgetBand === '15k-25k') return maxBudget >= 15000 && maxBudget <= 25000;
+  if (budgetBand === '25k-plus') return maxBudget > 25000;
+  return true;
+}
+
 function budgetLabel(job: any) {
   if (job?.budgetMin !== undefined || job?.budgetMax !== undefined) {
     return `${job.budgetMin !== undefined ? formatCurrency(job.budgetMin) : '-'}-${job.budgetMax !== undefined ? formatCurrency(job.budgetMax) : '-'}`;
@@ -90,6 +150,12 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [activeJobId, setActiveJobId] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, ProposalDraft>>({});
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedWorkType, setSelectedWorkType] = useState<typeof workTypeFilters[number]>('All');
+  const [selectedBudget, setSelectedBudget] = useState<typeof budgetFilters[number]['value']>('any');
+  const [readyOnly, setReadyOnly] = useState(false);
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [notAppliedOnly, setNotAppliedOnly] = useState(false);
   const queryClient = useQueryClient();
   const { user } = useAuthContext();
   const userId = user?._id || user?.id;
@@ -124,6 +190,31 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
   const verifiedSkillIds = useMemo<Set<string>>(
     () => new Set<string>((profile?.verifiedSkills || []).map((item: any) => String(item.skill?._id || item.skill))),
     [profile]
+  );
+
+  const getMissingVerifiedSkills = (job: any) =>
+    (job?.requiredSkills || []).filter((skill: any) => !verifiedSkillIds.has(String(skill?._id || skill)));
+
+  const allJobs = useMemo(() => jobs || [], [jobs]);
+
+  const filteredJobs = useMemo(
+    () =>
+      allJobs.filter((job: any) => {
+        const jobKey = job._id || job.id;
+        const hasSubmitted = submittedJobIds.has(jobKey);
+        const isReady = getMissingVerifiedSkills(job).length === 0;
+        const isVerified = isCompanyVerified(job);
+        const workType = getWorkType(job);
+
+        if (!matchesCategory(job, selectedCategory)) return false;
+        if (selectedWorkType !== 'All' && workType !== selectedWorkType) return false;
+        if (!matchesBudget(job, selectedBudget)) return false;
+        if (readyOnly && !isReady) return false;
+        if (verifiedOnly && !isVerified) return false;
+        if (notAppliedOnly && hasSubmitted) return false;
+        return true;
+      }),
+    [allJobs, notAppliedOnly, readyOnly, selectedBudget, selectedCategory, selectedWorkType, submittedJobIds, verifiedOnly, verifiedSkillIds]
   );
 
   const proposalMutation = useMutation({
@@ -166,26 +257,39 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
     },
   });
 
-  const filteredJobs = useMemo(() => jobs || [], [jobs]);
-
   const getDraft = (jobId: string) => drafts[jobId] ?? emptyDraft();
 
   const setDraftField = (jobId: string, field: keyof ProposalDraft, value: string) => {
     setDrafts((p) => ({ ...p, [jobId]: { ...getDraft(jobId), [field]: value } }));
   };
 
-  const getMissingVerifiedSkills = (job: any) =>
-    (job?.requiredSkills || []).filter((skill: any) => !verifiedSkillIds.has(String(skill?._id || skill)));
-
-  const openJobCount = filteredJobs.filter((job: any) => !submittedJobIds.has(job._id || job.id)).length;
-  const readyJobCount = filteredJobs.filter((job: any) => {
+  const openJobCount = allJobs.filter((job: any) => !submittedJobIds.has(job._id || job.id)).length;
+  const readyJobCount = allJobs.filter((job: any) => {
     const jobKey = job._id || job.id;
     return !submittedJobIds.has(jobKey) && getMissingVerifiedSkills(job).length === 0;
   }).length;
 
-  const activeJob = filteredJobs.find((j: any) => (j._id || j.id) === activeJobId);
+  const activeJob = allJobs.find((j: any) => (j._id || j.id) === activeJobId);
   const activeDraft = activeJobId ? getDraft(activeJobId) : emptyDraft();
   const coverLetterLength = activeDraft.details.trim().length;
+  const hasActiveFilters =
+    Boolean(search) ||
+    selectedCategory !== 'All' ||
+    selectedWorkType !== 'All' ||
+    selectedBudget !== 'any' ||
+    readyOnly ||
+    verifiedOnly ||
+    notAppliedOnly;
+
+  const resetFilters = () => {
+    setSearch('');
+    setSelectedCategory('All');
+    setSelectedWorkType('All');
+    setSelectedBudget('any');
+    setReadyOnly(false);
+    setVerifiedOnly(false);
+    setNotAppliedOnly(false);
+  };
 
   const handleSubmit = async () => {
     if (!activeJobId) return;
@@ -228,7 +332,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
             description="Roles matched to your verified skills and availability."
           />
           <div className="flex items-center gap-2">
-            <span className="sh-chip font-mono">{filteredJobs.length || 0} open jobs</span>
+            <span className="sh-chip font-mono">{filteredJobs.length || 0} shown</span>
             <Button variant="outline" size="sm"><SlidersHorizontal size={14} /> Sort: Best match</Button>
           </div>
         </div>
@@ -236,25 +340,121 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
 
       <div className="grid items-start gap-6 lg:grid-cols-[248px_minmax(0,1fr)]">
         <aside className="sh-panel hidden p-[18px] lg:sticky lg:top-[88px] lg:block">
-          <div className="mb-3 flex items-center justify-between">
-            <span className="text-sm font-semibold text-ink-900 dark:text-white">Job board</span>
-            {search ? (
-              <button type="button" onClick={() => setSearch('')} className="text-xs font-semibold text-brand-600">Reset</button>
+          <div className="mb-4 flex items-center justify-between">
+            <span className="text-sm font-semibold text-ink-900 dark:text-white">Filters</span>
+            {hasActiveFilters ? (
+              <button type="button" onClick={resetFilters} className="text-xs font-semibold text-brand-600 transition hover:text-brand-700">Reset</button>
             ) : null}
           </div>
-          <div className="space-y-3">
-            {[
-              { label: 'Open jobs', value: openJobCount },
-              { label: 'Ready to apply', value: readyJobCount },
-              { label: 'Verified skills', value: verifiedSkillIds.size },
-            ].map((item) => (
-              <div key={item.label} className="rounded-[12px] border border-ink-100 bg-ink-50 px-3.5 py-3 dark:border-ink-dark-border dark:bg-white/[0.04]">
-                <p className="label-muted">{item.label}</p>
-                <p className="sh-number mt-1 text-xl text-ink-900 dark:text-white">{item.value}</p>
+
+          <div className="space-y-[18px]">
+            <div>
+              <div className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-ink-400 dark:text-ink-dark-muted">Category</div>
+              <div className="flex flex-wrap gap-2">
+                {categoryFilters.map((item) => {
+                  const active = selectedCategory === item.label;
+                  return (
+                    <button
+                      key={item.label}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => setSelectedCategory(item.label)}
+                      className={`rounded-[8px] border px-2.5 py-1.5 text-[12.5px] font-semibold transition ${
+                        active
+                          ? 'border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-500/35 dark:bg-brand-500/15 dark:text-brand-200'
+                          : 'border-ink-200 bg-ink-50 text-ink-600 hover:border-brand-200 hover:text-brand-700 dark:border-ink-dark-border dark:bg-white/[0.045] dark:text-ink-300'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  );
+                })}
               </div>
-            ))}
-            <div className="rounded-[12px] border border-brand-100 bg-brand-50 px-3.5 py-3 text-sm leading-6 text-brand-700 dark:border-brand-500/25 dark:bg-brand-500/15 dark:text-brand-200">
-              Job recommendations are based on the live jobs returned by the backend and your verified skills.
+            </div>
+
+            <div>
+              <div className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-ink-400 dark:text-ink-dark-muted">Job type</div>
+              <div className="space-y-2.5">
+                {workTypeFilters.map((type) => {
+                  const active = selectedWorkType === type;
+                  return (
+                    <button
+                      key={type}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => setSelectedWorkType(type)}
+                      className="flex w-full items-center gap-2 text-left text-[13.5px] text-ink-600 transition hover:text-brand-700 dark:text-ink-300"
+                    >
+                      <span className={`flex h-[17px] w-[17px] items-center justify-center rounded-[5px] border ${active ? 'border-brand-500 bg-brand-500' : 'border-ink-300 dark:border-ink-600'}`}>
+                        {active ? <CheckCircle2 size={11} className="text-white" /> : null}
+                      </span>
+                      {type}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-ink-400 dark:text-ink-dark-muted">Budget range</div>
+              <div className="space-y-2">
+                {budgetFilters.map((item) => {
+                  const active = selectedBudget === item.value;
+                  return (
+                    <button
+                      key={item.value}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => setSelectedBudget(item.value)}
+                      className={`flex w-full items-center justify-between rounded-[10px] border px-3 py-2 text-[13px] font-semibold transition ${
+                        active
+                          ? 'border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-500/35 dark:bg-brand-500/15 dark:text-brand-200'
+                          : 'border-ink-200 bg-white text-ink-600 hover:border-brand-200 hover:text-brand-700 dark:border-ink-dark-border dark:bg-white/[0.04] dark:text-ink-300'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="space-y-2.5">
+              {[
+                { label: 'Ready to apply', checked: readyOnly, setChecked: setReadyOnly },
+                { label: 'Verified clients only', checked: verifiedOnly, setChecked: setVerifiedOnly },
+                { label: 'Not applied yet', checked: notAppliedOnly, setChecked: setNotAppliedOnly },
+              ].map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  aria-pressed={item.checked}
+                  onClick={() => item.setChecked((value) => !value)}
+                  className={`flex w-full items-center justify-between rounded-[11px] border px-3 py-2.5 text-left text-[13px] font-semibold transition ${
+                    item.checked
+                      ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/10 dark:text-emerald-300'
+                      : 'border-ink-200 bg-white text-ink-600 hover:border-brand-200 dark:border-ink-dark-border dark:bg-white/[0.04] dark:text-ink-300'
+                  }`}
+                >
+                  <span>{item.label}</span>
+                  <span className={`h-[19px] w-[34px] rounded-full p-0.5 transition ${item.checked ? 'bg-emerald-500' : 'bg-ink-200 dark:bg-ink-700'}`}>
+                    <span className={`block h-[15px] w-[15px] rounded-full bg-white transition ${item.checked ? 'translate-x-[15px]' : ''}`} />
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 border-t border-ink-100 pt-4 dark:border-ink-dark-border">
+              {[
+                { label: 'Open', value: openJobCount },
+                { label: 'Ready', value: readyJobCount },
+                { label: 'Shown', value: filteredJobs.length },
+              ].map((item) => (
+                <div key={item.label} className="rounded-[10px] bg-ink-50 px-2 py-2 text-center dark:bg-white/[0.04]">
+                  <div className="sh-number text-sm text-ink-900 dark:text-white">{item.value}</div>
+                  <div className="mt-0.5 text-[10.5px] font-semibold text-ink-400">{item.label}</div>
+                </div>
+              ))}
             </div>
           </div>
         </aside>
@@ -300,15 +500,15 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
 
           {!isLoading && !isError && filteredJobs.length === 0 ? (
             <EmptyState
-              title={debouncedSearch ? 'No jobs match this search' : 'No jobs available yet'}
-              description={debouncedSearch ? 'Try a broader keyword.' : 'New jobs will appear here as clients publish them.'}
+              title={debouncedSearch || hasActiveFilters ? 'No jobs match these filters' : 'No jobs available yet'}
+              description={debouncedSearch || hasActiveFilters ? 'Try a broader keyword or reset the filters.' : 'New jobs will appear here as clients publish them.'}
             />
           ) : null}
 
           {!isLoading && !isError && filteredJobs.length > 0 ? (
             <motion.div className="space-y-3" variants={stagger} initial="hidden" animate="visible" key={debouncedSearch}>
               <AnimatePresence>
-                {filteredJobs.map((job: any, index: number) => {
+                {filteredJobs.map((job: any) => {
                   const jobKey = job._id || job.id;
                   const hasSubmitted = submittedJobIds.has(jobKey);
                   const skills = job.requiredSkills || [];
@@ -335,7 +535,10 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                           ) : null}
                         </div>
                         <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[13px] text-ink-500 dark:text-ink-dark-muted">
-                          <span className="font-semibold text-ink-600 dark:text-ink-300">{getCompanyName(job)}</span>
+                          <span className="inline-flex items-center gap-1.5 font-semibold text-ink-600 dark:text-ink-300">
+                            <CompanyLogo job={job} className="h-5 w-5 rounded-[6px] border-ink-100 shadow-none dark:border-white/10 [&_img]:p-0.5" />
+                            {getCompanyName(job)}
+                          </span>
                           <span>·</span>
                           <span className="inline-flex items-center gap-1"><MapPin size={12} /> {job.location || 'Remote'}</span>
                           <span>·</span>
