@@ -11,6 +11,14 @@ import {
 } from '@/services/api';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -34,7 +42,7 @@ const StudentWallet: React.FC = () => {
   const [bankAccount, setBankAccount] = useState('');
   const [instapayHandle, setInstapayHandle] = useState('');
   const [note, setNote] = useState('');
-  const payoutFormRef = useRef<HTMLElement | null>(null);
+  const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const payoutMethodRef = useRef<HTMLSelectElement | null>(null);
 
   const { data: balanceData, isLoading: balanceLoading } = useQuery({
@@ -57,6 +65,7 @@ const StudentWallet: React.FC = () => {
       setBankAccount('');
       setInstapayHandle('');
       setNote('');
+      setIsWithdrawOpen(false);
       queryClient.invalidateQueries({ queryKey: ['wallet', 'withdrawals'] });
       queryClient.invalidateQueries({ queryKey: ['wallet', 'balance'] });
     },
@@ -108,8 +117,8 @@ const StudentWallet: React.FC = () => {
   const balance = balanceData?.balance ?? 0;
 
   const handleChangePayoutMethod = () => {
-    payoutFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    window.setTimeout(() => payoutMethodRef.current?.focus(), 250);
+    setIsWithdrawOpen(true);
+    window.setTimeout(() => payoutMethodRef.current?.focus(), 120);
   };
 
   return (
@@ -119,8 +128,8 @@ const StudentWallet: React.FC = () => {
           <h1 className="sh-page-title">Wallet</h1>
           <p className="mt-1 text-sm text-ink-500 dark:text-ink-dark-muted">Earnings, pending payments, and withdrawals.</p>
         </div>
-        <Button onClick={handleSubmit} disabled={withdrawMutation.isPending}>
-          {withdrawMutation.isPending ? 'Submitting...' : 'Withdraw funds'}
+        <Button onClick={() => setIsWithdrawOpen(true)} disabled={withdrawMutation.isPending}>
+          Withdraw funds
         </Button>
       </div>
 
@@ -203,7 +212,6 @@ const StudentWallet: React.FC = () => {
                 className="text-xs font-semibold text-brand-600 transition hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
                 onClick={handleChangePayoutMethod}
                 disabled={withdrawMutation.isPending}
-                aria-controls="withdrawal-request-form"
               >
                 Change
               </button>
@@ -221,28 +229,6 @@ const StudentWallet: React.FC = () => {
             <p className="mt-2.5 text-xs leading-5 text-ink-400">Withdrawals arrive after admin review.</p>
           </section>
 
-          <section ref={payoutFormRef} id="withdrawal-request-form" className="sh-panel p-[18px]">
-            <h3 className="mb-3 text-sm font-semibold text-ink-900 dark:text-white">Request a withdrawal</h3>
-            <div className="space-y-3">
-              <Input type="number" placeholder="Amount" value={amount} onChange={(e) => setAmount(e.target.value)} disabled={withdrawMutation.isPending} />
-              <Select ref={payoutMethodRef} value={payoutMethod} onChange={(e) => setPayoutMethod(e.target.value as 'BANK' | 'INSTAPAY')} disabled={withdrawMutation.isPending}>
-                <option value="BANK">Bank account</option>
-                <option value="INSTAPAY">Instapay</option>
-              </Select>
-
-              {payoutMethod === 'BANK' ? (
-                <Input placeholder="Bank account" value={bankAccount} onChange={(e) => setBankAccount(e.target.value)} disabled={withdrawMutation.isPending} />
-              ) : (
-                <Input placeholder="Instapay handle" value={instapayHandle} onChange={(e) => setInstapayHandle(e.target.value)} disabled={withdrawMutation.isPending} />
-              )}
-
-              <Textarea rows={4} placeholder="Optional note" value={note} onChange={(e) => setNote(e.target.value)} disabled={withdrawMutation.isPending} />
-              <Button className="w-full" onClick={handleSubmit} disabled={withdrawMutation.isPending}>
-                {withdrawMutation.isPending ? 'Submitting...' : 'Submit withdrawal'}
-              </Button>
-            </div>
-          </section>
-
           <section className="sh-panel p-[18px]">
             <h3 className="mb-3 text-sm font-semibold text-ink-900 dark:text-white">This month</h3>
             <div className="space-y-2.5 text-[13px]">
@@ -255,6 +241,81 @@ const StudentWallet: React.FC = () => {
           </section>
         </aside>
       </div>
+
+      <Dialog open={isWithdrawOpen} onOpenChange={setIsWithdrawOpen}>
+        <DialogContent className="max-w-md p-5">
+          <DialogHeader>
+            <DialogTitle>Withdraw funds</DialogTitle>
+            <DialogDescription>
+              Add the amount and payout destination. Requests are reviewed by admin before payout.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form
+            className="space-y-3"
+            onSubmit={(event) => {
+              event.preventDefault();
+              handleSubmit();
+            }}
+          >
+            <Input
+              type="number"
+              min={0}
+              placeholder="Amount"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              disabled={withdrawMutation.isPending}
+            />
+            <Select
+              ref={payoutMethodRef}
+              value={payoutMethod}
+              onChange={(e) => setPayoutMethod(e.target.value as 'BANK' | 'INSTAPAY')}
+              disabled={withdrawMutation.isPending}
+            >
+              <option value="BANK">Bank account</option>
+              <option value="INSTAPAY">Instapay</option>
+            </Select>
+
+            {payoutMethod === 'BANK' ? (
+              <Input
+                placeholder="Bank account"
+                value={bankAccount}
+                onChange={(e) => setBankAccount(e.target.value)}
+                disabled={withdrawMutation.isPending}
+              />
+            ) : (
+              <Input
+                placeholder="Instapay handle"
+                value={instapayHandle}
+                onChange={(e) => setInstapayHandle(e.target.value)}
+                disabled={withdrawMutation.isPending}
+              />
+            )}
+
+            <Textarea
+              rows={4}
+              placeholder="Optional note"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              disabled={withdrawMutation.isPending}
+            />
+
+            <DialogFooter className="pt-1">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsWithdrawOpen(false)}
+                disabled={withdrawMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={withdrawMutation.isPending}>
+                {withdrawMutation.isPending ? 'Submitting...' : 'Submit withdrawal'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
