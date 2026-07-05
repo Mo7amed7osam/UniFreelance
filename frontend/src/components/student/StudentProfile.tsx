@@ -122,7 +122,7 @@ const EditSection = ({
 const ProfileStat = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div className="min-w-0 rounded-xl border border-ink-200/75 bg-ink-50/70 px-2 py-2.5 text-center shadow-soft dark:border-white/10 dark:bg-white/[0.045] sm:rounded-2xl sm:px-4 sm:py-3">
     <p className="text-lg font-semibold tracking-tight text-ink-950 dark:text-white sm:text-2xl">{value}</p>
-    <p className="mt-0.5 truncate text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-500 dark:text-ink-dark-muted sm:mt-1 sm:text-[11px] sm:tracking-[0.16em]">{label}</p>
+    <p className="mt-0.5 whitespace-normal break-words text-[10px] font-semibold uppercase tracking-[0.06em] text-ink-500 dark:text-ink-dark-muted sm:mt-1 sm:text-[11px] sm:tracking-[0.12em]">{label}</p>
   </div>
 );
 
@@ -197,7 +197,12 @@ const StudentProfile: React.FC = () => {
   const { mutateAsync: uploadPhoto, isPending: isUploadingPhoto } = useMutation({
     mutationFn: (file: File) => uploadStudentPhoto(userId, file),
     onSuccess: (data) => {
-      if (data?.profilePhotoUrl) setFormValues((p) => ({ ...p, profilePhotoUrl: data.profilePhotoUrl }));
+      if (data?.profilePhotoUrl) {
+        setFormValues((p) => ({ ...p, profilePhotoUrl: data.profilePhotoUrl }));
+        setLocalPhotoPreview('');
+        queryClient.setQueryData(['student', 'profile', userId], (old: any) => old ? { ...old, profilePhotoUrl: data.profilePhotoUrl } : old);
+        queryClient.setQueryData(['auth', 'me'], (old: any) => old?.user ? { ...old, user: { ...old.user, profilePhotoUrl: data.profilePhotoUrl } } : old);
+      }
       setPhotoLoadError(false);
       toast.success('Profile photo updated');
       queryClient.invalidateQueries({ queryKey: ['student', 'profile', userId] });
@@ -213,9 +218,15 @@ const StudentProfile: React.FC = () => {
   const { mutateAsync: uploadCover, isPending: isUploadingCover } = useMutation({
     mutationFn: (file: File) => uploadStudentCover(userId, file),
     onSuccess: (data) => {
-      if (data?.coverPhotoUrl) setFormValues((p) => ({ ...p, coverPhotoUrl: data.coverPhotoUrl }));
+      if (data?.coverPhotoUrl) {
+        setFormValues((p) => ({ ...p, coverPhotoUrl: data.coverPhotoUrl }));
+        setLocalCoverPreview('');
+        queryClient.setQueryData(['student', 'profile', userId], (old: any) => old ? { ...old, coverPhotoUrl: data.coverPhotoUrl } : old);
+        queryClient.setQueryData(['auth', 'me'], (old: any) => old?.user ? { ...old, user: { ...old.user, coverPhotoUrl: data.coverPhotoUrl } } : old);
+      }
       toast.success('Cover updated');
       queryClient.invalidateQueries({ queryKey: ['student', 'profile', userId] });
+      queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
       if (coverInputRef.current) coverInputRef.current.value = '';
     },
     onError: () => {
