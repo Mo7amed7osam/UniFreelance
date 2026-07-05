@@ -33,9 +33,9 @@
 
   .dark body {
     background-image:
-      radial-gradient(circle at 20% -12%, rgba(59, 130, 246, 0.16), transparent 28rem),
-      radial-gradient(circle at 92% 10%, rgba(16, 185, 129, 0.08), transparent 24rem),
-      linear-gradient(180deg, rgba(19, 17, 31, 0.72), rgba(11, 10, 20, 0));
+      radial-gradient(circle at 18% -10%, rgba(37, 99, 235, 0.12), transparent 26rem),
+      radial-gradient(circle at 92% 6%, rgba(16, 185, 129, 0.055), transparent 24rem),
+      linear-gradient(180deg, rgba(15, 23, 42, 0.64), rgba(9, 13, 20, 0));
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -80,25 +80,25 @@
 
   /* Panel surfaces */
   .glass-panel {
-    @apply rounded-2xl border border-white/70 bg-white/80 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/80;
+    @apply rounded-2xl border border-white/70 bg-white/80 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/95 dark:shadow-dark-card;
   }
 
   .card-surface {
-    @apply rounded-2xl border border-white/70 bg-white/90 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/90;
+    @apply rounded-2xl border border-white/70 bg-white/90 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/95 dark:shadow-dark-card;
   }
 
   .muted-panel {
-    @apply rounded-xl border border-ink-200/80 bg-ink-50/80 dark:border-white/10 dark:bg-white/[0.045];
+    @apply rounded-xl border border-ink-200/80 bg-ink-50/80 dark:border-white/10 dark:bg-white/[0.06];
   }
 
   /* KPI card */
   .kpi-card {
-    @apply relative overflow-hidden rounded-2xl border border-white/70 bg-white/90 p-4 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/90;
+    @apply relative overflow-hidden rounded-2xl border border-white/70 bg-white/90 p-4 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/95 dark:shadow-dark-card;
   }
 
   /* Feature highlight — solid brand hero surface */
   .feature-highlight {
-    @apply relative overflow-hidden rounded-3xl border border-brand-400/20 bg-brand-700 text-white shadow-glass;
+    @apply relative overflow-hidden rounded-3xl border border-brand-400/20 bg-brand-700 text-white shadow-glass dark:border-brand-400/25 dark:bg-brand-700;
   }
 
   .feature-highlight::after {
@@ -120,6 +120,7 @@
 
   .dark .interactive-card:hover {
     border-color: rgba(96, 165, 250, 0.3);
+    box-shadow: 0 20px 48px -30px rgba(0,0,0,0.95), 0 1px 0 rgba(255,255,255,0.08) inset;
   }
 }
 

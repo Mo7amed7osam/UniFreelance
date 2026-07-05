@@ -77,7 +77,7 @@ export const TopNav = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-white/60 bg-white/70 shadow-[0_1px_0_rgba(15,23,42,0.035),0_18px_44px_-32px_rgba(15,23,42,0.42)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/70 dark:border-white/10 dark:bg-ink-dark-surface/70 dark:supports-[backdrop-filter]:bg-ink-dark-surface/70">
+      <header className="sticky top-0 z-40 border-b border-white/60 bg-white/72 shadow-[0_1px_0_rgba(15,23,42,0.035),0_18px_44px_-32px_rgba(15,23,42,0.42)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/72 dark:border-white/10 dark:bg-[#0d141f]/82 dark:shadow-[0_1px_0_rgba(255,255,255,0.04),0_18px_44px_-32px_rgba(0,0,0,0.9)] dark:supports-[backdrop-filter]:bg-[#0d141f]/82">
         <div className="mx-auto grid h-[3.75rem] w-full max-w-screen-2xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 px-4 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-3">
             <button
@@ -95,7 +95,7 @@ export const TopNav = () => {
             </NavLink>
           </div>
 
-          <nav className="hidden min-w-0 items-center justify-center gap-1 rounded-2xl border border-ink-200/60 bg-white/70 p-1 shadow-soft backdrop-blur-xl xl:flex dark:border-white/10 dark:bg-white/[0.045]" aria-label="Primary">
+          <nav className="hidden min-w-0 items-center justify-center gap-1 rounded-2xl border border-ink-200/60 bg-white/72 p-1 shadow-soft backdrop-blur-xl xl:flex dark:border-white/10 dark:bg-white/[0.055]" aria-label="Primary">
             {items.map((item) => (
               <NavLink
                 key={item.to}
@@ -114,7 +114,7 @@ export const TopNav = () => {
                     {isActive ? (
                       <motion.span
                         layoutId="topnav-active"
-                        className="absolute inset-0 -z-10 rounded-xl border border-ink-200/80 bg-white shadow-[0_8px_20px_-14px_rgba(15,23,42,0.45),0_1px_0_rgba(255,255,255,0.9)_inset] dark:border-white/10 dark:bg-white/10"
+                        className="absolute inset-0 -z-10 rounded-xl border border-ink-200/80 bg-white shadow-[0_8px_20px_-14px_rgba(15,23,42,0.45),0_1px_0_rgba(255,255,255,0.9)_inset] dark:border-white/12 dark:bg-white/[0.14]"
                         transition={{ type: 'spring', stiffness: 420, damping: 34 }}
                       />
                     ) : (

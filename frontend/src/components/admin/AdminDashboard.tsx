@@ -162,15 +162,15 @@ const filteredStats = useMemo(() => [
   !!dateRange?.from &&
   !!dateRange?.to;
   return (
-    <div className="space-y-5">
-      <div className="flex items-start justify-between">
+    <div className="min-w-0 space-y-5">
+      <div className="flex min-w-0 flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
   <PageHeader
     eyebrow="Admin dashboard"
     title="Platform control center"
     description="Review AI interview outcomes, maintain the skill library, and keep jobs and accounts tidy."
   />
 
-  <div className="rounded-xl border p-3 bg-white dark:bg-ink-dark-surface">
+  <div className="w-full overflow-x-auto rounded-xl border bg-white p-3 dark:bg-ink-dark-surface xl:w-auto">
   <DayPicker
     mode="range"
     selected={dateRange}
@@ -178,9 +178,9 @@ const filteredStats = useMemo(() => [
   />
 </div>
 </div>
-      <div className="grid gap-5 md:grid-cols-2">
+      <div className="grid min-w-0 gap-5 md:grid-cols-2">
 
-        <div className="glass-panel p-4 space-y-3">
+        <div className="glass-panel min-w-0 space-y-3 p-4">
           <h2 className="text-xl font-semibold">Interview Results</h2>
         
   
@@ -222,7 +222,7 @@ const filteredStats = useMemo(() => [
             </ResponsiveContainer>
           )}
 
-          <div className="flex justify-center gap-6">
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
             {filteredStats.map((s) => (
               <div key={s.name} className="flex items-center gap-2 text-xs">
                 <div className="h-3 w-3 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }} />
@@ -233,7 +233,7 @@ const filteredStats = useMemo(() => [
           </div>
         </div>
 
-        <div className="glass-panel p-4 space-y-3">
+        <div className="glass-panel min-w-0 space-y-3 p-4">
           <h2 className="text-xl font-semibold">Skills by Interviews</h2>
           {allInterviewsLoading ? (
   <Skeleton className="h-[220px] w-full rounded-xl" />
@@ -275,7 +275,7 @@ const filteredStats = useMemo(() => [
             </ResponsiveContainer>
           )}
           {skillsData.length > 1 && (
-            <div className="flex justify-between text-xs pt-1 border-t border-ink-100 dark:border-ink-800">
+            <div className="flex flex-col gap-2 border-t border-ink-100 pt-1 text-xs sm:flex-row sm:justify-between dark:border-ink-800">
               <div className="flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full bg-green-500 inline-block" />
                 <span className="text-ink-500">Most popular:</span>
@@ -296,23 +296,23 @@ const filteredStats = useMemo(() => [
 
       </div>
       {/* Analytics Stats */}
-      <motion.div variants={fadeUp} className="grid gap-4 md:grid-cols-4">
-        <div className="glass-panel p-4 space-y-1">
+      <motion.div variants={fadeUp} className="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="glass-panel min-w-0 space-y-1 p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-400">Total Interviews</p>
           <p className="text-2xl font-bold text-ink-900 dark:text-white">{(allInterviews || []).length}</p>
           <p className="text-xs text-ink-500">All time</p>
         </div>
-        <div className="glass-panel p-4 space-y-1">
+        <div className="glass-panel min-w-0 space-y-1 p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-400">Pass Rate</p>
           <p className="text-2xl font-bold text-emerald-600">{passRate}%</p>
           <p className="text-xs text-ink-500">Selected period</p>
         </div>
-        <div className="glass-panel p-4 space-y-1">
+        <div className="glass-panel min-w-0 space-y-1 p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-400">Passed</p>
           <p className="text-2xl font-bold text-emerald-600">{filteredStats[1].value}</p>
           <p className="text-xs text-ink-500">Selected period</p>
         </div>
-        <div className="glass-panel p-4 space-y-1">
+        <div className="glass-panel min-w-0 space-y-1 p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-400">Failed</p>
           <p className="text-2xl font-bold text-rose-500">{filteredStats[2].value}</p>
           <p className="text-xs text-ink-500">Selected period</p>
@@ -320,21 +320,21 @@ const filteredStats = useMemo(() => [
       </motion.div>
 
       {/* Top Skills */}
-      <motion.div variants={fadeUp} className="glass-panel p-4 space-y-3">
+      <motion.div variants={fadeUp} className="glass-panel min-w-0 space-y-3 p-4">
         <h2 className="text-xl font-semibold">🏆 Top Skills</h2>
         <div className="space-y-3">
           {topSkills.map((skill, index) => (
-            <div key={skill.name} className="flex items-center gap-4">
+            <div key={skill.name} className="grid min-w-0 grid-cols-[1rem_minmax(0,7rem)_minmax(0,1fr)] items-center gap-3 sm:grid-cols-[1rem_8rem_minmax(0,1fr)_4rem_4rem] sm:gap-4">
               <span className="text-xs font-bold text-ink-400 w-4">{index + 1}</span>
-              <span className="text-sm font-semibold text-ink-900 dark:text-white w-32">{skill.name}</span>
-              <div className="flex-1 h-2 bg-ink-100 dark:bg-white/10 rounded-full overflow-hidden">
+              <span className="truncate text-sm font-semibold text-ink-900 dark:text-white">{skill.name}</span>
+              <div className="h-2 overflow-hidden rounded-full bg-ink-100 dark:bg-white/10">
                 <div
                   className="h-full bg-brand-500 rounded-full transition-all duration-500"
                   style={{ width: `${(skill.total / (topSkills[0]?.total || 1)) * 100}%` }}
                 />
               </div>
-              <span className="text-xs text-ink-500 w-16">{skill.total} interviews</span>
-              <span className={`text-xs font-semibold w-16 ${skill.passRate >= 70 ? 'text-emerald-600' : skill.passRate >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>
+              <span className="hidden text-xs text-ink-500 sm:block">{skill.total} interviews</span>
+              <span className={`hidden text-xs font-semibold sm:block ${skill.passRate >= 70 ? 'text-emerald-600' : skill.passRate >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>
                 {skill.passRate}% pass
               </span>
             </div>
@@ -342,7 +342,7 @@ const filteredStats = useMemo(() => [
           {topSkills.length === 0 && <p className="text-sm text-ink-400">No data yet</p>}
         </div>
       </motion.div>
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Interview queue" value={interviewsLoading ? <Skeleton className="h-10 w-24" /> : (interviews || []).length} caption="Items in the selected review state." />
         <StatCard label="Users" value={usersLoading ? <Skeleton className="h-10 w-24" /> : (users || []).length} caption="Accounts currently on the platform." />
         <StatCard label="Jobs" value={jobsLoading ? <Skeleton className="h-10 w-24" /> : (jobs || []).length} caption="Live and historical marketplace listings." />

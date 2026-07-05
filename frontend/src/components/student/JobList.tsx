@@ -177,7 +177,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="min-w-0 space-y-5">
       {!embedded && (
         <PageHeader
           eyebrow="Student workspace"
@@ -187,7 +187,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
       )}
 
       {/* Search bar */}
-      <div className="flex items-center gap-3 rounded-2xl border border-white/70 bg-white/90 px-4 py-3 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/90">
+      <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-white/70 bg-white/90 px-4 py-3 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/95 dark:shadow-dark-card">
         <Search size={16} className="shrink-0 text-ink-400" />
         <Input
           placeholder="Search by title, skill, or keyword..."
@@ -225,7 +225,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
       {/* Job cards */}
       {!isLoading && !isError && filteredJobs.length > 0 && (
         <motion.div
-          className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3"
+          className="grid min-w-0 gap-4 lg:grid-cols-2 2xl:grid-cols-3"
           variants={stagger}
           initial="hidden"
           animate="visible"
@@ -241,7 +241,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
               const canApply = missingSkills.length === 0;
 
               return (
-                <motion.div key={jobKey} variants={fadeUp} layout>
+                <motion.div key={jobKey} variants={fadeUp} layout className="min-w-0">
                   <Card className="group flex flex-col gap-0 overflow-hidden p-0 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-200/80 hover:shadow-elevated dark:hover:border-brand-500/25">
                     {/* Card header section */}
                     <CardHeader className="gap-0 space-y-2 p-4 pb-3">
@@ -251,11 +251,11 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                             <Briefcase size={18} />
                           </div>
                           <div className="min-w-0">
-                            <h3 className="truncate font-semibold text-ink-900 dark:text-white">{job.title}</h3>
+                            <h3 className="line-clamp-2 break-words font-semibold leading-6 text-ink-900 dark:text-white">{job.title}</h3>
                             {job.clientId?.name && (
-                              <p className="flex items-center gap-1 text-xs text-ink-500 dark:text-ink-400">
-                                <Building2 size={10} />
-                                {job.clientId.name}
+                              <p className="flex min-w-0 items-center gap-1 text-xs text-ink-500 dark:text-ink-400">
+                                <Building2 size={10} className="shrink-0" />
+                                <span className="truncate">{job.clientId.name}</span>
                               </p>
                             )}
                           </div>
@@ -266,9 +266,9 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                       </div>
 
                       {skills.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5">
+                        <div className="flex min-w-0 flex-wrap gap-1.5">
                           {skills.slice(0, 4).map((skill: any) => (
-                            <Badge key={skill._id || skill} variant="subtle" className="dark:border-brand-700/40 dark:bg-brand-900/30 dark:text-brand-300">
+                            <Badge key={skill._id || skill} variant="subtle" className="max-w-full dark:border-brand-700/40 dark:bg-brand-900/30 dark:text-brand-300">
                               {skill.name || skill}
                             </Badge>
                           ))}
@@ -278,7 +278,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                         </div>
                       )}
 
-                      <p className="line-clamp-2 text-sm leading-6 text-ink-600 dark:text-ink-300">
+                      <p className="line-clamp-3 break-words text-sm leading-6 text-ink-600 dark:text-ink-300 sm:line-clamp-2">
                         {job.description}
                       </p>
                     </CardHeader>
@@ -286,16 +286,16 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                     <Separator />
 
                     {/* Meta row */}
-                    <CardContent className="flex flex-wrap items-center gap-3 bg-ink-50/40 px-4 py-2.5 dark:bg-white/[0.025]">
+                    <CardContent className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 bg-ink-50/40 px-4 py-2.5 dark:bg-white/[0.04]">
                       {(job.budgetMin !== undefined || job.budgetMax !== undefined) && (
-                        <span className="flex items-center gap-1.5 text-sm text-ink-600 dark:text-ink-300">
-                          <Wallet size={13} className="text-ink-400" />
-                          <span className="font-medium">{job.budgetMin !== undefined ? formatCurrency(job.budgetMin) : '—'} – {job.budgetMax !== undefined ? formatCurrency(job.budgetMax) : '—'}</span>
+                        <span className="flex min-w-0 items-center gap-1.5 text-sm text-ink-600 dark:text-ink-300">
+                          <Wallet size={13} className="shrink-0 text-ink-400" />
+                          <span className="min-w-0 font-medium">{job.budgetMin !== undefined ? formatCurrency(job.budgetMin) : '—'} – {job.budgetMax !== undefined ? formatCurrency(job.budgetMax) : '—'}</span>
                         </span>
                       )}
                       {job.duration && (
-                        <span className="flex items-center gap-1.5 text-sm text-ink-600 dark:text-ink-300">
-                          <Clock size={13} className="text-ink-400" />
+                        <span className="flex min-w-0 items-center gap-1.5 text-sm text-ink-600 dark:text-ink-300">
+                          <Clock size={13} className="shrink-0 text-ink-400" />
                           <span className="font-medium">{job.duration}</span>
                         </span>
                       )}
@@ -308,7 +308,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                       {hasSubmitted ? (
                         <div className="flex items-center gap-2 rounded-lg border border-accent-200 bg-accent-50 px-3 py-2 dark:border-accent-700/30 dark:bg-accent-900/15">
                           <span className="h-1.5 w-1.5 rounded-full bg-accent-500" />
-                          <p className="text-sm font-medium text-accent-700 dark:text-accent-300">Application submitted — awaiting review</p>
+                          <p className="min-w-0 text-sm font-medium text-accent-700 dark:text-accent-300">Application submitted — awaiting review</p>
                         </div>
                       ) : (
                         <div className="space-y-2">
@@ -323,7 +323,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                           {!canApply && (
                             <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-700/30 dark:bg-amber-900/10">
                               <ShieldAlert size={15} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-300" />
-                              <p className="text-sm text-amber-700 dark:text-amber-200">
+                              <p className="min-w-0 break-words text-sm text-amber-700 dark:text-amber-200">
                                 Verify these skills first: {missingSkills.map((skill: any) => skill.name || skill).join(', ')}
                               </p>
                             </div>

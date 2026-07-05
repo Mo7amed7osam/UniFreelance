@@ -35,7 +35,7 @@ const ClientContracts: React.FC = () => {
 
   return (
     <motion.div
-      className="space-y-5"
+      className="min-w-0 space-y-5"
       initial="hidden"
       animate="visible"
       variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.07 } } }}
@@ -56,35 +56,35 @@ const ClientContracts: React.FC = () => {
         <EmptyState title="No contracts yet" description="Accepted proposals appear here as contracts." />
       ) : (
         <motion.div
-          className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
+          className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-3"
           variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.06 } } }}
           initial="hidden"
           animate="visible"
         >
           {(contracts || []).map((contract: any) => (
-            <motion.div key={contract._id} variants={fadeUp}>
+            <motion.div key={contract._id} variants={fadeUp} className="min-w-0">
               <Card className="group flex flex-col gap-0 overflow-hidden p-0 transition-all hover:-translate-y-0.5 hover:shadow-card">
-                <CardContent className="flex items-start justify-between gap-3 p-4">
-                  <div className="flex items-start gap-3">
+                <CardContent className="flex min-w-0 items-start justify-between gap-3 p-4">
+                  <div className="flex min-w-0 items-start gap-3">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-ink-100 text-ink-500 dark:bg-white/10 dark:text-ink-400">
                       <FileText size={16} />
                     </div>
                     <div className="min-w-0">
                       <p className="truncate font-semibold text-ink-900 dark:text-white">{contract.jobId?.title || 'Contract'}</p>
-                      <div className="mt-1 flex items-center gap-1.5">
+                      <div className="mt-1 flex min-w-0 items-center gap-1.5">
                         <Avatar className="h-4 w-4">
                           <AvatarFallback className="text-[8px]">{getInitials(contract.studentId?.name)}</AvatarFallback>
                         </Avatar>
-                        <span className="text-xs text-ink-500 dark:text-ink-400">{contract.studentId?.name || 'Student'}</span>
+                        <span className="truncate text-xs text-ink-500 dark:text-ink-400">{contract.studentId?.name || 'Student'}</span>
                       </div>
                     </div>
                   </div>
-                  <Badge variant={contract.status === 'completed' ? 'success' : 'brand'}>{contract.status}</Badge>
+                  <Badge variant={contract.status === 'completed' ? 'success' : 'brand'} className="shrink-0">{contract.status}</Badge>
                 </CardContent>
                 <Separator />
-                <div className="flex items-center justify-between px-4 py-3">
+                <div className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                   <span className="text-sm font-bold text-ink-900 dark:text-white">{formatCurrency(contract.agreedBudget)}</span>
-                  <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => navigate(`/contracts/${contract._id}`)}>
+                  <Button variant="ghost" size="sm" className="h-7 justify-start text-xs sm:justify-center" onClick={() => navigate(`/contracts/${contract._id}`)}>
                     View contract <ArrowRight size={11} />
                   </Button>
                 </div>

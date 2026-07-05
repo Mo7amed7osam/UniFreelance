@@ -7,7 +7,7 @@ export const Card = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      'rounded-2xl border border-white/70 bg-white/90 p-4 text-ink-900 shadow-card backdrop-blur-xl transition-all duration-200 dark:border-white/10 dark:bg-ink-dark-surface/90 dark:text-ink-dark-text sm:p-5',
+      'min-w-0 rounded-2xl border border-white/70 bg-white/90 p-4 text-ink-900 shadow-card backdrop-blur-xl transition-all duration-200 dark:border-white/10 dark:bg-ink-dark-surface/95 dark:text-ink-dark-text dark:shadow-dark-card sm:p-5',
       className
     )}
     {...props}
@@ -45,5 +45,5 @@ export const CardContent = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('space-y-3', className)} {...props} />
+  <div className={cn('min-w-0 space-y-3', className)} {...props} />
 );

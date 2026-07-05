@@ -84,7 +84,7 @@ const SkillVerification: React.FC = () => {
   const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.06 } } };
 
   return (
-    <motion.div className="space-y-6" initial="hidden" animate="visible" variants={stagger}>
+    <motion.div className="space-y-5" initial="hidden" animate="visible" variants={stagger}>
       <motion.div variants={fadeUp}><PageHeader
         eyebrow="Mandatory verification"
         title="Skill verification interviews"
@@ -92,13 +92,13 @@ const SkillVerification: React.FC = () => {
       /></motion.div>
 
       <motion.div variants={fadeUp}>
-        <div className="rounded-2xl border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-sm font-medium text-amber-800 shadow-soft backdrop-blur dark:border-amber-700/30 dark:bg-amber-900/15 dark:text-amber-200">
+        <div className="rounded-2xl border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-sm font-medium text-amber-800 shadow-soft backdrop-blur dark:border-amber-400/25 dark:bg-amber-400/10 dark:text-amber-100">
           Start the live interview from a desktop or laptop. The verification flow needs camera, microphone, and entire-screen sharing.
         </div>
       </motion.div>
 
-      <motion.div variants={fadeUp}><section className="feature-highlight text-white">
-        <CardContent className="relative grid gap-4 p-5 md:grid-cols-3 lg:p-6">
+      <motion.div variants={fadeUp}><section className="relative overflow-hidden rounded-2xl border border-brand-300/20 bg-brand-700 text-white shadow-glass dark:border-brand-400/20 dark:bg-[#1d4ed8]">
+        <CardContent className="relative grid gap-3 p-4 md:grid-cols-3 lg:p-5">
           {[
             {
               title: 'AI-guided interview',
@@ -116,12 +116,12 @@ const SkillVerification: React.FC = () => {
               Icon: Sparkles,
             },
           ].map(({ title, body, Icon }) => (
-            <div key={title} className="rounded-2xl border border-white/15 bg-white/10 p-4 shadow-[0_1px_0_rgba(255,255,255,0.12)_inset] backdrop-blur">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15">
+            <div key={title} className="rounded-xl border border-white/15 bg-white/[0.08] p-4 shadow-[0_1px_0_rgba(255,255,255,0.12)_inset] backdrop-blur">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 text-white">
                 <Icon size={18} />
               </div>
-              <p className="mt-4 text-base font-semibold text-white">{title}</p>
-              <p className="mt-1.5 text-sm leading-6 text-white/85">{body}</p>
+              <p className="mt-3 text-sm font-semibold text-white sm:text-base">{title}</p>
+              <p className="mt-1 text-sm leading-6 text-white/80">{body}</p>
             </div>
           ))}
         </CardContent>
@@ -136,35 +136,35 @@ const SkillVerification: React.FC = () => {
       ) : (skills || []).length === 0 ? (
         <EmptyState title="No skills available" description="Verification tracks will appear here once the skill library is ready." />
       ) : (
-        <motion.div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" variants={stagger} initial="hidden" animate="visible">
+        <motion.div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" variants={stagger} initial="hidden" animate="visible">
           {(skills || []).map((skill: any) => (
             <motion.div key={skill._id} variants={fadeUp}>
-            <Card className="interactive-card overflow-hidden p-0 hover:border-brand-200/80 dark:hover:border-brand-500/25">
-              <CardHeader className="space-y-3 p-4">
+            <Card className="interactive-card flex min-h-full flex-col overflow-hidden p-0 hover:border-brand-200/80 dark:hover:border-brand-500/25">
+              <CardHeader className="space-y-3 p-4 pb-3">
                 <div className="flex items-start justify-between gap-3">
-                  <CardTitle className="text-lg">{skill.name}</CardTitle>
-                  <Badge variant="brand">AI interview</Badge>
+                  <CardTitle className="min-w-0 text-lg leading-7">{skill.name}</CardTitle>
+                  <Badge variant="brand" className="shrink-0">AI</Badge>
                 </div>
-                <p className="text-sm text-ink-600 dark:text-ink-200">
+                <p className="line-clamp-3 min-h-[4.5rem] text-sm leading-6 text-ink-600 dark:text-ink-300">
                   {skill.description || 'No description provided.'}
                 </p>
               </CardHeader>
 
-              <CardContent className="space-y-4 p-4 pt-0">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="muted-panel p-3">
+              <CardContent className="flex flex-1 flex-col space-y-4 p-4 pt-0">
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="muted-panel p-3 dark:bg-white/[0.055]">
                     <p className="label-muted">Interview mode</p>
                     <p className="mt-2 text-sm font-semibold text-ink-900 dark:text-white">Live with Gravis</p>
                   </div>
-                  <div className="muted-panel p-3">
+                  <div className="muted-panel p-3 dark:bg-white/[0.055]">
                     <p className="label-muted">Outcome</p>
                     <p className="mt-2 text-sm font-semibold text-ink-900 dark:text-white">Verified skill badge</p>
                   </div>
                 </div>
 
                 {verifiedSkillIds.has(String(skill._id)) ? (
-                  <div className="space-y-3">
-                    <div className="muted-panel p-3 text-center">
+                  <div className="mt-auto space-y-3">
+                    <div className="rounded-xl border border-accent-200/80 bg-accent-50/80 p-3 text-center dark:border-accent-400/20 dark:bg-accent-400/10">
                       <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
                         Verified — Score: {getVerifiedScore(String(skill._id)) ?? '—'}
                       </p>
@@ -189,7 +189,7 @@ const SkillVerification: React.FC = () => {
                 ) : (
                   <Button
                     type="button"
-                    className="w-full"
+                    className="mt-auto w-full"
                     size="lg"
                     onClick={() => handleStartInterview(skill)}
                     disabled={isPending && startingSkillId === String(skill._id)}
