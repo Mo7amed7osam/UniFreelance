@@ -213,7 +213,7 @@ const uploadStudentCV = async (req, res) => {
 const browseJobs = async (req, res) => {
     try {
         const jobs = await Job.find({ status: 'open' })
-            .populate('employer', 'name')
+            .populate('employer', 'name website companyLogoUrl isVerified')
             .populate('requiredSkills', 'name');
         res.status(200).json(jobs);
     } catch (error) {

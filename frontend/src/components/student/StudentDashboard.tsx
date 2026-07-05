@@ -20,6 +20,7 @@ import { getJobs, getStudentProfile, getStudentProposals } from '@/services/api'
 import useAuth from '@/hooks/useAuth';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { CompanyLogo, getCompanyName } from '@/components/ui/company-logo';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -33,8 +34,6 @@ const staggerContainer = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.06 } },
 };
-
-const logoColors = ['#111014', '#6366f1', '#0ea5e9', '#16a34a', '#f59e0b'];
 
 const statusVariant: Record<string, 'success' | 'brand' | 'danger' | 'warning'> = {
   accepted: 'success',
@@ -55,15 +54,6 @@ function getProfileCompletion(profile: any, verifiedSkillsCount: number): { pct:
     pct: Math.round((done / checks.length) * 100),
     missing: checks.filter((c) => !c.done).map((c) => c.label),
   };
-}
-
-function initials(value?: string) {
-  if (!value) return 'S';
-  return value.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase();
-}
-
-function companyName(job: any) {
-  return job?.clientId?.name || job?.company || 'Client';
 }
 
 function budgetLabel(job: any) {
@@ -208,15 +198,10 @@ const StudentDashboard: React.FC = () => {
                       onClick={() => navigate('/student/jobs')}
                       className="sh-panel flex w-full items-center gap-3 px-4 py-3 text-left transition hover:-translate-y-0.5 hover:border-brand-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
                     >
-                      <span
-                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] text-sm font-bold text-white"
-                        style={{ background: logoColors[index % logoColors.length] }}
-                      >
-                        {initials(companyName(job))}
-                      </span>
+                      <CompanyLogo job={job} className="h-10 w-10 rounded-[11px]" />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-[14.5px] font-semibold text-ink-900 dark:text-white">{job.title}</span>
-                        <span className="block truncate text-xs text-ink-500 dark:text-ink-dark-muted">{companyName(job)} · {job.duration || 'Fixed price'}</span>
+                        <span className="block truncate text-xs text-ink-500 dark:text-ink-dark-muted">{getCompanyName(job)} · {job.duration || 'Fixed price'}</span>
                       </span>
                       <span className="text-right">
                         <span className="sh-number block text-sm text-ink-900 dark:text-white">{budgetLabel(job)}</span>
@@ -249,12 +234,7 @@ const StudentDashboard: React.FC = () => {
               <div className="divide-y divide-ink-100 dark:divide-ink-dark-border">
                 {proposalList.slice(0, 3).map((proposal: any, index: number) => (
                   <div key={proposal._id || index} className="flex items-center gap-3 py-3">
-                    <span
-                      className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[9px] text-xs font-bold text-white"
-                      style={{ background: logoColors[index % logoColors.length] }}
-                    >
-                      {initials(proposal.jobId?.clientId?.name || proposal.jobId?.title)}
-                    </span>
+                    <CompanyLogo job={proposal.jobId} className="h-[34px] w-[34px] rounded-[9px]" />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[13.5px] font-semibold text-ink-900 dark:text-white">{proposal.jobId?.title || 'Job'}</span>
                       <span className="block text-xs text-ink-500 dark:text-ink-dark-muted">

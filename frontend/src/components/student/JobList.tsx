@@ -23,6 +23,7 @@ import { toast } from 'sonner';
 import { fetchJobs, getStudentProfile, getStudentProposals, improveCoverLetter, submitProposal } from '@/services/api';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { CompanyLogo, getCompanyName, isCompanyVerified } from '@/components/ui/company-logo';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { PageHeader } from '@/components/ui/page-header';
@@ -60,17 +61,6 @@ const stagger = {
   visible: { transition: { staggerChildren: 0.05 } },
 };
 
-const logoColors = ['#111014', '#0ea5e9', '#6366f1', '#16a34a', '#f59e0b', '#e11d48'];
-
-function companyName(job: any) {
-  return job?.clientId?.name || job?.company || 'Client';
-}
-
-function initials(value?: string) {
-  if (!value) return 'C';
-  return value.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase();
-}
-
 function budgetLabel(job: any) {
   if (job?.budgetMin !== undefined || job?.budgetMax !== undefined) {
     return `${job.budgetMin !== undefined ? formatCurrency(job.budgetMin) : '-'}-${job.budgetMax !== undefined ? formatCurrency(job.budgetMax) : '-'}`;
@@ -93,17 +83,6 @@ function matchScore(job: any, verifiedSkillIds: Set<string>) {
   if (requiredSkills.length === 0) return null;
   const matched = requiredSkills.filter((skill: any) => verifiedSkillIds.has(String(skill?._id || skill))).length;
   return Math.round((matched / requiredSkills.length) * 100);
-}
-
-function isClientVerified(job: any) {
-  return Boolean(
-    job?.clientId?.isVerified ||
-    job?.clientId?.verified ||
-    job?.client?.isVerified ||
-    job?.client?.verified ||
-    job?.verifiedClient ||
-    job?.clientVerified
-  );
 }
 
 const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
@@ -336,7 +315,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                   const missingSkills = getMissingVerifiedSkills(job);
                   const canApply = missingSkills.length === 0;
                   const score = matchScore(job, verifiedSkillIds);
-                  const clientVerified = isClientVerified(job);
+                  const clientVerified = isCompanyVerified(job);
 
                   return (
                     <motion.article
@@ -345,12 +324,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                       layout
                       className="sh-panel flex flex-col gap-4 p-[18px] transition hover:-translate-y-0.5 hover:border-brand-200 xl:flex-row"
                     >
-                      <div
-                        className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl text-base font-bold text-white"
-                        style={{ background: logoColors[index % logoColors.length] }}
-                      >
-                        {initials(companyName(job))}
-                      </div>
+                      <CompanyLogo job={job} className="h-[46px] w-[46px]" />
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <h3 className="m-0 text-[16px] font-semibold tracking-[-0.01em] text-ink-900 dark:text-white">{job.title}</h3>
@@ -361,7 +335,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                           ) : null}
                         </div>
                         <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[13px] text-ink-500 dark:text-ink-dark-muted">
-                          <span className="font-semibold text-ink-600 dark:text-ink-300">{companyName(job)}</span>
+                          <span className="font-semibold text-ink-600 dark:text-ink-300">{getCompanyName(job)}</span>
                           <span>·</span>
                           <span className="inline-flex items-center gap-1"><MapPin size={12} /> {job.location || 'Remote'}</span>
                           <span>·</span>
@@ -447,9 +421,9 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                   <Clock size={13} /> {activeJob.duration}
                 </span>
               ) : null}
-              {companyName(activeJob) ? (
+              {getCompanyName(activeJob) ? (
                 <span className="flex items-center gap-1.5 text-ink-600 dark:text-ink-300">
-                  <Building2 size={13} /> {companyName(activeJob)}
+                  <Building2 size={13} /> {getCompanyName(activeJob)}
                 </span>
               ) : null}
             </div>
@@ -557,11 +531,11 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
 
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-500 dark:text-ink-400">Proposed budget</label>
+                <label className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-500 dark:text-ink-400">Proposed budget (EGP)</label>
                 <Input
                   type="number"
                   min={0}
-                  placeholder="500"
+                  placeholder="15000"
                   value={activeJobId ? getDraft(activeJobId).budget : ''}
                   onChange={(e) => activeJobId && setDraftField(activeJobId, 'budget', e.target.value)}
                   disabled={proposalMutation.isPending}

@@ -112,12 +112,12 @@ const PostJob: React.FC = () => {
 
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-ink-700 dark:text-ink-200">Min budget</label>
-                  <Input type="number" min={0} placeholder="300" {...register('minBudget')} />
+                  <label className="text-sm font-semibold text-ink-700 dark:text-ink-200">Min budget (EGP)</label>
+                  <Input type="number" min={0} placeholder="12000" {...register('minBudget')} />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-ink-700 dark:text-ink-200">Max budget</label>
-                  <Input type="number" min={0} placeholder="900" {...register('maxBudget')} />
+                  <label className="text-sm font-semibold text-ink-700 dark:text-ink-200">Max budget (EGP)</label>
+                  <Input type="number" min={0} placeholder="22000" {...register('maxBudget')} />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-ink-700 dark:text-ink-200">Duration</label>

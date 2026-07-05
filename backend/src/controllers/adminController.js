@@ -62,7 +62,7 @@ const getUsers = async (req, res) => {
 const getJobs = async (req, res) => {
     try {
         const jobs = await Job.find()
-            .populate('employer', 'name email')
+            .populate('employer', 'name email website companyLogoUrl isVerified')
             .populate('requiredSkills', 'name')
             .populate('selectedStudent', 'name email');
         return res.status(200).json(jobs);

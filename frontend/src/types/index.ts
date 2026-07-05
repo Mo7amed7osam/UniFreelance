@@ -8,6 +8,9 @@ export interface User {
   profilePhotoUrl?: string;
   coverPhotoUrl?: string;
   description?: string;
+  website?: string;
+  companyLogoUrl?: string;
+  isVerified?: boolean;
   university?: string;
   portfolioLinks?: string[];
   jobsCompleted?: number;
@@ -41,6 +44,12 @@ export interface Job {
   budgetMin?: number;
   budgetMax?: number;
   duration?: string;
+  employer?: Pick<User, '_id' | 'id' | 'name' | 'email' | 'website' | 'companyLogoUrl' | 'isVerified'>;
+  company?: string;
+  companyLogoUrl?: string;
+  companyWebsite?: string;
+  verifiedClient?: boolean;
+  clientVerified?: boolean;
   status?: 'open' | 'in_progress' | 'completed' | 'closed';
 }
 
