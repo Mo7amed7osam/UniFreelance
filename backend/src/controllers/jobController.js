@@ -7,6 +7,8 @@ const { acceptProposalWithEscrow } = require('../services/contractService');
 const { matchStudentsToJob, notifyMatchedStudents } = require('../services/matchingService');
 const { studentHasRequiredVerifiedSkills } = require('../utils/proposalEligibility');
 
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 // POST /jobs - Create a new job
 const createJob = async (req, res) => {
     try {
@@ -61,7 +63,29 @@ const getJobs = async (req, res) => {
         const query = { status: 'open' };
 
         if (search) {
-            query.$text = { $search: search.toString() };
+            const searchTerm = search.toString().trim().slice(0, 100);
+            if (searchTerm) {
+                const searchRegex = new RegExp(escapeRegExp(searchTerm), 'i');
+                const [matchedSkills, matchedEmployers] = await Promise.all([
+                    Skill.find({ name: searchRegex }).select('_id'),
+                    User.find({
+                        role: 'Client',
+                        $or: [
+                            { name: searchRegex },
+                            { email: searchRegex },
+                            { website: searchRegex },
+                        ],
+                    }).select('_id'),
+                ]);
+
+                query.$or = [
+                    { title: searchRegex },
+                    { description: searchRegex },
+                    { duration: searchRegex },
+                    ...(matchedSkills.length ? [{ requiredSkills: { $in: matchedSkills.map((skill) => skill._id) } }] : []),
+                    ...(matchedEmployers.length ? [{ employer: { $in: matchedEmployers.map((employer) => employer._id) } }] : []),
+                ];
+            }
         }
 
         if (duration) {

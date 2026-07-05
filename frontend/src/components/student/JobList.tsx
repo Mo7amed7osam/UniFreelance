@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useSearchParams } from 'react-router-dom';
 import {
   Bookmark,
   Briefcase,
@@ -146,7 +147,9 @@ function matchScore(job: any, verifiedSkillIds: Set<string>) {
 }
 
 const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
-  const [search, setSearch] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlSearch = searchParams.get('search') || '';
+  const [search, setSearch] = useState(urlSearch);
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [activeJobId, setActiveJobId] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, ProposalDraft>>({});
@@ -164,6 +167,26 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
     const t = setTimeout(() => setDebouncedSearch(search.trim()), 400);
     return () => clearTimeout(t);
   }, [search]);
+
+  useEffect(() => {
+    setSearch((current) => (current === urlSearch ? current : urlSearch));
+  }, [urlSearch]);
+
+  useEffect(() => {
+    if (embedded) return;
+
+    const next = new URLSearchParams(searchParams);
+    if (debouncedSearch) {
+      next.set('search', debouncedSearch);
+    } else {
+      next.delete('search');
+    }
+
+    const currentValue = searchParams.get('search') || '';
+    if (currentValue !== debouncedSearch) {
+      setSearchParams(next, { replace: true });
+    }
+  }, [debouncedSearch, embedded, searchParams, setSearchParams]);
 
   const { data: jobs, isLoading, isError, isFetching } = useQuery({
     queryKey: ['jobs', debouncedSearch],
