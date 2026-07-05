@@ -35,7 +35,7 @@ const ClientContracts: React.FC = () => {
 
   return (
     <motion.div
-      className="space-y-8"
+      className="space-y-5"
       initial="hidden"
       animate="visible"
       variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.07 } } }}
@@ -56,7 +56,7 @@ const ClientContracts: React.FC = () => {
         <EmptyState title="No contracts yet" description="Accepted proposals appear here as contracts." />
       ) : (
         <motion.div
-          className="grid gap-3 sm:grid-cols-2"
+          className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
           variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.06 } } }}
           initial="hidden"
           animate="visible"

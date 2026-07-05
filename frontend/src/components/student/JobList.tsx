@@ -177,7 +177,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {!embedded && (
         <PageHeader
           eyebrow="Student workspace"
@@ -204,7 +204,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
 
       {/* Loading skeletons */}
       {isLoading && (
-        <div className="grid gap-4 xl:grid-cols-2">
+        <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
           {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-56 w-full rounded-xl" />)}
         </div>
       )}
@@ -225,7 +225,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
       {/* Job cards */}
       {!isLoading && !isError && filteredJobs.length > 0 && (
         <motion.div
-          className="grid gap-4 xl:grid-cols-2"
+          className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3"
           variants={stagger}
           initial="hidden"
           animate="visible"
@@ -244,7 +244,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                 <motion.div key={jobKey} variants={fadeUp} layout>
                   <Card className="group flex flex-col gap-0 overflow-hidden p-0 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-200/80 hover:shadow-elevated dark:hover:border-brand-500/25">
                     {/* Card header section */}
-                    <CardHeader className="gap-0 space-y-3 p-5 pb-4">
+                    <CardHeader className="gap-0 space-y-2 p-4 pb-3">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex min-w-0 items-start gap-3">
                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100 dark:bg-brand-900/30 dark:text-brand-400 dark:ring-brand-700/30">
@@ -286,7 +286,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                     <Separator />
 
                     {/* Meta row */}
-                    <CardContent className="flex flex-wrap items-center gap-4 bg-ink-50/40 px-5 py-3 dark:bg-white/[0.025]">
+                    <CardContent className="flex flex-wrap items-center gap-3 bg-ink-50/40 px-4 py-2.5 dark:bg-white/[0.025]">
                       {(job.budgetMin !== undefined || job.budgetMax !== undefined) && (
                         <span className="flex items-center gap-1.5 text-sm text-ink-600 dark:text-ink-300">
                           <Wallet size={13} className="text-ink-400" />
@@ -304,7 +304,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                     <Separator />
 
                     {/* Action row */}
-                    <div className="px-5 py-4">
+                    <div className="px-4 py-3">
                       {hasSubmitted ? (
                         <div className="flex items-center gap-2 rounded-lg border border-accent-200 bg-accent-50 px-3 py-2 dark:border-accent-700/30 dark:bg-accent-900/15">
                           <span className="h-1.5 w-1.5 rounded-full bg-accent-500" />

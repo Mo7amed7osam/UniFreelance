@@ -63,7 +63,7 @@ const AdminEvents: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <PageHeader eyebrow="Admin · Events" title="Manage Events" description="Create, edit, and remove events visible to all users." />
 
       <div className="flex justify-end">
@@ -73,7 +73,7 @@ const AdminEvents: React.FC = () => {
       </div>
 
       {showForm && (
-        <div className="glass-panel space-y-4 p-6">
+        <div className="glass-panel space-y-3 p-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">{editingId ? 'Edit Event' : 'New Event'}</h3>
             <Button variant="ghost" size="icon" onClick={resetForm} aria-label="Close form"><X size={18} /></Button>
@@ -114,11 +114,11 @@ const AdminEvents: React.FC = () => {
       ) : events.length === 0 ? (
         <EmptyState title="No events yet" description="Add your first event using the button above." />
       ) : (
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {events.map((ev: any) => (
             <div key={ev._id} className="glass-panel overflow-hidden rounded-xl">
               {ev.imageUrl && <img src={ev.imageUrl} alt={ev.title} className="w-full object-contain bg-black" />}
-              <div className="space-y-2 p-5">
+              <div className="space-y-2 p-4">
                 <p className="text-xs font-semibold uppercase tracking-widest text-brand-500">{ev.isOnline ? 'Online' : ev.location}</p>
                 <h3 className="text-lg font-semibold">{ev.title}</h3>
                 <p className="text-sm text-ink-500 dark:text-ink-300 line-clamp-2">{ev.description}</p>

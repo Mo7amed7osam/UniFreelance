@@ -162,7 +162,7 @@ const filteredStats = useMemo(() => [
   !!dateRange?.from &&
   !!dateRange?.to;
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <div className="flex items-start justify-between">
   <PageHeader
     eyebrow="Admin dashboard"
@@ -180,7 +180,7 @@ const filteredStats = useMemo(() => [
 </div>
       <div className="grid gap-5 md:grid-cols-2">
 
-        <div className="glass-panel p-6 space-y-4">
+        <div className="glass-panel p-4 space-y-3">
           <h2 className="text-xl font-semibold">Interview Results</h2>
         
   
@@ -233,7 +233,7 @@ const filteredStats = useMemo(() => [
           </div>
         </div>
 
-        <div className="glass-panel p-6 space-y-4">
+        <div className="glass-panel p-4 space-y-3">
           <h2 className="text-xl font-semibold">Skills by Interviews</h2>
           {allInterviewsLoading ? (
   <Skeleton className="h-[220px] w-full rounded-xl" />
@@ -297,30 +297,30 @@ const filteredStats = useMemo(() => [
       </div>
       {/* Analytics Stats */}
       <motion.div variants={fadeUp} className="grid gap-4 md:grid-cols-4">
-        <div className="glass-panel p-5 space-y-1">
+        <div className="glass-panel p-4 space-y-1">
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-400">Total Interviews</p>
-          <p className="text-3xl font-bold text-ink-900 dark:text-white">{(allInterviews || []).length}</p>
+          <p className="text-2xl font-bold text-ink-900 dark:text-white">{(allInterviews || []).length}</p>
           <p className="text-xs text-ink-500">All time</p>
         </div>
-        <div className="glass-panel p-5 space-y-1">
+        <div className="glass-panel p-4 space-y-1">
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-400">Pass Rate</p>
-          <p className="text-3xl font-bold text-emerald-600">{passRate}%</p>
+          <p className="text-2xl font-bold text-emerald-600">{passRate}%</p>
           <p className="text-xs text-ink-500">Selected period</p>
         </div>
-        <div className="glass-panel p-5 space-y-1">
+        <div className="glass-panel p-4 space-y-1">
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-400">Passed</p>
-          <p className="text-3xl font-bold text-emerald-600">{filteredStats[1].value}</p>
+          <p className="text-2xl font-bold text-emerald-600">{filteredStats[1].value}</p>
           <p className="text-xs text-ink-500">Selected period</p>
         </div>
-        <div className="glass-panel p-5 space-y-1">
+        <div className="glass-panel p-4 space-y-1">
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-400">Failed</p>
-          <p className="text-3xl font-bold text-rose-500">{filteredStats[2].value}</p>
+          <p className="text-2xl font-bold text-rose-500">{filteredStats[2].value}</p>
           <p className="text-xs text-ink-500">Selected period</p>
         </div>
       </motion.div>
 
       {/* Top Skills */}
-      <motion.div variants={fadeUp} className="glass-panel p-6 space-y-4">
+      <motion.div variants={fadeUp} className="glass-panel p-4 space-y-3">
         <h2 className="text-xl font-semibold">🏆 Top Skills</h2>
         <div className="space-y-3">
           {topSkills.map((skill, index) => (

@@ -7,7 +7,7 @@ export const Card = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      'rounded-2xl border border-white/70 bg-white/90 p-5 text-ink-900 shadow-card backdrop-blur-xl transition-all duration-200 dark:border-white/10 dark:bg-ink-dark-surface/90 dark:text-ink-dark-text sm:p-6',
+      'rounded-2xl border border-white/70 bg-white/90 p-4 text-ink-900 shadow-card backdrop-blur-xl transition-all duration-200 dark:border-white/10 dark:bg-ink-dark-surface/90 dark:text-ink-dark-text sm:p-5',
       className
     )}
     {...props}
@@ -18,7 +18,7 @@ export const CardHeader = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('mb-4 flex flex-col gap-1.5', className)} {...props} />
+  <div className={cn('mb-3 flex flex-col gap-1', className)} {...props} />
 );
 
 export const CardTitle = ({
@@ -26,7 +26,7 @@ export const CardTitle = ({
   ...props
 }: React.HTMLAttributes<HTMLHeadingElement>) => (
   <h3
-    className={cn('text-base font-semibold tracking-tight text-ink-900 dark:text-ink-dark-text sm:text-lg', className)}
+    className={cn('text-base font-semibold tracking-tight text-ink-900 dark:text-ink-dark-text', className)}
     {...props}
   />
 );
@@ -45,5 +45,5 @@ export const CardContent = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('space-y-4', className)} {...props} />
+  <div className={cn('space-y-3', className)} {...props} />
 );

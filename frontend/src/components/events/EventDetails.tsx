@@ -15,7 +15,7 @@ const EventDetails: React.FC = () => {
   const event = data?.events?.find((ev: any) => ev._id === id);
 
   if (isLoading) return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Skeleton className="h-72 w-full rounded-xl" />
       <Skeleton className="h-8 w-64" />
       <Skeleton className="h-24 w-full" />
@@ -30,7 +30,7 @@ const EventDetails: React.FC = () => {
   );
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8">
+    <div className="mx-auto max-w-3xl space-y-5">
       <Button variant="ghost" size="sm" onClick={() => navigate('/events')} className="gap-1.5">
         <ArrowLeft size={16} /> Back to Events
       </Button>
@@ -44,13 +44,13 @@ const EventDetails: React.FC = () => {
           </div>
         )}
 
-        <div className="space-y-6 p-8">
+        <div className="space-y-4 p-5">
           <div className="space-y-2">
             <Badge variant="brand">{event.isOnline ? 'Online' : 'In Person'}</Badge>
-            <h1 className="text-3xl font-semibold">{event.title}</h1>
+            <h1 className="text-2xl font-semibold">{event.title}</h1>
           </div>
 
-          <div className="flex flex-wrap gap-5 rounded-lg border border-ink-200 dark:border-ink-700 p-5">
+          <div className="flex flex-wrap gap-4 rounded-lg border border-ink-200 p-4 dark:border-ink-700">
             <div className="flex items-center gap-2 text-sm">
               <Calendar size={16} className="text-brand-500" />
               <span className="font-medium">{new Date(event.date).toLocaleDateString('en-EG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>

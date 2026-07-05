@@ -29,14 +29,14 @@ export const StatCard: React.FC<StatCardProps> = ({
         className
       )}
     >
-      <CardContent className="space-y-4 p-6">
+      <CardContent className="space-y-3 p-4">
         <div className="flex items-center justify-between gap-3">
           <p className={cn('text-sm font-medium', tone === 'brand' ? 'text-white/80' : 'text-ink-500 dark:text-ink-dark-muted')}>
             {label}
           </p>
           {badge ? <Badge variant={tone === 'brand' ? 'subtle' : 'brand'}>{badge}</Badge> : null}
         </div>
-        <div className={cn('text-4xl font-semibold tracking-tight', tone === 'brand' ? 'text-white' : 'text-ink-900 dark:text-ink-dark-text')}>
+        <div className={cn('text-2xl font-semibold tracking-tight sm:text-3xl', tone === 'brand' ? 'text-white' : 'text-ink-900 dark:text-ink-dark-text')}>
           {value}
         </div>
         {caption ? (

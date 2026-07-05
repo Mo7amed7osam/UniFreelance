@@ -59,7 +59,7 @@ const ReviewInterview: React.FC = () => {
   if (isError || !interview) {
     return (
       <Card className="border-dashed">
-        <CardContent className="space-y-4 py-10 text-center">
+        <CardContent className="space-y-3 py-6 text-center">
           <p className="text-sm text-ink-500 dark:text-ink-300">Interview not found.</p>
           <Button variant="outline" onClick={() => navigate('/admin/dashboard')}>
             Back
@@ -70,7 +70,7 @@ const ReviewInterview: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <PageHeader
         eyebrow="Interview review"
         title={
@@ -94,10 +94,10 @@ const ReviewInterview: React.FC = () => {
         }
       />
 
-      <div className="space-y-5">
+      <div className="space-y-4">
         {(interview.answers || []).map((response: any, index: number) => (
           <Card key={response.answerId || index}>
-            <CardContent className="space-y-6 p-6">
+            <CardContent className="space-y-4 p-4">
               <div className="space-y-2">
                 <p className="page-eyebrow">Question {index + 1}</p>
                 <h2 className="text-2xl font-semibold">{response.question}</h2>
@@ -175,7 +175,7 @@ const ReviewInterview: React.FC = () => {
       </div>
 
       <Card>
-        <CardContent className="grid gap-5 p-6 md:grid-cols-2">
+        <CardContent className="grid gap-4 p-4 md:grid-cols-2">
           <div className="space-y-2">
             <label className="text-sm font-semibold text-ink-700 dark:text-ink-200">Score (0-100)</label>
             <Input type="number" min="0" max="100" value={score} onChange={(e) => setScore(e.target.value)} />

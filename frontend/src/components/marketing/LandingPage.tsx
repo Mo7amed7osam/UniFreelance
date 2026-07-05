@@ -191,7 +191,7 @@ const ProductPreview: React.FC = () => {
         className="pointer-events-none absolute -inset-6 rounded-3xl opacity-30 blur-2xl dark:opacity-20"
         style={{ background: 'radial-gradient(circle, rgb(59 130 246 / 0.25) 0%, transparent 70%)' }}
       />
-      <Card className="relative w-full max-w-sm overflow-hidden border-ink-200 bg-white shadow-elevated dark:border-ink-dark-border dark:bg-ink-dark-surface">
+      <Card className="relative w-full max-w-xs overflow-hidden border-ink-200 bg-white shadow-elevated dark:border-ink-dark-border dark:bg-ink-dark-surface">
         {/* Header */}
         <div className="flex items-center gap-2 border-b border-ink-100 px-4 py-3 dark:border-ink-dark-border">
           <div className="flex gap-1.5">
@@ -210,7 +210,7 @@ const ProductPreview: React.FC = () => {
               initial={shouldReduce ? false : { opacity: 0, x: 12 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, ease: EASE_OUT, delay: item.delay }}
-              className={`px-4 py-3 ${item.accent}`}
+            className={`px-3 py-2.5 ${item.accent}`}
             >
               <div className="mb-1.5 flex items-center gap-1.5">
                 <span className={`h-1.5 w-1.5 rounded-full ${item.dot}`} />
@@ -330,7 +330,7 @@ const LandingPage: React.FC = () => {
     <div className="min-h-screen bg-white dark:bg-ink-dark-bg">
       {/* ── Nav ── */}
       <header className="sticky top-0 z-20 border-b border-ink-100 bg-white/95 backdrop-blur-sm dark:border-ink-dark-border dark:bg-ink-dark-bg/95">
-        <div className="page-container flex h-16 items-center justify-between gap-4">
+        <div className="page-container flex h-14 items-center justify-between gap-4">
           <Link to="/" className="flex items-center text-ink-900 no-underline dark:text-ink-dark-text">
             <Logo />
           </Link>
@@ -361,10 +361,10 @@ const LandingPage: React.FC = () => {
           style={{ background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgb(30 58 138 / 0.2) 0%, #0b0a14 60%)' }}
         />
 
-        <div className="page-container relative py-20 sm:py-28">
-          <div className="grid items-center gap-12 lg:grid-cols-[1fr_auto] lg:gap-16">
+        <div className="page-container relative py-12 sm:py-16">
+          <div className="grid items-center gap-8 lg:grid-cols-[1fr_auto] lg:gap-12">
             {/* Left: text */}
-            <div className="mx-auto max-w-2xl space-y-7 text-center lg:mx-0 lg:text-left">
+            <div className="mx-auto max-w-2xl space-y-5 text-center lg:mx-0 lg:text-left">
               <motion.div
                 custom={0}
                 variants={fadeIn}
@@ -381,7 +381,7 @@ const LandingPage: React.FC = () => {
                 variants={fadeUp}
                 initial="hidden"
                 animate="visible"
-                className="text-balance text-5xl font-semibold leading-tight text-ink-950 dark:text-white sm:text-6xl"
+                className="text-balance text-4xl font-semibold leading-tight text-ink-950 dark:text-white sm:text-5xl"
               >
                 Hire verified student talent.{' '}
                 <span className="bg-gradient-to-r from-brand-500 to-sky-500 bg-clip-text text-transparent">
@@ -394,7 +394,7 @@ const LandingPage: React.FC = () => {
                 variants={fadeUp}
                 initial="hidden"
                 animate="visible"
-                className="max-w-xl text-lg leading-7 text-ink-600 dark:text-ink-300 lg:max-w-none"
+                className="max-w-xl text-base leading-7 text-ink-600 dark:text-ink-300 lg:max-w-none"
               >
                 Shaghalny connects clients with early-career freelancers who have completed structured AI interviews.
                 Real verification, clean workflows, one platform.
@@ -418,7 +418,7 @@ const LandingPage: React.FC = () => {
                 <motion.div whileTap={shouldReduce ? {} : { scale: 0.97 }} transition={{ duration: 0.1 }}>
                   <Link
                     to="/login"
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-ink-200 bg-white px-6 text-base font-semibold text-ink-900 transition-colors duration-150 hover:border-brand-300 hover:bg-brand-50 active:scale-[0.97] dark:border-white/25 dark:bg-white/10 dark:text-white dark:hover:border-white/40 dark:hover:bg-white/20"
+                    className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-ink-200 bg-white px-4 text-sm font-semibold text-ink-900 transition-colors duration-150 hover:border-brand-300 hover:bg-brand-50 active:scale-[0.97] dark:border-white/25 dark:bg-white/10 dark:text-white dark:hover:border-white/40 dark:hover:bg-white/20"
                   >
                     Sign in
                   </Link>
@@ -431,7 +431,7 @@ const LandingPage: React.FC = () => {
                 variants={fadeUp}
                 initial="hidden"
                 animate="visible"
-                className="flex flex-wrap items-center justify-center gap-6 pt-2 lg:justify-start"
+                className="flex flex-wrap items-center justify-center gap-4 pt-1 lg:justify-start"
               >
                 {[
                   { icon: BadgeCheck, label: 'AI-verified profiles' },
@@ -461,21 +461,21 @@ const LandingPage: React.FC = () => {
 
       {/* ── Features ── */}
       <section ref={featuresSection.ref} className="bg-ink-50 dark:bg-ink-dark-surface">
-        <div className="page-container py-20">
+        <div className="page-container py-12">
           <motion.div
             variants={fadeUp}
             custom={0}
             initial="hidden"
             animate={featuresSection.inView ? 'visible' : 'hidden'}
-            className="mb-12 text-center"
+            className="mb-8 text-center"
           >
-            <p className="page-eyebrow mb-3">Platform</p>
-            <h2 className="text-3xl font-semibold text-ink-900 dark:text-ink-dark-text sm:text-4xl">
+            <p className="page-eyebrow mb-2">Platform</p>
+            <h2 className="text-2xl font-semibold text-ink-900 dark:text-ink-dark-text sm:text-3xl">
               What makes Shaghalny different
             </h2>
           </motion.div>
 
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-3">
             {features.map((f, i) => (
               <motion.div
                 key={f.title}
@@ -484,7 +484,7 @@ const LandingPage: React.FC = () => {
                 initial="hidden"
                 animate={featuresSection.inView ? 'visible' : 'hidden'}
                 whileHover={shouldReduce ? {} : { y: -4, transition: { duration: 0.2, ease: EASE_OUT } }}
-                className="group cursor-default rounded-xl border border-ink-200 bg-white p-6 shadow-soft transition-shadow duration-200 hover:shadow-card dark:border-ink-dark-border dark:bg-ink-dark-bg"
+                className="group cursor-default rounded-xl border border-ink-200 bg-white p-4 shadow-soft transition-shadow duration-200 hover:shadow-card dark:border-ink-dark-border dark:bg-ink-dark-bg"
               >
                 <div className={`mb-4 flex h-10 w-10 items-center justify-center rounded-lg ${f.accent}`}>
                   <f.icon size={20} />
@@ -499,21 +499,21 @@ const LandingPage: React.FC = () => {
 
       {/* ── Roles ── */}
       <section ref={rolesSection.ref} className="bg-white dark:bg-ink-dark-bg">
-        <div className="page-container py-20">
+        <div className="page-container py-12">
           <motion.div
             variants={fadeUp}
             custom={0}
             initial="hidden"
             animate={rolesSection.inView ? 'visible' : 'hidden'}
-            className="mb-12 text-center"
+            className="mb-8 text-center"
           >
-            <p className="page-eyebrow mb-3">For every role</p>
-            <h2 className="text-3xl font-semibold text-ink-900 dark:text-ink-dark-text sm:text-4xl">
+            <p className="page-eyebrow mb-2">For every role</p>
+            <h2 className="text-2xl font-semibold text-ink-900 dark:text-ink-dark-text sm:text-3xl">
               One platform, two sides of hiring
             </h2>
           </motion.div>
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-2">
             {roles.map((role, i) => (
               <motion.div
                 key={role.label}
@@ -522,7 +522,7 @@ const LandingPage: React.FC = () => {
                 initial="hidden"
                 animate={rolesSection.inView ? 'visible' : 'hidden'}
                 whileHover={shouldReduce ? {} : { y: -4, transition: { duration: 0.2, ease: EASE_OUT } }}
-                className={`flex flex-col justify-between gap-8 rounded-xl border border-ink-200 bg-gradient-to-br p-8 transition-shadow duration-200 hover:shadow-card dark:border-ink-dark-border ${role.accent}`}
+                className={`flex flex-col justify-between gap-5 rounded-xl border border-ink-200 bg-gradient-to-br p-5 transition-shadow duration-200 hover:shadow-card dark:border-ink-dark-border ${role.accent}`}
               >
                 <div className="space-y-4">
                   <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${role.iconAccent}`}>
@@ -532,7 +532,7 @@ const LandingPage: React.FC = () => {
                     <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-ink-400 dark:text-ink-dark-muted">
                       {role.label}
                     </p>
-                    <h3 className="mb-3 text-2xl font-semibold text-ink-900 dark:text-ink-dark-text">
+                    <h3 className="mb-2 text-xl font-semibold text-ink-900 dark:text-ink-dark-text">
                       {role.heading}
                     </h3>
                     <p className="text-sm leading-6 text-ink-600 dark:text-ink-dark-muted">{role.body}</p>
@@ -550,7 +550,7 @@ const LandingPage: React.FC = () => {
             custom={0.2}
             initial="hidden"
             animate={rolesSection.inView ? 'visible' : 'hidden'}
-            className="mt-6 rounded-xl border border-ink-200 p-8 dark:border-ink-dark-border"
+            className="mt-4 rounded-xl border border-ink-200 p-5 dark:border-ink-dark-border"
           >
             <div className="flex items-start gap-4">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-50 text-accent-600 dark:bg-accent-900/30 dark:text-accent-400">
@@ -577,21 +577,21 @@ const LandingPage: React.FC = () => {
         ref={stepsSection.ref}
         className="border-y border-ink-100 bg-ink-50 dark:border-ink-dark-border dark:bg-ink-dark-surface"
       >
-        <div className="page-container py-20">
+        <div className="page-container py-12">
           <motion.div
             variants={fadeUp}
             custom={0}
             initial="hidden"
             animate={stepsSection.inView ? 'visible' : 'hidden'}
-            className="mb-12"
+            className="mb-8"
           >
-            <p className="page-eyebrow mb-3">How it works</p>
-            <h2 className="text-3xl font-semibold text-ink-900 dark:text-ink-dark-text sm:text-4xl">
+            <p className="page-eyebrow mb-2">How it works</p>
+            <h2 className="text-2xl font-semibold text-ink-900 dark:text-ink-dark-text sm:text-3xl">
               Structured hiring, start to finish.
             </h2>
           </motion.div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((step, i) => (
               <motion.div
                 key={step.n}
@@ -599,10 +599,10 @@ const LandingPage: React.FC = () => {
                 custom={i * 0.08}
                 initial="hidden"
                 animate={stepsSection.inView ? 'visible' : 'hidden'}
-                className="rounded-xl border border-ink-200 bg-white p-6 dark:border-ink-dark-border dark:bg-ink-dark-bg"
+                className="rounded-xl border border-ink-200 bg-white p-4 dark:border-ink-dark-border dark:bg-ink-dark-bg"
               >
                 <div className="mb-4 flex items-center justify-between">
-                  <p className="text-3xl font-bold text-brand-200 dark:text-brand-800">{step.n}</p>
+                  <p className="text-2xl font-bold text-brand-200 dark:text-brand-800">{step.n}</p>
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-ink-50 text-ink-400 dark:bg-ink-dark-surface dark:text-ink-500">
                     <step.icon size={15} />
                   </div>
@@ -624,17 +624,17 @@ const LandingPage: React.FC = () => {
             backgroundImage: 'radial-gradient(circle at 20% 50%, rgb(96 165 250 / 0.55) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgb(37 99 235 / 0.45) 0%, transparent 40%)',
           }}
         />
-        <div className="page-container relative py-20">
-          <div className="grid gap-12 lg:grid-cols-[1fr_auto] lg:items-center">
-            <div className="space-y-6">
+        <div className="page-container relative py-12">
+          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+            <div className="space-y-4">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-brand-100">
                 <BadgeCheck size={12} />
                 Gravis AI verification
               </div>
-              <h2 className="text-3xl font-semibold text-white sm:text-4xl">
+              <h2 className="text-2xl font-semibold text-white sm:text-3xl">
                 Skills that are proven, not promised.
               </h2>
-              <p className="max-w-xl text-base leading-7 text-brand-100">
+              <p className="max-w-xl text-sm leading-6 text-brand-100">
                 Every student on Shaghalny has completed a structured AI interview with Gravis before their proposals
                 reach clients. No unverified claims, no noise in your candidate shortlist.
               </p>
@@ -695,10 +695,10 @@ const LandingPage: React.FC = () => {
 
       {/* ── CTA ── */}
       <section className="bg-white dark:bg-ink-dark-bg">
-        <div className="page-container py-20">
-          <div className="flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
+        <div className="page-container py-12">
+          <div className="flex flex-col items-start justify-between gap-5 lg:flex-row lg:items-center">
             <div className="space-y-3">
-              <h2 className="text-3xl font-semibold text-ink-900 dark:text-ink-dark-text sm:text-4xl">
+              <h2 className="text-2xl font-semibold text-ink-900 dark:text-ink-dark-text sm:text-3xl">
                 Ready to get started?
               </h2>
               <p className="max-w-lg text-base text-ink-500 dark:text-ink-dark-muted">

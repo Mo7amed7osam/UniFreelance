@@ -30,7 +30,7 @@ const StudentPublicProfile: React.FC = () => {
   const photoUrl = buildAssetUrl(profile.profilePhotoUrl);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <PageHeader
         eyebrow="Student profile"
         title={profile.name}
@@ -39,7 +39,7 @@ const StudentPublicProfile: React.FC = () => {
 
       <div className="grid gap-5 xl:grid-cols-[0.85fr_1.15fr]">
         <Card>
-          <CardContent className="space-y-5 p-6">
+          <CardContent className="space-y-4 p-4">
             <div className="flex items-center gap-4">
               <div className="h-24 w-24 overflow-hidden rounded-xl border border-ink-200 bg-ink-50 dark:border-white/10 dark:bg-white/5">
                 {photoUrl ? (
@@ -74,7 +74,7 @@ const StudentPublicProfile: React.FC = () => {
         </Card>
 
         <Card>
-          <CardContent className="space-y-5 p-6">
+          <CardContent className="space-y-4 p-4">
             <div>
               <h2 className="text-2xl font-semibold">Verified skills</h2>
               <div className="mt-4 flex flex-wrap gap-2">

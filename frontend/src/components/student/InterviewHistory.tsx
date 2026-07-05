@@ -18,7 +18,7 @@ const InterviewHistory: React.FC = () => {
   });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <PageHeader
         eyebrow="Student workspace"
         title="Interview History"

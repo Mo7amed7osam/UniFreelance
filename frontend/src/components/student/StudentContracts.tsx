@@ -41,7 +41,7 @@ const StudentContracts: React.FC = () => {
   const balance = profile?.balance?.toFixed?.(2) ?? '0.00';
 
   return (
-    <motion.div className="space-y-8" initial="hidden" animate="visible" variants={stagger}>
+    <motion.div className="space-y-5" initial="hidden" animate="visible" variants={stagger}>
       <motion.div variants={fadeUp}>
         <PageHeader
           eyebrow="Student workspace"
@@ -53,13 +53,13 @@ const StudentContracts: React.FC = () => {
       {/* Balance card */}
       <motion.div variants={fadeUp}>
         <Card className="border-brand-200 bg-brand-50 dark:border-brand-700/40 dark:bg-brand-900/20">
-          <CardContent className="flex items-center gap-4 p-5">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-100 text-brand-600 dark:bg-brand-800/50 dark:text-brand-300">
-              <Wallet size={22} />
+          <CardContent className="flex items-center gap-3 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100 text-brand-600 dark:bg-brand-800/50 dark:text-brand-300">
+              <Wallet size={18} />
             </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.1em] text-brand-600 dark:text-brand-400">Available balance</p>
-              <p className="mt-0.5 text-3xl font-bold tracking-tight text-brand-700 dark:text-brand-300">{formatCurrency(balance)}</p>
+              <p className="mt-0.5 text-2xl font-bold tracking-tight text-brand-700 dark:text-brand-300">{formatCurrency(balance)}</p>
               <p className="text-xs text-brand-500 dark:text-brand-400">Released funds ready for withdrawal</p>
             </div>
             <Button variant="soft" size="sm" className="ml-auto" onClick={() => navigate('/student/wallet')}>
@@ -77,7 +77,7 @@ const StudentContracts: React.FC = () => {
       ) : (contracts || []).length === 0 ? (
         <EmptyState title="No contracts yet" description="Accepted proposals turn into active contracts and appear here." />
       ) : (
-        <motion.div className="grid gap-3 sm:grid-cols-2" variants={stagger} initial="hidden" animate="visible">
+        <motion.div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" variants={stagger} initial="hidden" animate="visible">
           {(contracts || []).map((contract: any) => (
             <motion.div key={contract._id} variants={fadeUp}>
               <Card className="group flex flex-col gap-0 overflow-hidden p-0 transition-all hover:-translate-y-0.5 hover:shadow-card">

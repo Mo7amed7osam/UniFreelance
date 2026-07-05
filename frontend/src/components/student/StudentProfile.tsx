@@ -238,25 +238,25 @@ const StudentProfile: React.FC = () => {
   const featuredLinks = portfolioLinks.slice(0, 4);
 
   return (
-    <motion.div className="mx-auto w-full max-w-6xl space-y-5" initial="hidden" animate="visible" variants={stagger}>
-      <motion.section variants={fadeUp} className="overflow-hidden rounded-[2rem] border border-white/70 bg-white/90 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/90">
-        <div className="h-24 bg-[linear-gradient(135deg,#2563eb_0%,#1e40af_45%,#0f172a_100%)]" />
-        <div className="grid gap-6 px-5 pb-6 lg:grid-cols-[minmax(0,1fr)_300px] lg:px-7">
-          <div className="-mt-12 flex min-w-0 flex-col gap-5 sm:flex-row sm:items-end">
+    <motion.div className="mx-auto w-full max-w-6xl space-y-4" initial="hidden" animate="visible" variants={stagger}>
+      <motion.section variants={fadeUp} className="overflow-hidden rounded-2xl border border-white/70 bg-white/90 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/90">
+        <div className="h-16 bg-[linear-gradient(135deg,#2563eb_0%,#1e40af_45%,#0f172a_100%)]" />
+        <div className="grid gap-4 px-4 pb-4 lg:grid-cols-[minmax(0,1fr)_280px] lg:px-5">
+          <div className="-mt-9 flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end">
             <div className="relative shrink-0">
-              <Avatar className="h-32 w-32 border-4 border-white bg-white shadow-elevated ring-1 ring-ink-200 dark:border-ink-dark-surface dark:bg-ink-dark-surface dark:ring-white/10">
+              <Avatar className="h-24 w-24 border-4 border-white bg-white shadow-elevated ring-1 ring-ink-200 dark:border-ink-dark-surface dark:bg-ink-dark-surface dark:ring-white/10">
                 {photoUrl && !photoLoadError ? (
                   <AvatarImage src={photoUrl} alt={profile.name} onError={() => setPhotoLoadError(true)} />
                 ) : null}
-                <AvatarFallback className="text-3xl">
-                  {photoLoadError ? <ImageOff size={28} /> : getInitials(profile.name)}
+                <AvatarFallback className="text-2xl">
+                  {photoLoadError ? <ImageOff size={24} /> : getInitials(profile.name)}
                 </AvatarFallback>
               </Avatar>
               <button
                 type="button"
                 onClick={() => photoInputRef.current?.click()}
                 disabled={isUploadingPhoto}
-                className="absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-brand-600 text-white shadow-card transition-colors hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-60 dark:border-ink-dark-surface"
+                className="absolute bottom-1 right-1 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-brand-600 text-white shadow-card transition-colors hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-60 dark:border-ink-dark-surface"
                 aria-label="Upload profile photo"
               >
                 {isUploadingPhoto ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
@@ -272,7 +272,7 @@ const StudentProfile: React.FC = () => {
 
             <div className="min-w-0 flex-1 pt-2 sm:pb-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-3xl font-semibold tracking-tight text-ink-950 dark:text-white">{profile.name}</h1>
+                <h1 className="text-2xl font-semibold tracking-tight text-ink-950 dark:text-white">{profile.name}</h1>
                 {verifiedSkills.length ? (
                   <span className="inline-flex items-center gap-1 rounded-full border border-brand-200 bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:border-brand-700/40 dark:bg-brand-900/30 dark:text-brand-300">
                     <BadgeCheck size={13} />
@@ -294,8 +294,8 @@ const StudentProfile: React.FC = () => {
               { label: 'Projects', value: portfolioLinks.length },
               { label: 'Reviews', value: reviews.length },
             ].map((item) => (
-              <div key={item.label} className="rounded-2xl border border-ink-200/70 bg-ink-50/70 px-3 py-3 text-center dark:border-white/10 dark:bg-white/[0.04]">
-                <p className="text-xl font-semibold tracking-tight text-ink-950 dark:text-white">{item.value}</p>
+              <div key={item.label} className="rounded-xl border border-ink-200/70 bg-ink-50/70 px-2 py-2 text-center dark:border-white/10 dark:bg-white/[0.04]">
+                <p className="text-lg font-semibold tracking-tight text-ink-950 dark:text-white">{item.value}</p>
                 <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-500 dark:text-ink-dark-muted">{item.label}</p>
               </div>
             ))}
@@ -303,18 +303,18 @@ const StudentProfile: React.FC = () => {
         </div>
       </motion.section>
 
-      <motion.div variants={fadeUp} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <main className="space-y-5">
+      <motion.div variants={fadeUp} className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <main className="space-y-4">
           <Card className="p-0">
-            <CardContent className="p-5 sm:p-6">
+            <CardContent className="p-4 sm:p-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="page-eyebrow">Overview</p>
-                  <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink-950 dark:text-white">What clients should know</h2>
+                  <h2 className="mt-1.5 text-xl font-semibold tracking-tight text-ink-950 dark:text-white">What clients should know</h2>
                 </div>
                 <BriefcaseBusiness size={20} className="mt-1 text-brand-500" />
               </div>
-              <p className="mt-4 max-w-3xl text-base leading-8 text-ink-600 dark:text-ink-300">
+              <p className="mt-3 max-w-3xl text-sm leading-7 text-ink-600 dark:text-ink-300">
                 {formValues.description || 'Add a focused overview that explains what you help clients achieve, your strongest skills, and the kind of work you want to do.'}
               </p>
               <div className="mt-5 flex flex-wrap gap-2">
@@ -330,7 +330,7 @@ const StudentProfile: React.FC = () => {
           </Card>
 
           <Card className="p-0">
-            <CardHeader className="mb-0 border-b border-ink-100/80 p-5 dark:border-white/10">
+            <CardHeader className="mb-0 border-b border-ink-100/80 p-4 dark:border-white/10">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <CardTitle className="text-lg">Portfolio showcase</CardTitle>
@@ -339,9 +339,9 @@ const StudentProfile: React.FC = () => {
                 <Globe2 size={19} className="text-brand-500" />
               </div>
             </CardHeader>
-            <CardContent className="p-5">
+            <CardContent className="p-4">
               {featuredLinks.length ? (
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                   {featuredLinks.map((link, index) => (
                     <a
                       key={link}
@@ -350,7 +350,7 @@ const StudentProfile: React.FC = () => {
                       rel="noreferrer"
                       className="group min-w-0 rounded-2xl border border-ink-200/80 bg-white/70 p-4 text-ink-800 no-underline shadow-soft transition hover:-translate-y-0.5 hover:border-brand-200 hover:bg-brand-50/60 hover:text-brand-700 hover:shadow-card dark:border-white/10 dark:bg-white/[0.04] dark:text-ink-200 dark:hover:border-brand-500/30 dark:hover:bg-brand-900/20 dark:hover:text-brand-300"
                     >
-                      <div className="mb-4 flex h-24 items-end rounded-xl border border-ink-200/70 bg-[linear-gradient(135deg,rgba(37,99,235,0.12),rgba(15,23,42,0.04))] p-3 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(59,130,246,0.18),rgba(255,255,255,0.04))]">
+                      <div className="mb-3 flex h-16 items-end rounded-xl border border-ink-200/70 bg-[linear-gradient(135deg,rgba(37,99,235,0.12),rgba(15,23,42,0.04))] p-2 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(59,130,246,0.18),rgba(255,255,255,0.04))]">
                         <span className="rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-600 shadow-soft dark:bg-ink-dark-surface/90 dark:text-ink-300">
                           Project {index + 1}
                         </span>
@@ -378,10 +378,10 @@ const StudentProfile: React.FC = () => {
           </Card>
 
           <Card className="p-0">
-            <CardHeader className="mb-0 border-b border-ink-100/80 p-5 dark:border-white/10">
+            <CardHeader className="mb-0 border-b border-ink-100/80 p-4 dark:border-white/10">
               <CardTitle className="text-lg">Proof and credentials</CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-3 p-5 sm:grid-cols-2">
+            <CardContent className="grid gap-3 p-4 sm:grid-cols-2">
               <div className="rounded-2xl border border-ink-200/80 bg-ink-50/70 p-4 dark:border-white/10 dark:bg-white/[0.04]">
                 <p className="flex items-center gap-2 text-sm font-semibold text-ink-900 dark:text-white"><GraduationCap size={15} className="text-brand-500" />Education</p>
                 <p className="mt-2 text-sm text-ink-500 dark:text-ink-dark-muted">{formValues.university || 'Add your university to strengthen trust.'}</p>
@@ -400,7 +400,7 @@ const StudentProfile: React.FC = () => {
             </CardContent>
           </Card>
 
-          <section className="space-y-4">
+          <section className="space-y-3">
             <div>
               <h2 className="text-xl font-semibold text-ink-900 dark:text-white">Client reviews</h2>
               <p className="text-sm text-ink-500 dark:text-ink-400">Completed engagements and client feedback.</p>
@@ -430,7 +430,7 @@ const StudentProfile: React.FC = () => {
           </section>
         </main>
 
-        <aside className="space-y-4 lg:sticky lg:top-24">
+        <aside className="space-y-3 lg:sticky lg:top-20">
           <Card className="p-0">
             <CardHeader className="mb-0 border-b border-ink-100/80 p-5 dark:border-white/10">
               <div className="flex items-center justify-between gap-3">

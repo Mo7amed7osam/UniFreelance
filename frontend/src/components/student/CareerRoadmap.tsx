@@ -224,7 +224,7 @@ const CareerRoadmap: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <PageHeader
         eyebrow="AI Career Assistant"
         title="Career Roadmap"
@@ -233,7 +233,7 @@ const CareerRoadmap: React.FC = () => {
       />
 
       <Card className="overflow-hidden p-0">
-        <CardContent className="relative space-y-5 p-6 lg:p-8">
+        <CardContent className="relative space-y-4 p-4 lg:p-5">
           <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-r from-brand-50 via-transparent to-accent-50 dark:from-brand-900/20 dark:to-accent-900/10" />
 
           <div className="relative flex items-start gap-4">
@@ -277,9 +277,9 @@ const CareerRoadmap: React.FC = () => {
       </Card>
 
       {isLoading ? (
-        <div className="space-y-5">
+        <div className="space-y-4">
           <Card className="overflow-hidden border-0 bg-gradient-to-br from-brand-600 to-brand-700 p-0 text-white shadow-soft">
-            <CardContent className="space-y-4 p-8">
+            <CardContent className="space-y-3 p-4">
               <div className="h-3 w-28 animate-pulse rounded-full bg-white/20" />
               <div className="h-8 w-2/3 animate-pulse rounded-full bg-white/15" />
               <div className="grid gap-3 md:grid-cols-3">
@@ -290,10 +290,10 @@ const CareerRoadmap: React.FC = () => {
             </CardContent>
           </Card>
 
-          <div className="grid gap-5 xl:grid-cols-2">
+          <div className="grid gap-4 xl:grid-cols-3">
             {Array.from({ length: 4 }).map((_, index) => (
               <Card key={index}>
-                <CardContent className="space-y-4 p-6">
+                <CardContent className="space-y-3 p-4">
                   <div className="flex items-center gap-3">
                     <div className="h-12 w-12 animate-pulse rounded-2xl bg-muted" />
                     <div className="space-y-2">
@@ -312,9 +312,9 @@ const CareerRoadmap: React.FC = () => {
           </div>
         </div>
       ) : parsedRoadmap ? (
-        <div className="space-y-6">
+        <div className="space-y-4">
           <Card className="p-0">
-            <CardContent className="flex flex-col gap-4 p-5 lg:flex-row lg:items-center lg:justify-between">
+            <CardContent className="flex flex-col gap-3 p-4 lg:flex-row lg:items-center lg:justify-between">
               <div className="space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge variant="brand">Personalized AI roadmap</Badge>
@@ -348,14 +348,14 @@ const CareerRoadmap: React.FC = () => {
             </CardContent>
           </Card>
 
-          <div className="grid gap-5 xl:grid-cols-2">
+          <div className="grid gap-4 xl:grid-cols-3">
             {parsedRoadmap.sections.map((section, index) => {
               const meta = getSectionMeta(section.title);
               const Icon = meta.icon;
 
               return (
                 <Card key={section.title + index} className="interactive-card overflow-hidden border-ink-200/80 p-0">
-                  <CardContent className="space-y-5 p-6">
+                  <CardContent className="space-y-4 p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-4">
                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-300">

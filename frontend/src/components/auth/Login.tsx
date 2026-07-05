@@ -54,30 +54,30 @@ const Login: React.FC = () => {
   return (
     <div className="flex min-h-screen bg-ink-50 dark:bg-ink-dark-bg">
       {/* Left: brand panel */}
-      <div className="relative hidden w-[42%] shrink-0 flex-col justify-between overflow-hidden bg-brand-700 p-10 lg:flex">
+      <div className="relative hidden w-[42%] shrink-0 flex-col justify-between overflow-hidden bg-brand-700 p-8 lg:flex">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_8%,rgba(255,255,255,0.22),transparent_23rem),linear-gradient(180deg,rgba(255,255,255,0.08),transparent_48%)]" />
         <div className="pointer-events-none absolute inset-x-10 top-24 h-px bg-white/18" />
         <Link to="/" className="relative flex items-center text-white no-underline" aria-label="Shaghalny home">
           <Logo tone="inverted" />
         </Link>
 
-        <div className="relative space-y-8">
-          <div className="space-y-4">
+        <div className="relative space-y-5">
+          <div className="space-y-3">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-brand-100">
               <Sparkles size={12} />
               Student marketplace
             </div>
-            <h1 className="text-balance text-4xl font-semibold text-white">
+            <h1 className="text-balance text-3xl font-semibold text-white">
               Freelancing infrastructure built for students.
             </h1>
-            <p className="text-base leading-7 text-brand-100">
+            <p className="text-sm leading-6 text-brand-100">
               Manage proposals, verified interviews, contracts, and hiring workflows from one workspace.
             </p>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {highlights.map((item) => (
-              <div key={item.text} className="flex items-center gap-3 rounded-2xl border border-white/18 bg-white/[0.12] px-4 py-3 shadow-[0_1px_0_rgba(255,255,255,0.12)_inset] backdrop-blur">
+              <div key={item.text} className="flex items-center gap-3 rounded-2xl border border-white/18 bg-white/[0.12] px-3 py-2.5 shadow-[0_1px_0_rgba(255,255,255,0.12)_inset] backdrop-blur">
                 <item.icon size={16} className="shrink-0 text-brand-100" />
                 <p className="text-sm text-white">{item.text}</p>
               </div>
@@ -89,9 +89,9 @@ const Login: React.FC = () => {
       </div>
 
       {/* Right: form */}
-      <div className="flex flex-1 items-center justify-center px-4 py-10 sm:px-8">
+      <div className="flex flex-1 items-center justify-center px-4 py-8 sm:px-8">
         <div className="w-full max-w-md">
-          <div className="mb-8 lg:hidden">
+          <div className="mb-6 lg:hidden">
             <Link to="/" className="flex items-center text-ink-900 no-underline dark:text-ink-dark-text" aria-label="Shaghalny home">
               <Logo />
             </Link>

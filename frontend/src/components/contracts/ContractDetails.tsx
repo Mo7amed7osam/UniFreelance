@@ -102,7 +102,7 @@ const ContractDetails: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <PageHeader
         eyebrow="Contract workspace"
         title={contract.jobId?.title || 'Contract'}
@@ -116,7 +116,7 @@ const ContractDetails: React.FC = () => {
       />
 
       <Card>
-        <CardContent className="space-y-5 p-6">
+        <CardContent className="space-y-4 p-4">
           <div className="grid gap-4 md:grid-cols-3">
             <div className="muted-panel rounded-lg p-4">
               <p className="label-muted">Agreed budget</p>
@@ -145,8 +145,8 @@ const ContractDetails: React.FC = () => {
       </Card>
 
       <Card>
-        <CardContent className="space-y-4 p-6">
-          <h2 className="text-2xl font-semibold">Submissions</h2>
+        <CardContent className="space-y-3 p-4">
+          <h2 className="text-xl font-semibold">Submissions</h2>
           {(submissions || []).length ? (
             <div className="space-y-4">
               {(submissions || []).map((submission: any) => (
@@ -177,8 +177,8 @@ const ContractDetails: React.FC = () => {
 
       {isStudent ? (
         <Card>
-          <CardContent className="space-y-4 p-6">
-            <h2 className="text-2xl font-semibold">Deliver work</h2>
+          <CardContent className="space-y-3 p-4">
+            <h2 className="text-xl font-semibold">Deliver work</h2>
             <Textarea
               rows={4}
               placeholder="Describe the delivery and anything the client should review."
@@ -214,8 +214,8 @@ const ContractDetails: React.FC = () => {
 
       {isClient ? (
         <Card>
-          <CardContent className="space-y-4 p-6">
-            <h2 className="text-2xl font-semibold">Client actions</h2>
+          <CardContent className="space-y-3 p-4">
+            <h2 className="text-xl font-semibold">Client actions</h2>
             <div className="flex flex-wrap gap-3">
               <Button type="button" variant="outline" disabled={acceptMutation.isPending || contract.status !== 'submitted'} onClick={() => acceptMutation.mutate()}>
                 {acceptMutation.isPending ? 'Releasing...' : 'Accept work and release escrow'}

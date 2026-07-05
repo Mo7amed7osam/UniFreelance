@@ -84,7 +84,7 @@ const ClientDashboard: React.FC = () => {
   const recentProposals = (proposals || []).slice(0, 6);
 
   return (
-    <motion.div className="space-y-8" initial="hidden" animate="visible" variants={stagger}>
+    <motion.div className="space-y-5" initial="hidden" animate="visible" variants={stagger}>
 
       {/* Page header */}
       <motion.div variants={fadeUp} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -142,7 +142,7 @@ const ClientDashboard: React.FC = () => {
         </div>
 
         {jobsLoading ? (
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {[1, 2, 3].map((i) => <Skeleton key={i} className="h-40 w-full rounded-xl" />)}
           </div>
         ) : (jobs || []).length === 0 ? (
@@ -153,7 +153,7 @@ const ClientDashboard: React.FC = () => {
             onAction={() => navigate('/client/post-job')}
           />
         ) : (
-          <motion.div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" variants={stagger}>
+          <motion.div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" variants={stagger}>
             {(jobs || []).map((job: any) => (
               <motion.div key={job._id} variants={fadeUp}>
                 <Card className="group flex flex-col gap-3 p-4 transition-all hover:-translate-y-0.5 hover:shadow-card">

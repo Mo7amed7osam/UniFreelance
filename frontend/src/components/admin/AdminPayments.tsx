@@ -95,7 +95,7 @@ const AdminPayments: React.FC = () => {
   const items = activeTab === 'topups' ? topups || [] : withdrawals || [];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <PageHeader
         eyebrow="Admin payments"
         title="Payments management"
@@ -119,7 +119,7 @@ const AdminPayments: React.FC = () => {
       </div>
 
       <Card>
-        <CardContent className="p-6">
+        <CardContent className="p-4">
           {loading ? (
             <Skeleton className="h-44 w-full rounded-xl" />
           ) : items.length === 0 ? (

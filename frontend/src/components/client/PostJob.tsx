@@ -87,7 +87,7 @@ const PostJob: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <PageHeader
         eyebrow="Client workspace"
         title="Post a new job"
@@ -96,8 +96,8 @@ const PostJob: React.FC = () => {
 
       <div className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
         <Card>
-          <CardContent className="space-y-6 p-6">
-            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          <CardContent className="space-y-4 p-4">
+            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-ink-700 dark:text-ink-200">Job title</label>
                 <Input placeholder="UI designer for a student marketplace redesign" {...register('title')} />
@@ -178,9 +178,9 @@ const PostJob: React.FC = () => {
           </CardContent>
         </Card>
 
-        <div className="space-y-5">
+        <div className="space-y-4">
           <Card className="overflow-hidden bg-ink-950 p-0 text-white dark:bg-ink-950">
-            <CardContent className="space-y-4 p-6">
+            <CardContent className="space-y-3 p-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white/10">
                 <BriefcaseBusiness size={20} />
               </div>
@@ -194,7 +194,7 @@ const PostJob: React.FC = () => {
           </Card>
 
           <Card>
-            <CardContent className="space-y-4 p-6">
+            <CardContent className="space-y-3 p-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-400/10 dark:text-brand-200">
                 <Wallet size={20} />
               </div>

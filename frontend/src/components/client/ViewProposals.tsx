@@ -98,7 +98,7 @@ const fetchMatchScore = async (proposal: any, job: any) => {
   });
 
   return (
-    <motion.div className="space-y-8" initial="hidden" animate="visible" variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}>
+    <motion.div className="space-y-5" initial="hidden" animate="visible" variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}>
       <motion.div variants={fadeUp}>
         <PageHeader
           eyebrow="Client workspace"
@@ -143,13 +143,13 @@ const fetchMatchScore = async (proposal: any, job: any) => {
 
       {/* Proposals grid */}
       {proposalsLoading ? (
-        <div className="grid gap-4 xl:grid-cols-2">
+        <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
           {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-72 w-full rounded-xl" />)}
         </div>
       ) : filteredProposals.length === 0 ? (
         <EmptyState title="No proposals match" description="Change the job or skill filter to reveal more applicants." />
       ) : (
-        <motion.div className="grid gap-4 xl:grid-cols-2" variants={stagger} initial="hidden" animate="visible">
+        <motion.div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3" variants={stagger} initial="hidden" animate="visible">
           {filteredProposals.map((proposal: any) => {
             const statusValue = proposal.status || 'submitted';
             const displayStatus = statusValue === 'pending' ? 'submitted' : statusValue;
@@ -165,7 +165,7 @@ const fetchMatchScore = async (proposal: any, job: any) => {
                     </div>
                   )}
 
-                  <CardHeader className="gap-0 space-y-0 px-5 pb-3 pt-5">
+                  <CardHeader className="gap-0 space-y-0 px-4 pb-3 pt-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-11 w-11 shrink-0">
@@ -191,7 +191,7 @@ const fetchMatchScore = async (proposal: any, job: any) => {
 
                   <Separator />
 
-                  <CardContent className="space-y-4 px-5 py-4">
+                  <CardContent className="space-y-3 px-4 py-3">
                     {/* Job + budget */}
                     <div className="grid gap-3 sm:grid-cols-2">
                       <div className="rounded-lg border border-ink-200 bg-ink-50 p-3 dark:border-ink-dark-border dark:bg-white/5">

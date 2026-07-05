@@ -96,7 +96,7 @@ const StudentWallet: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <PageHeader
         eyebrow="Student wallet"
         title="Withdraw earnings"
@@ -112,10 +112,10 @@ const StudentWallet: React.FC = () => {
           className="xl:col-span-1"
         />
 
-        <div className="glass-panel xl:col-span-2 p-6">
-          <div className="space-y-5">
+        <div className="glass-panel xl:col-span-2 p-4">
+          <div className="space-y-4">
             <div>
-              <h2 className="text-2xl font-semibold">Request a withdrawal</h2>
+              <h2 className="text-xl font-semibold">Request a withdrawal</h2>
               <p className="text-sm text-ink-500 dark:text-ink-300">Provide the amount and payout destination, then submit the request for admin review.</p>
             </div>
 

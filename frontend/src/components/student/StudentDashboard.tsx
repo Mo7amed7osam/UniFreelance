@@ -62,17 +62,17 @@ const StatItem: React.FC<{
   accent?: boolean;
 }> = ({ icon, label, value, sub, accent }) => (
   <motion.div variants={fadeUp}>
-    <Card className={`group relative min-h-[9.25rem] overflow-hidden ${accent ? 'border-brand-200/80 bg-brand-50/80 dark:border-brand-700/40 dark:bg-brand-900/20' : ''}`}>
+    <Card className={`group relative min-h-[7.5rem] overflow-hidden ${accent ? 'border-brand-200/80 bg-brand-50/80 dark:border-brand-700/40 dark:bg-brand-900/20' : ''}`}>
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
       <div className="flex items-start justify-between gap-3">
-        <div className={`flex h-10 w-10 items-center justify-center rounded-xl ring-1 ring-inset ${accent ? 'bg-brand-100 text-brand-600 ring-brand-200 dark:bg-brand-800/50 dark:text-brand-300 dark:ring-brand-700/40' : 'bg-ink-100/80 text-ink-500 ring-ink-200/70 dark:bg-white/10 dark:text-ink-400 dark:ring-white/10'}`}>
+        <div className={`flex h-8 w-8 items-center justify-center rounded-xl ring-1 ring-inset ${accent ? 'bg-brand-100 text-brand-600 ring-brand-200 dark:bg-brand-800/50 dark:text-brand-300 dark:ring-brand-700/40' : 'bg-ink-100/80 text-ink-500 ring-ink-200/70 dark:bg-white/10 dark:text-ink-400 dark:ring-white/10'}`}>
           {icon}
         </div>
         <span className="mt-1 h-1.5 w-1.5 rounded-full bg-ink-300 transition-colors group-hover:bg-brand-500 dark:bg-white/20" />
       </div>
-      <div className="mt-4">
+      <div className="mt-3">
         <p className="text-xs font-semibold uppercase tracking-[0.1em] text-ink-500 dark:text-ink-400">{label}</p>
-        <p className={`mt-1 text-2xl font-bold tracking-tight ${accent ? 'text-brand-700 dark:text-brand-300' : 'text-ink-900 dark:text-white'}`}>{value}</p>
+        <p className={`mt-1 text-xl font-bold tracking-tight ${accent ? 'text-brand-700 dark:text-brand-300' : 'text-ink-900 dark:text-white'}`}>{value}</p>
         {sub && <p className="mt-0.5 text-xs text-ink-400 dark:text-ink-500">{sub}</p>}
       </div>
     </Card>
@@ -117,7 +117,7 @@ const StudentDashboard: React.FC = () => {
   const recentActivity = proposalList.slice(0, 3);
 
   return (
-    <motion.div className="space-y-8" initial="hidden" animate="visible" variants={staggerContainer}>
+    <motion.div className="space-y-5" initial="hidden" animate="visible" variants={staggerContainer}>
       {/* Welcome header */}
       <motion.div variants={fadeUp} className="glass-panel p-4 sm:p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -174,7 +174,7 @@ const StudentDashboard: React.FC = () => {
       </motion.div>
 
       {/* Middle row: profile completion + quick actions */}
-      <motion.div variants={staggerContainer} className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <motion.div variants={staggerContainer} className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
         <motion.div variants={fadeUp}>
           <Card className="h-full">
             <CardHeader className="mb-0">
@@ -266,7 +266,7 @@ const StudentDashboard: React.FC = () => {
       </motion.div>
 
       {/* Bottom row: recent applications + recommended jobs */}
-      <motion.div variants={staggerContainer} className="grid items-start gap-6 xl:grid-cols-[1fr_360px]">
+      <motion.div variants={staggerContainer} className="grid items-start gap-4 xl:grid-cols-[1fr_320px]">
       <motion.div variants={fadeUp}>
         <div className="mb-4 flex items-center justify-between">
           <div>
@@ -293,7 +293,7 @@ const StudentDashboard: React.FC = () => {
           />
         ) : (
           <motion.div
-            className="grid gap-3 sm:grid-cols-2"
+            className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3"
             variants={staggerContainer}
             initial="hidden"
             animate="visible"

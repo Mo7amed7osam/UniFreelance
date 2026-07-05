@@ -78,12 +78,12 @@ export const TopNav = () => {
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-white/60 bg-white/70 shadow-[0_1px_0_rgba(15,23,42,0.035),0_18px_44px_-32px_rgba(15,23,42,0.42)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/70 dark:border-white/10 dark:bg-ink-dark-surface/70 dark:supports-[backdrop-filter]:bg-ink-dark-surface/70">
-        <div className="mx-auto grid h-[4.25rem] w-full max-w-screen-2xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto grid h-[3.75rem] w-full max-w-screen-2xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 px-4 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-3">
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
-              className="flex h-10 w-10 items-center justify-center rounded-xl text-ink-600 transition-colors hover:bg-ink-100 hover:text-ink-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 xl:hidden dark:text-ink-400 dark:hover:bg-white/10 dark:hover:text-white"
+              className="flex h-9 w-9 items-center justify-center rounded-xl text-ink-600 transition-colors hover:bg-ink-100 hover:text-ink-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 xl:hidden dark:text-ink-400 dark:hover:bg-white/10 dark:hover:text-white"
               aria-label="Open navigation menu"
               aria-expanded={drawerOpen}
             >
@@ -141,7 +141,7 @@ export const TopNav = () => {
             {user?.role === 'Student' ? <StudentPwaInstallButton /> : null}
             {user?.role === 'Student' ? <NotificationBell /> : null}
 
-            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl" onClick={toggleTheme} aria-label="Toggle theme">
+            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-2xl" onClick={toggleTheme} aria-label="Toggle theme">
               {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
             </Button>
 
@@ -152,7 +152,7 @@ export const TopNav = () => {
                   className="flex items-center gap-2 rounded-2xl border border-transparent p-1 pr-2 transition-colors hover:border-ink-200/70 hover:bg-white/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:hover:border-white/10 dark:hover:bg-white/10"
                   aria-label="Open account menu"
                 >
-                  <Avatar className="h-8 w-8">
+                  <Avatar className="h-7 w-7">
                     <AvatarFallback className="text-[10px]">{getInitials(user?.name)}</AvatarFallback>
                   </Avatar>
                   <ChevronDown size={12} className="hidden text-ink-400 sm:block dark:text-ink-dark-muted" />

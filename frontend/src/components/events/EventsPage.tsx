@@ -13,17 +13,17 @@ const EventsPage: React.FC = () => {
   const events = data?.events || [];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <PageHeader eyebrow="Community" title="Upcoming Events" description="Stay up to date with workshops, networking meetups, and freelance opportunities." />
 
       {isLoading ? (
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {[1,2,3].map(i => <Skeleton key={i} className="h-80 w-full rounded-xl" />)}
         </div>
       ) : events.length === 0 ? (
         <EmptyState title="No upcoming events" description="Check back soon for new events and opportunities." />
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {events.map((ev: any) => (
             <button key={ev._id} type="button" onClick={() => navigate(`/events/${ev._id}`)} className="group glass-panel overflow-hidden rounded-xl text-left transition-all duration-300 hover:shadow-xl hover:-translate-y-1" aria-label={`View event: ${ev.title}`}>
               <div className="relative w-full overflow-hidden">
@@ -40,7 +40,7 @@ const EventsPage: React.FC = () => {
                   {ev.isOnline ? 'Online' : ev.location}
                 </div>
               </div>
-              <div className="space-y-3 p-5">
+              <div className="space-y-2 p-4">
                 <h3 className="text-lg font-semibold leading-snug group-hover:text-brand-600 transition-colors">{ev.title}</h3>
                 <p className="text-sm text-ink-500 dark:text-ink-300 line-clamp-2">{ev.description}</p>
                 <div className="flex flex-wrap gap-3 pt-1 text-sm text-ink-400">

@@ -69,9 +69,9 @@ const Register: React.FC = () => {
   return (
     <div className="flex min-h-screen bg-ink-50 dark:bg-ink-dark-bg">
       {/* Left: form */}
-      <div className="flex flex-1 items-center justify-center px-4 py-10 sm:px-8">
+      <div className="flex flex-1 items-center justify-center px-4 py-8 sm:px-8">
         <div className="w-full max-w-md">
-          <div className="mb-8">
+          <div className="mb-6">
             <Link to="/" className="flex items-center text-ink-900 no-underline dark:text-ink-dark-text">
               <Logo />
             </Link>
@@ -87,7 +87,7 @@ const Register: React.FC = () => {
             </CardHeader>
 
             <CardContent className="space-y-5">
-              <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+              <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
                 <div className="space-y-1.5">
                   <Label htmlFor="name">Full name</Label>
                   <Input id="name" placeholder="Alex Johnson" {...register('name')} />
@@ -152,7 +152,7 @@ const Register: React.FC = () => {
       </div>
 
       {/* Right: feature panel */}
-      <div className="hidden w-[42%] shrink-0 flex-col justify-between bg-[radial-gradient(circle_at_top,_#eef5ff_0%,_#f6f9ff_45%,_#ffffff_100%)] p-10 text-ink-950 lg:flex dark:bg-ink-950 dark:text-white">
+      <div className="hidden w-[42%] shrink-0 flex-col justify-between bg-[radial-gradient(circle_at_top,_#eef5ff_0%,_#f6f9ff_45%,_#ffffff_100%)] p-8 text-ink-950 lg:flex dark:bg-ink-950 dark:text-white">
         <div className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white/85 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-brand-500 dark:border-white/20 dark:bg-white/10 dark:text-ink-300">
           <Sparkles size={12} />
           Why Shaghalny
@@ -160,16 +160,16 @@ const Register: React.FC = () => {
 
         <div className="space-y-6">
           <div className="space-y-3">
-            <h2 className="text-balance text-4xl font-semibold text-ink-950 dark:text-white">
+            <h2 className="text-balance text-3xl font-semibold text-ink-950 dark:text-white">
               A cleaner path from student potential to paid work.
             </h2>
-            <p className="text-base leading-7 text-ink-600 dark:text-ink-200">
+            <p className="text-sm leading-6 text-ink-600 dark:text-ink-200">
               Students can prove capability, and clients can hire with clearer signals. No guessing on either side.
             </p>
           </div>
           <div className="space-y-3">
             {roleCards.map((item) => (
-              <div key={item.title} className="flex items-start gap-3 rounded-lg border border-ink-200 bg-white/90 px-4 py-3 shadow-soft dark:border-white/15 dark:bg-white/10 dark:shadow-none">
+              <div key={item.title} className="flex items-start gap-3 rounded-xl border border-ink-200 bg-white/90 px-3 py-2.5 shadow-soft dark:border-white/15 dark:bg-white/10 dark:shadow-none">
                 <item.icon size={16} className="mt-0.5 shrink-0 text-brand-500 dark:text-brand-300" />
                 <div>
                   <p className="text-sm font-semibold text-ink-950 dark:text-white">{item.title}</p>

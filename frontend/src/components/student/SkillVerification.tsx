@@ -84,7 +84,7 @@ const SkillVerification: React.FC = () => {
   const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.06 } } };
 
   return (
-    <motion.div className="space-y-10" initial="hidden" animate="visible" variants={stagger}>
+    <motion.div className="space-y-6" initial="hidden" animate="visible" variants={stagger}>
       <motion.div variants={fadeUp}><PageHeader
         eyebrow="Mandatory verification"
         title="Skill verification interviews"
@@ -98,7 +98,7 @@ const SkillVerification: React.FC = () => {
       </motion.div>
 
       <motion.div variants={fadeUp}><section className="feature-highlight text-white">
-        <CardContent className="relative grid gap-5 p-8 md:grid-cols-3 lg:p-10">
+        <CardContent className="relative grid gap-4 p-5 md:grid-cols-3 lg:p-6">
           {[
             {
               title: 'AI-guided interview',
@@ -116,19 +116,19 @@ const SkillVerification: React.FC = () => {
               Icon: Sparkles,
             },
           ].map(({ title, body, Icon }) => (
-            <div key={title} className="rounded-2xl border border-white/15 bg-white/10 p-6 shadow-[0_1px_0_rgba(255,255,255,0.12)_inset] backdrop-blur">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15">
-                <Icon size={20} />
+            <div key={title} className="rounded-2xl border border-white/15 bg-white/10 p-4 shadow-[0_1px_0_rgba(255,255,255,0.12)_inset] backdrop-blur">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15">
+                <Icon size={18} />
               </div>
-              <p className="mt-5 text-xl font-semibold text-white">{title}</p>
-              <p className="mt-2 text-sm leading-6 text-white/85">{body}</p>
+              <p className="mt-4 text-base font-semibold text-white">{title}</p>
+              <p className="mt-1.5 text-sm leading-6 text-white/85">{body}</p>
             </div>
           ))}
         </CardContent>
       </section></motion.div>
 
       {isLoading ? (
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-72 w-full rounded-xl" />
           ))}
@@ -136,13 +136,13 @@ const SkillVerification: React.FC = () => {
       ) : (skills || []).length === 0 ? (
         <EmptyState title="No skills available" description="Verification tracks will appear here once the skill library is ready." />
       ) : (
-        <motion.div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3" variants={stagger} initial="hidden" animate="visible">
+        <motion.div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" variants={stagger} initial="hidden" animate="visible">
           {(skills || []).map((skill: any) => (
             <motion.div key={skill._id} variants={fadeUp}>
             <Card className="interactive-card overflow-hidden p-0 hover:border-brand-200/80 dark:hover:border-brand-500/25">
-              <CardHeader className="space-y-4 p-6">
+              <CardHeader className="space-y-3 p-4">
                 <div className="flex items-start justify-between gap-3">
-                  <CardTitle className="text-2xl">{skill.name}</CardTitle>
+                  <CardTitle className="text-lg">{skill.name}</CardTitle>
                   <Badge variant="brand">AI interview</Badge>
                 </div>
                 <p className="text-sm text-ink-600 dark:text-ink-200">
@@ -150,7 +150,7 @@ const SkillVerification: React.FC = () => {
                 </p>
               </CardHeader>
 
-              <CardContent className="space-y-5 p-6 pt-0">
+              <CardContent className="space-y-4 p-4 pt-0">
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="muted-panel p-3">
                     <p className="label-muted">Interview mode</p>

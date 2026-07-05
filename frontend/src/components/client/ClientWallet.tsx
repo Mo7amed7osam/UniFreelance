@@ -93,7 +93,7 @@ const ClientWallet: React.FC = () => {
   const instapayReceiver = balanceData?.instapayReceiver || '01146370900';
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <PageHeader
         eyebrow="Client wallet"
         title="Wallet and top-ups"
@@ -108,7 +108,7 @@ const ClientWallet: React.FC = () => {
           tone="brand"
         />
 
-        <div className="glass-panel xl:col-span-2 p-6">
+        <div className="glass-panel xl:col-span-2 p-4">
           <h2 className="text-2xl font-semibold">Instapay instructions</h2>
           <p className="mt-2 text-sm text-ink-500 dark:text-ink-300">
             Transfer the exact amount to <span className="font-semibold text-ink-900 dark:text-white">{instapayReceiver}</span>, then upload the payment screenshot below.
@@ -116,8 +116,8 @@ const ClientWallet: React.FC = () => {
         </div>
       </div>
 
-      <div className="glass-panel p-6">
-        <div className="space-y-5">
+      <div className="glass-panel p-4">
+        <div className="space-y-4">
           <div>
             <h2 className="text-2xl font-semibold">Submit top-up request</h2>
             <p className="text-sm text-ink-500 dark:text-ink-300">Add the transfer amount, attach proof, and include any useful reference note.</p>

@@ -25,9 +25,9 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 }) => {
   return (
     <Card className={cn('border-dashed', className)}>
-      <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
-          <Icon size={22} />
+      <CardContent className="flex flex-col items-center gap-3 py-8 text-center">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+          <Icon size={19} />
         </div>
         <div className="space-y-1.5">
           <h3 className="text-base font-semibold text-ink-900 dark:text-ink-dark-text">{title}</h3>

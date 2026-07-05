@@ -18,11 +18,11 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   className,
 }) => {
   return (
-    <div className={cn('flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between', className)}>
-      <div className="space-y-3">
+    <div className={cn('flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between', className)}>
+      <div className="space-y-2">
         {eyebrow ? <p className="page-eyebrow">{eyebrow}</p> : null}
-        <div className="space-y-2">
-          <h1 className="text-balance text-3xl font-semibold sm:text-4xl">{title}</h1>
+        <div className="space-y-1.5">
+          <h1 className="text-balance text-2xl font-semibold sm:text-3xl">{title}</h1>
           {description ? <div className="page-copy">{description}</div> : null}
         </div>
       </div>
