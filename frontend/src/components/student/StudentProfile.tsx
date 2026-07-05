@@ -201,6 +201,7 @@ const StudentProfile: React.FC = () => {
       setPhotoLoadError(false);
       toast.success('Profile photo updated');
       queryClient.invalidateQueries({ queryKey: ['student', 'profile', userId] });
+      queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
       if (photoInputRef.current) photoInputRef.current.value = '';
     },
     onError: () => {

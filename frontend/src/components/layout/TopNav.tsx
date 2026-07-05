@@ -7,7 +7,7 @@ import { Logo } from '@/components/brand/Logo';
 import { NotificationBell } from '@/components/layout/NotificationBell';
 import { navByRole } from '@/components/layout/nav-config';
 import { StudentPwaInstallButton } from '@/components/pwa/StudentPwaInstallButton';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,6 +15,7 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import useAuth from '@/hooks/useAuth';
+import { buildAssetUrl } from '@/lib/assets';
 import { getTheme, setTheme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 
@@ -29,6 +30,7 @@ export const TopNav = () => {
   const location = useLocation();
   const [theme, setThemeState] = useState<'light' | 'dark'>(getTheme());
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const profilePhotoUrl = buildAssetUrl(user?.profilePhotoUrl);
 
   const items = user ? navByRole[user.role] || [] : [];
   const primaryItems = user?.role === 'Student'
@@ -160,6 +162,7 @@ export const TopNav = () => {
                   aria-label="Open account menu"
                 >
                   <Avatar className="h-7 w-7">
+                    {profilePhotoUrl ? <AvatarImage src={profilePhotoUrl} alt={user?.name || 'Profile'} /> : null}
                     <AvatarFallback className="bg-gradient-to-br from-brand-300 to-brand-500 text-[10px] font-bold text-white">{getInitials(user?.name)}</AvatarFallback>
                   </Avatar>
                   <ChevronDown size={12} className="hidden text-ink-400 sm:block dark:text-ink-dark-muted" />
@@ -260,6 +263,7 @@ export const TopNav = () => {
               <div className="shrink-0 border-t border-ink-200 p-3 dark:border-ink-dark-border">
                 <div className="flex items-center gap-3 rounded-lg p-2">
                   <Avatar className="h-8 w-8 shrink-0">
+                    {profilePhotoUrl ? <AvatarImage src={profilePhotoUrl} alt={user?.name || 'Profile'} /> : null}
                     <AvatarFallback className="text-xs">{getInitials(user?.name)}</AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">
