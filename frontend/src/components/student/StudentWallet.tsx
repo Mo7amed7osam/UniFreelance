@@ -1,5 +1,5 @@
 import { formatCurrency } from '@/lib/currency';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ArrowDown, ArrowUp, Check, CreditCard, Wallet } from 'lucide-react';
@@ -34,6 +34,8 @@ const StudentWallet: React.FC = () => {
   const [bankAccount, setBankAccount] = useState('');
   const [instapayHandle, setInstapayHandle] = useState('');
   const [note, setNote] = useState('');
+  const payoutFormRef = useRef<HTMLElement | null>(null);
+  const payoutMethodRef = useRef<HTMLSelectElement | null>(null);
 
   const { data: balanceData, isLoading: balanceLoading } = useQuery({
     queryKey: ['wallet', 'balance', userId],
@@ -104,6 +106,11 @@ const StudentWallet: React.FC = () => {
   }, [withdrawals]);
 
   const balance = balanceData?.balance ?? 0;
+
+  const handleChangePayoutMethod = () => {
+    payoutFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    window.setTimeout(() => payoutMethodRef.current?.focus(), 250);
+  };
 
   return (
     <div className="space-y-[22px]">
@@ -191,7 +198,15 @@ const StudentWallet: React.FC = () => {
           <section className="sh-panel p-[18px]">
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-ink-900 dark:text-white">Payout method</h3>
-              <span className="text-xs font-semibold text-brand-600">Change</span>
+              <button
+                type="button"
+                className="text-xs font-semibold text-brand-600 transition hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                onClick={handleChangePayoutMethod}
+                disabled={withdrawMutation.isPending}
+                aria-controls="withdrawal-request-form"
+              >
+                Change
+              </button>
             </div>
             <div className="flex items-center gap-3 rounded-[11px] border border-ink-200 p-3 dark:border-ink-dark-border">
               <div className="flex h-9 w-9 items-center justify-center rounded-[9px] bg-brand-50 text-brand-500 dark:bg-brand-500/15">
@@ -206,11 +221,11 @@ const StudentWallet: React.FC = () => {
             <p className="mt-2.5 text-xs leading-5 text-ink-400">Withdrawals arrive after admin review.</p>
           </section>
 
-          <section className="sh-panel p-[18px]">
+          <section ref={payoutFormRef} id="withdrawal-request-form" className="sh-panel p-[18px]">
             <h3 className="mb-3 text-sm font-semibold text-ink-900 dark:text-white">Request a withdrawal</h3>
             <div className="space-y-3">
               <Input type="number" placeholder="Amount" value={amount} onChange={(e) => setAmount(e.target.value)} disabled={withdrawMutation.isPending} />
-              <Select value={payoutMethod} onChange={(e) => setPayoutMethod(e.target.value as 'BANK' | 'INSTAPAY')} disabled={withdrawMutation.isPending}>
+              <Select ref={payoutMethodRef} value={payoutMethod} onChange={(e) => setPayoutMethod(e.target.value as 'BANK' | 'INSTAPAY')} disabled={withdrawMutation.isPending}>
                 <option value="BANK">Bank account</option>
                 <option value="INSTAPAY">Instapay</option>
               </Select>
