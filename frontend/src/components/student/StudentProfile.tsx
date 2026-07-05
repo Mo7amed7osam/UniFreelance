@@ -239,6 +239,15 @@ const StudentProfile: React.FC = () => {
     const rawLinks = formValues.portfolioLinks.split('\n');
     return rawLinks.some((link) => link.length > 0) ? rawLinks : [''];
   }, [formValues.portfolioLinks]);
+  const completionChecks = [
+    { label: 'Bio', done: Boolean(formValues.description.trim()) },
+    { label: 'University', done: Boolean(formValues.university.trim()) },
+    { label: 'Photo', done: Boolean(formValues.profilePhotoUrl || profile?.profilePhotoUrl || localPhotoPreview) },
+    { label: 'Cover', done: Boolean(formValues.coverPhotoUrl || profile?.coverPhotoUrl || localCoverPreview) },
+    { label: 'Verified skill', done: verifiedSkills.length > 0 },
+    { label: 'Portfolio', done: portfolioLinks.length > 0 },
+  ];
+  const nextCompletionItem = completionChecks.find((item) => !item.done)?.label;
 
   const handlePhotoSelect = async (file?: File) => {
     if (!file) return;
@@ -445,8 +454,8 @@ const StudentProfile: React.FC = () => {
         </motion.div>
       ) : (
         <motion.div variants={fadeUp} className="space-y-4">
-          <Card className="p-0">
-            <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <Card className="overflow-hidden p-0">
+            <CardContent className="grid gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center sm:p-5">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <div className="min-w-0">
@@ -454,10 +463,25 @@ const StudentProfile: React.FC = () => {
                     <h2 className="mt-1 text-xl font-semibold tracking-tight text-ink-950 dark:text-white">{completionPct}% complete</h2>
                   </div>
                   <span className="w-fit rounded-full border border-brand-100 bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 dark:border-brand-500/20 dark:bg-brand-900/20 dark:text-brand-300 sm:text-sm">
-                    Client-ready profile
+                    {nextCompletionItem ? `Next: ${nextCompletionItem}` : 'Client-ready profile'}
                   </span>
                 </div>
                 <Progress value={completionPct} className="mt-4" />
+                <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {completionChecks.map((item) => (
+                    <span
+                      key={item.label}
+                      className={`inline-flex min-w-0 items-center gap-2 rounded-xl border px-2.5 py-2 text-xs font-semibold ${
+                        item.done
+                          ? 'border-accent-200 bg-accent-50 text-accent-700 dark:border-accent-500/20 dark:bg-accent-500/10 dark:text-accent-300'
+                          : 'border-ink-200 bg-ink-50 text-ink-500 dark:border-white/10 dark:bg-white/[0.045] dark:text-ink-dark-muted'
+                      }`}
+                    >
+                      <CheckCircle2 size={13} className={item.done ? 'text-accent-500' : 'text-ink-300 dark:text-ink-600'} />
+                      <span className="truncate">{item.label}</span>
+                    </span>
+                  ))}
+                </div>
               </div>
               <Button type="button" onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto">
                 {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}

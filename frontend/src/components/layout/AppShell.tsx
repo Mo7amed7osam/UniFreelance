@@ -7,7 +7,7 @@ export const AppShell = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex min-h-screen flex-col bg-transparent">
       <TopNav />
-      <main className="flex-1 pb-24 pt-4 md:pb-8 md:pt-5">
+      <main className="flex-1 pb-[calc(8rem+env(safe-area-inset-bottom))] pt-4 md:pb-8 md:pt-5">
         <div className="page-container">
           {children}
         </div>

@@ -91,7 +91,7 @@ export const TopNav = () => {
             </button>
 
             <NavLink to={homePath} className="flex shrink-0 items-center rounded-xl no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" aria-label="Go to dashboard">
-              <Logo className="gap-2" markClassName="h-7 w-7" />
+              <Logo className="gap-2 [&>span]:hidden min-[430px]:[&>span]:inline" markClassName="h-7 w-7" />
             </NavLink>
           </div>
 

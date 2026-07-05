@@ -137,12 +137,18 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
     setDrafts((p) => ({ ...p, [jobId]: { ...getDraft(jobId), [field]: value } }));
   };
 
+  const getMissingVerifiedSkills = (job: any) =>
+    (job?.requiredSkills || []).filter((skill: any) => !verifiedSkillIds.has(String(skill?._id || skill)));
+
+  const openJobCount = filteredJobs.filter((job: any) => !submittedJobIds.has(job._id || job.id)).length;
+  const readyJobCount = filteredJobs.filter((job: any) => {
+    const jobKey = job._id || job.id;
+    return !submittedJobIds.has(jobKey) && getMissingVerifiedSkills(job).length === 0;
+  }).length;
+
   const activeJob = filteredJobs.find((j: any) => (j._id || j.id) === activeJobId);
   const activeDraft = activeJobId ? getDraft(activeJobId) : emptyDraft();
   const coverLetterLength = activeDraft.details.trim().length;
-
-  const getMissingVerifiedSkills = (job: any) =>
-    (job?.requiredSkills || []).filter((skill: any) => !verifiedSkillIds.has(String(skill?._id || skill)));
 
   const handleSubmit = async () => {
     if (!activeJobId) return;
@@ -187,19 +193,34 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
       )}
 
       {/* Search bar */}
-      <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-white/70 bg-white/90 px-4 py-3 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/95 dark:shadow-dark-card">
-        <Search size={16} className="shrink-0 text-ink-400" />
-        <Input
-          placeholder="Search by title, skill, or keyword..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="min-h-0 border-0 bg-transparent p-0 text-sm shadow-none focus:ring-0 dark:bg-transparent"
-        />
-        {search && (
-          <button onClick={() => setSearch('')} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-ink-400 transition-colors hover:bg-ink-100 hover:text-ink-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:hover:bg-white/10">
-            <X size={14} />
-          </button>
-        )}
+      <div className="sticky top-[4.75rem] z-20 -mx-1 rounded-2xl bg-ink-50/[0.92] p-1 shadow-[0_18px_46px_-34px_rgba(15,23,42,0.65)] backdrop-blur-xl dark:bg-ink-dark-bg/[0.92] md:static md:mx-0 md:bg-transparent md:p-0 md:shadow-none md:backdrop-blur-0">
+        <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-white/70 bg-white/[0.92] px-4 py-3 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/95 dark:shadow-dark-card">
+          <Search size={16} className="shrink-0 text-ink-400" />
+          <Input
+            placeholder="Search by title, skill, or keyword..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="min-h-0 border-0 bg-transparent p-0 text-sm shadow-none focus:ring-0 dark:bg-transparent"
+          />
+          {search && (
+            <button onClick={() => setSearch('')} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-ink-400 transition-colors hover:bg-ink-100 hover:text-ink-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:hover:bg-white/10">
+              <X size={14} />
+            </button>
+          )}
+        </div>
+        {!isLoading && !isError ? (
+          <div className="mt-2 flex min-w-0 gap-2 overflow-x-auto px-1 pb-0.5 text-xs md:hidden">
+            <span className="shrink-0 rounded-full border border-ink-200 bg-white px-3 py-1 font-semibold text-ink-600 dark:border-white/10 dark:bg-white/[0.055] dark:text-ink-300">
+              {filteredJobs.length} jobs
+            </span>
+            <span className="shrink-0 rounded-full border border-brand-100 bg-brand-50 px-3 py-1 font-semibold text-brand-700 dark:border-brand-400/20 dark:bg-brand-400/[0.12] dark:text-brand-200">
+              {readyJobCount} ready to apply
+            </span>
+            <span className="shrink-0 rounded-full border border-ink-200 bg-white px-3 py-1 font-semibold text-ink-500 dark:border-white/10 dark:bg-white/[0.055] dark:text-ink-dark-muted">
+              {openJobCount} open
+            </span>
+          </div>
+        ) : null}
       </div>
 
       {/* Loading skeletons */}

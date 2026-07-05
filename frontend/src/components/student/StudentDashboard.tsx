@@ -116,6 +116,37 @@ const StudentDashboard: React.FC = () => {
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   const recentActivity = proposalList.slice(0, 3);
+  const nextAction = completionMissing.includes('Skills verified')
+    ? {
+        title: 'Verify your first skill',
+        body: 'Verified skills make proposals more credible before clients review your profile.',
+        cta: 'Start verification',
+        path: '/student/skill-verification',
+        icon: <Shield size={17} />,
+      }
+    : completionPct < 100
+      ? {
+          title: `Add ${completionMissing[0]?.toLowerCase() || 'profile proof'}`,
+          body: 'Finish the missing profile proof so clients can evaluate you faster.',
+          cta: 'Finish profile',
+          path: '/student/profile',
+          icon: <TrendingUp size={17} />,
+        }
+      : activeProposals === 0
+        ? {
+            title: 'Send your first proposal',
+            body: 'You have a client-ready profile. Browse matched jobs and apply with a focused proposal.',
+            cta: 'Browse jobs',
+            path: '/student/jobs',
+            icon: <Briefcase size={17} />,
+          }
+        : {
+            title: 'Review active proposals',
+            body: 'Keep an eye on shortlisted work, contract progress, and client responses.',
+            cta: 'View contracts',
+            path: '/student/contracts',
+            icon: <FileText size={17} />,
+          };
 
   return (
     <motion.div className="space-y-5" initial="hidden" animate="visible" variants={staggerContainer}>
@@ -174,6 +205,26 @@ const StudentDashboard: React.FC = () => {
         />
       </motion.div>
 
+      <motion.div variants={fadeUp}>
+        <Card className="overflow-hidden border-brand-200/70 bg-white/[0.92] p-0 dark:border-brand-400/20 dark:bg-ink-dark-surface/[0.92]">
+          <CardContent className="flex flex-col gap-3 p-3.5 sm:flex-row sm:items-center sm:justify-between sm:p-4">
+            <div className="flex min-w-0 items-start gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100 dark:bg-brand-400/[0.12] dark:text-brand-200 dark:ring-brand-400/20">
+                {nextAction.icon}
+              </span>
+              <div className="min-w-0">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-600 dark:text-brand-300">Next best action</p>
+                <p className="mt-0.5 font-semibold text-ink-950 dark:text-white">{nextAction.title}</p>
+                <p className="mt-0.5 max-w-2xl text-sm leading-6 text-ink-500 dark:text-ink-dark-muted">{nextAction.body}</p>
+              </div>
+            </div>
+            <Button size="sm" className="w-full shrink-0 sm:w-auto" onClick={() => navigate(nextAction.path)}>
+              {nextAction.cta} <ArrowRight size={13} />
+            </Button>
+          </CardContent>
+        </Card>
+      </motion.div>
+
       {/* Middle row: quick actions + upcoming interviews */}
       <motion.div variants={staggerContainer} className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
         <motion.div variants={fadeUp}>
@@ -217,11 +268,14 @@ const StudentDashboard: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="mt-3">
-              <div className="rounded-xl border border-dashed border-ink-200/80 bg-ink-50/70 px-4 py-5 text-center dark:border-white/10 dark:bg-white/[0.035]">
-                <p className="text-sm font-semibold text-ink-900 dark:text-white">No interviews scheduled</p>
-                <p className="mt-1 text-xs leading-5 text-ink-500 dark:text-ink-dark-muted">
-                  New interview invitations will appear here when a client schedules one.
-                </p>
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-dashed border-ink-200/80 bg-ink-50/70 px-3 py-3 dark:border-white/10 dark:bg-white/[0.035]">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-ink-900 dark:text-white">No interviews scheduled</p>
+                  <p className="mt-0.5 text-xs leading-5 text-ink-500 dark:text-ink-dark-muted">Invitations appear here.</p>
+                </div>
+                <Button variant="ghost" size="sm" className="shrink-0" onClick={() => navigate('/student/skill-verification')}>
+                  Prepare
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -293,7 +347,7 @@ const StudentDashboard: React.FC = () => {
           </CardHeader>
           <CardContent className="mt-3 space-y-2">
             {recentActivity.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-ink-200/80 bg-ink-50/70 px-4 py-5 text-center text-sm text-ink-500 dark:border-white/10 dark:bg-white/[0.035] dark:text-ink-dark-muted">
+              <p className="rounded-xl border border-dashed border-ink-200/80 bg-ink-50/70 px-3 py-3 text-center text-sm text-ink-500 dark:border-white/10 dark:bg-white/[0.035] dark:text-ink-dark-muted">
                 Activity will appear here after you apply to jobs.
               </p>
             ) : (
