@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, LogOut, Menu, Moon, Search, Sun, User, X } from 'lucide-react';
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { ChevronDown, LogOut, Menu, Moon, Sun, User, X } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 
 import { Logo } from '@/components/brand/Logo';
@@ -30,13 +30,11 @@ export const TopNav = () => {
   const location = useLocation();
   const [theme, setThemeState] = useState<'light' | 'dark'>(getTheme());
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [navSearch, setNavSearch] = useState('');
-  const searchInputRef = useRef<HTMLInputElement>(null);
   const profilePhotoUrl = buildAssetUrl(user?.profilePhotoUrl);
 
   const items = user ? navByRole[user.role] || [] : [];
   const primaryItems = user?.role === 'Student'
-    ? ['Dashboard', 'Job Board', 'Skill Verification', 'Career Roadmap', 'Profile', 'Wallet']
+    ? ['Dashboard', 'Job Board', 'Skill Verification', 'Career Roadmap', 'Events', 'Profile', 'Wallet']
       .flatMap((label) => items.filter((item) => item.label === label))
     : items;
 
@@ -58,19 +56,6 @@ export const TopNav = () => {
     const next = theme === 'dark' ? 'light' : 'dark';
     setThemeState(next);
     setTheme(next);
-  };
-
-  const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const term = navSearch.trim();
-    if (!term) return;
-
-    if (user?.role === 'Student') {
-      navigate(`/student/jobs?search=${encodeURIComponent(term)}`);
-      return;
-    }
-
-    navigate(`${homePath}?search=${encodeURIComponent(term)}`);
   };
 
   // Close the drawer on navigation and lock body scroll while it is open.
@@ -95,17 +80,6 @@ export const TopNav = () => {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [drawerOpen]);
-
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
-        event.preventDefault();
-        searchInputRef.current?.focus();
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
 
   return (
     <>
@@ -162,20 +136,6 @@ export const TopNav = () => {
           </nav>
 
           <div className="flex min-w-0 shrink-0 items-center justify-end gap-1.5">
-            <form onSubmit={handleSearchSubmit} className="hidden h-[38px] items-center gap-2 rounded-[10px] border border-ink-200 bg-white px-3 text-sm shadow-soft transition-colors focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-100 lg:flex dark:border-ink-dark-border dark:bg-white/[0.055] dark:focus-within:border-brand-500 dark:focus-within:ring-brand-500/20">
-              <Search size={13} className="shrink-0 text-ink-400 dark:text-ink-dark-muted" />
-              <input
-                ref={searchInputRef}
-                type="search"
-                placeholder={user?.role === 'Student' ? 'Search jobs' : 'Search'}
-                aria-label="Search"
-                value={navSearch}
-                onChange={(event) => setNavSearch(event.target.value)}
-                className="w-24 bg-transparent text-sm text-ink-800 outline-none placeholder:text-ink-400 xl:w-32 dark:text-ink-dark-text dark:placeholder:text-ink-dark-muted"
-              />
-              <span className="rounded-[5px] border border-ink-200 bg-ink-100 px-1.5 py-0.5 font-mono text-[11px] text-ink-500 dark:border-ink-dark-border dark:bg-white/[0.06]">⌘K</span>
-            </form>
-
             {user?.role === 'Student' ? <StudentPwaInstallButton /> : null}
             {user?.role === 'Student' ? <NotificationBell /> : null}
 
