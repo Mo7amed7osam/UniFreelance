@@ -32,7 +32,7 @@ export const TopNav = () => {
 
   const items = user ? navByRole[user.role] || [] : [];
   const primaryItems = user?.role === 'Student'
-    ? ['Dashboard', 'Job Board', 'Skill Verification', 'Profile', 'Wallet']
+    ? ['Dashboard', 'Job Board', 'Skill Verification', 'Career Roadmap', 'Profile', 'Wallet']
       .flatMap((label) => items.filter((item) => item.label === label))
     : items;
 
@@ -124,7 +124,9 @@ export const TopNav = () => {
                     ) : (
                       <span className="absolute inset-0 -z-10 rounded-full opacity-0 transition-opacity duration-150 hover:opacity-100 hover:bg-ink-200/50 dark:hover:bg-white/10" />
                     )}
-                    <span className="whitespace-nowrap">{item.label === 'Skill Verification' ? 'Verify' : item.label}</span>
+                    <span className="whitespace-nowrap">
+                      {item.label === 'Skill Verification' ? 'Verify' : item.label === 'Career Roadmap' ? 'Roadmap' : item.label}
+                    </span>
                   </>
                 )}
               </NavLink>
