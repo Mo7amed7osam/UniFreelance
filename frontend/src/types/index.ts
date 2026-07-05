@@ -6,6 +6,7 @@ export interface User {
   role: 'Student' | 'Client' | 'Admin';
   verifiedSkills: VerifiedSkill[];
   profilePhotoUrl?: string;
+  coverPhotoUrl?: string;
   description?: string;
   university?: string;
   portfolioLinks?: string[];

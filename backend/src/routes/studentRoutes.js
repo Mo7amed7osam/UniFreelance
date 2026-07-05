@@ -5,6 +5,7 @@ const {
     browseJobs,
     submitProposal,
     uploadStudentCV,
+    uploadStudentCover,
     uploadStudentPhoto,
     getStudentProposals,
 } = require('../controllers/studentController');
@@ -23,6 +24,9 @@ router.post('/:id/upload-cv', authenticate, checkRole(['Student', 'Admin']), upl
 
 // Route to upload profile photo
 router.post('/:id/upload-photo', authenticate, checkRole(['Student', 'Admin']), upload.single('photo'), uploadStudentPhoto);
+
+// Route to upload profile cover
+router.post('/:id/upload-cover', authenticate, checkRole(['Student', 'Admin']), upload.single('cover'), uploadStudentCover);
 
 // Route to browse available jobs
 router.get('/jobs', authenticate, checkRole('Student'), browseJobs);

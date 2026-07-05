@@ -235,6 +235,15 @@ export const uploadStudentPhoto = async (studentId: string, file: File) => {
   return response.data;
 };
 
+export const uploadStudentCover = async (studentId: string, file: File) => {
+  const formData = new FormData();
+  formData.append('cover', file);
+  const response = await http.post(`/students/${studentId}/upload-cover`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+};
+
 export const getStudentProposals = async (studentId: string) => {
   const response = await http.get(`/students/${studentId}/proposals`);
   return response.data;

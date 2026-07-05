@@ -25,6 +25,7 @@ const UserSchema = new Schema({
   verifiedSkills: { type: [VerifiedSkillSchema], default: [] },
   cvUrl: { type: String },
   profilePhotoUrl: { type: String },
+  coverPhotoUrl: { type: String },
   description: { type: String },
   university: { type: String },
   portfolioLinks: { type: [String], default: [] },

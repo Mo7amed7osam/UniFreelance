@@ -18,7 +18,7 @@ const getStudentProfile = async (req, res) => {
 
         const student = await User.findById(studentId)
             .populate('verifiedSkills.skill', 'name')
-            .select('name email description university portfolioLinks profilePhotoUrl verifiedSkills reviews jobsCompleted cvUrl role balance');
+            .select('name email description university portfolioLinks profilePhotoUrl coverPhotoUrl verifiedSkills reviews jobsCompleted cvUrl role balance');
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
@@ -60,6 +60,7 @@ const getStudentProfile = async (req, res) => {
             university: student.university,
             portfolioLinks: student.portfolioLinks || [],
             profilePhotoUrl: student.profilePhotoUrl,
+            coverPhotoUrl: student.coverPhotoUrl,
             verifiedSkills: filteredVerifiedSkills.map((skill) => ({
                 skill: skill.skill,
                 score: skill.score,
@@ -105,7 +106,7 @@ const updateStudentProfile = async (req, res) => {
         if (req.user?.id !== studentId && req.user?.role !== 'Admin') {
             return res.status(403).json({ message: 'Not authorized to update this profile' });
         }
-        const allowedFields = ['name', 'description', 'profilePhotoUrl', 'university', 'portfolioLinks'];
+        const allowedFields = ['name', 'description', 'profilePhotoUrl', 'coverPhotoUrl', 'university', 'portfolioLinks'];
         const updatedData = allowedFields.reduce((acc, field) => {
             if (req.body[field] !== undefined) {
                 acc[field] = req.body[field];
@@ -131,6 +132,31 @@ const updateStudentProfile = async (req, res) => {
             return res.status(404).json({ message: 'Student not found' });
         }
         res.status(200).json(updatedStudent);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
+
+// Upload profile cover
+const uploadStudentCover = async (req, res) => {
+    try {
+        const studentId = req.params.id;
+        if (req.user?.id !== studentId && req.user?.role !== 'Admin') {
+            return res.status(403).json({ message: 'Not authorized to upload for this profile' });
+        }
+        const coverFile = req.file;
+
+        if (!coverFile) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+        if (!coverFile.mimetype?.startsWith('image/')) {
+            return res.status(400).json({ message: 'Profile cover must be an image.' });
+        }
+
+        const coverPhotoUrl = `/uploads/photos/${coverFile.filename}`;
+        await User.findByIdAndUpdate(studentId, { coverPhotoUrl });
+
+        res.status(200).json({ message: 'Profile cover uploaded successfully', coverPhotoUrl });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error });
     }
@@ -268,6 +294,7 @@ module.exports = {
     getStudentProfile,
     updateStudentProfile,
     uploadStudentCV,
+    uploadStudentCover,
     uploadStudentPhoto,
     browseJobs,
     submitProposal,
