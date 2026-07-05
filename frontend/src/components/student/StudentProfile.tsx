@@ -3,15 +3,18 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
   BadgeCheck,
+  BriefcaseBusiness,
   Camera,
   CheckCircle2,
   ExternalLink,
   FileText,
   GraduationCap,
+  Globe2,
   ImageOff,
   Link2,
   Loader2,
   Mail,
+  PencilLine,
   Star,
   Upload,
   UserRound,
@@ -61,7 +64,22 @@ const fadeUp = {
 
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.06 } } };
 
-const ProfileSection = ({
+function getDomain(link: string) {
+  try {
+    return new URL(link).hostname.replace(/^www\./, '');
+  } catch {
+    return link.replace(/^https?:\/\//, '').split('/')[0] || 'portfolio link';
+  }
+}
+
+function getProfileTitle(profile: any, verifiedSkills: any[]) {
+  const primarySkill = verifiedSkills[0]?.skill?.name;
+  if (primarySkill) return `${primarySkill} freelancer`;
+  if (profile?.university) return `${profile.university} student freelancer`;
+  return 'Student freelancer';
+}
+
+const EditSection = ({
   title,
   icon,
   children,
@@ -72,11 +90,11 @@ const ProfileSection = ({
   children: React.ReactNode;
   action?: React.ReactNode;
 }) => (
-  <Card className="p-0">
-    <CardHeader className="mb-0 border-b border-ink-100/80 p-5 dark:border-white/10">
+  <Card className="overflow-hidden p-0">
+    <CardHeader className="mb-0 border-b border-ink-100/80 bg-ink-50/45 p-4 dark:border-white/10 dark:bg-white/[0.025]">
       <div className="flex items-center justify-between gap-4">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100 dark:bg-brand-900/30 dark:text-brand-300 dark:ring-brand-700/30">
+        <CardTitle className="flex items-center gap-2 text-sm">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-brand-600 ring-1 ring-ink-200/80 dark:bg-white/10 dark:text-brand-300 dark:ring-white/10">
             {icon}
           </span>
           {title}
@@ -84,7 +102,7 @@ const ProfileSection = ({
         {action}
       </div>
     </CardHeader>
-    <CardContent className="p-5">{children}</CardContent>
+    <CardContent className="p-4">{children}</CardContent>
   </Card>
 );
 
@@ -216,135 +234,228 @@ const StudentProfile: React.FC = () => {
   }
 
   const verifiedSkills = profile.verifiedSkills || [];
+  const profileTitle = getProfileTitle(profile, verifiedSkills);
+  const featuredLinks = portfolioLinks.slice(0, 4);
 
   return (
-    <motion.div className="mx-auto w-full max-w-6xl space-y-6" initial="hidden" animate="visible" variants={stagger}>
-      <motion.div variants={fadeUp} className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="page-eyebrow">Student profile</p>
-          <h1 className="mt-2 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Professional profile</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-500 dark:text-ink-400">
-            Manage the public profile clients use to evaluate your verified skills, education, portfolio, and CV.
-          </p>
-        </div>
-        <Button
-          onClick={() => saveProfile({ ...formValues, portfolioLinks: formValues.portfolioLinks })}
-          disabled={isSaving}
-        >
-          {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-          {isSaving ? 'Saving...' : 'Save changes'}
-        </Button>
-      </motion.div>
+    <motion.div className="mx-auto w-full max-w-6xl space-y-5" initial="hidden" animate="visible" variants={stagger}>
+      <motion.section variants={fadeUp} className="overflow-hidden rounded-[2rem] border border-white/70 bg-white/90 shadow-card backdrop-blur-xl dark:border-white/10 dark:bg-ink-dark-surface/90">
+        <div className="h-24 bg-[linear-gradient(135deg,#2563eb_0%,#1e40af_45%,#0f172a_100%)]" />
+        <div className="grid gap-6 px-5 pb-6 lg:grid-cols-[minmax(0,1fr)_300px] lg:px-7">
+          <div className="-mt-12 flex min-w-0 flex-col gap-5 sm:flex-row sm:items-end">
+            <div className="relative shrink-0">
+              <Avatar className="h-32 w-32 border-4 border-white bg-white shadow-elevated ring-1 ring-ink-200 dark:border-ink-dark-surface dark:bg-ink-dark-surface dark:ring-white/10">
+                {photoUrl && !photoLoadError ? (
+                  <AvatarImage src={photoUrl} alt={profile.name} onError={() => setPhotoLoadError(true)} />
+                ) : null}
+                <AvatarFallback className="text-3xl">
+                  {photoLoadError ? <ImageOff size={28} /> : getInitials(profile.name)}
+                </AvatarFallback>
+              </Avatar>
+              <button
+                type="button"
+                onClick={() => photoInputRef.current?.click()}
+                disabled={isUploadingPhoto}
+                className="absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-brand-600 text-white shadow-card transition-colors hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-60 dark:border-ink-dark-surface"
+                aria-label="Upload profile photo"
+              >
+                {isUploadingPhoto ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
+              </button>
+              <input
+                ref={photoInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => void handlePhotoSelect(e.target.files?.[0])}
+              />
+            </div>
 
-      <motion.div variants={fadeUp} className="grid items-start gap-5 lg:grid-cols-[320px_minmax(0,1fr)]">
-        <aside className="space-y-4 lg:sticky lg:top-24">
-          <Card className="overflow-hidden p-0">
-            <div className="h-20 bg-gradient-to-br from-brand-600 via-brand-700 to-ink-900" />
-            <CardContent className="-mt-12 flex flex-col items-center px-5 pb-5 text-center">
-              <div className="relative">
-                <Avatar className="h-28 w-28 border-4 border-white bg-white shadow-elevated ring-1 ring-ink-200 dark:border-ink-dark-surface dark:bg-ink-dark-surface dark:ring-white/10">
-                  {photoUrl && !photoLoadError ? (
-                    <AvatarImage src={photoUrl} alt={profile.name} onError={() => setPhotoLoadError(true)} />
-                  ) : null}
-                  <AvatarFallback className="text-2xl">
-                    {photoLoadError ? <ImageOff size={24} /> : getInitials(profile.name)}
-                  </AvatarFallback>
-                </Avatar>
-                <button
-                  type="button"
-                  onClick={() => photoInputRef.current?.click()}
-                  disabled={isUploadingPhoto}
-                  className="absolute bottom-1 right-1 flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-brand-600 text-white shadow-card transition-colors hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-60 dark:border-ink-dark-surface"
-                  aria-label="Upload profile photo"
-                >
-                  {isUploadingPhoto ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
-                </button>
-                <input
-                  ref={photoInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => void handlePhotoSelect(e.target.files?.[0])}
-                />
-              </div>
-
-              <div className="mt-4 space-y-1">
-                <div className="flex items-center justify-center gap-2">
-                  <h2 className="text-xl font-semibold tracking-tight text-ink-900 dark:text-white">{profile.name}</h2>
-                  {verifiedSkills.length ? <BadgeCheck size={17} className="text-brand-500" /> : null}
-                </div>
-                <p className="flex items-center justify-center gap-1.5 text-sm text-ink-500 dark:text-ink-400">
-                  <Mail size={13} />
-                  {profile.email}
-                </p>
-                {profile.university ? (
-                  <p className="flex items-center justify-center gap-1.5 text-sm font-medium text-brand-600 dark:text-brand-400">
-                    <GraduationCap size={13} />
-                    {profile.university}
-                  </p>
+            <div className="min-w-0 flex-1 pt-2 sm:pb-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-3xl font-semibold tracking-tight text-ink-950 dark:text-white">{profile.name}</h1>
+                {verifiedSkills.length ? (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-brand-200 bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:border-brand-700/40 dark:bg-brand-900/30 dark:text-brand-300">
+                    <BadgeCheck size={13} />
+                    Verified
+                  </span>
                 ) : null}
               </div>
+              <p className="mt-1 text-base font-medium text-ink-700 dark:text-ink-200">{profileTitle}</p>
+              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-ink-500 dark:text-ink-400">
+                <span className="inline-flex items-center gap-1.5"><Mail size={13} />{profile.email}</span>
+                {profile.university ? <span className="inline-flex items-center gap-1.5"><GraduationCap size={13} />{profile.university}</span> : null}
+              </div>
+            </div>
+          </div>
 
-              <div className="mt-5 w-full rounded-2xl border border-ink-100 bg-ink-50/70 p-4 text-left dark:border-white/10 dark:bg-white/[0.04]">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold uppercase tracking-[0.12em] text-ink-500 dark:text-ink-400">Completion</span>
-                  <span className="font-bold text-brand-600 dark:text-brand-400">{completionPct}%</span>
+          <div className="grid grid-cols-3 gap-2 self-end">
+            {[
+              { label: 'Skills', value: verifiedSkills.length },
+              { label: 'Projects', value: portfolioLinks.length },
+              { label: 'Reviews', value: reviews.length },
+            ].map((item) => (
+              <div key={item.label} className="rounded-2xl border border-ink-200/70 bg-ink-50/70 px-3 py-3 text-center dark:border-white/10 dark:bg-white/[0.04]">
+                <p className="text-xl font-semibold tracking-tight text-ink-950 dark:text-white">{item.value}</p>
+                <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-500 dark:text-ink-dark-muted">{item.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.section>
+
+      <motion.div variants={fadeUp} className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <main className="space-y-5">
+          <Card className="p-0">
+            <CardContent className="p-5 sm:p-6">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="page-eyebrow">Overview</p>
+                  <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink-950 dark:text-white">What clients should know</h2>
                 </div>
-                <Progress value={completionPct} className="mt-3" />
-                <p className="mt-3 text-xs leading-5 text-ink-500 dark:text-ink-dark-muted">
-                  Complete your photo, university, skills, bio, and portfolio links to improve client confidence.
-                </p>
+                <BriefcaseBusiness size={20} className="mt-1 text-brand-500" />
+              </div>
+              <p className="mt-4 max-w-3xl text-base leading-8 text-ink-600 dark:text-ink-300">
+                {formValues.description || 'Add a focused overview that explains what you help clients achieve, your strongest skills, and the kind of work you want to do.'}
+              </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {verifiedSkills.length ? verifiedSkills.map((s: any) => (
+                  <Badge key={s._id || s.skill?._id || s.skill?.name} variant="brand" className="normal-case tracking-normal">
+                    {s.skill?.name || 'Skill'} {s.score != null ? `· ${s.score}` : ''}
+                  </Badge>
+                )) : (
+                  <Badge variant="subtle" className="normal-case tracking-normal">No verified skills yet</Badge>
+                )}
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="mb-0">
-              <CardTitle className="text-sm">Profile summary</CardTitle>
-            </CardHeader>
-            <CardContent className="mt-3 space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="muted-panel p-3">
-                  <p className="label-muted">Skills</p>
-                  <p className="mt-1 text-lg font-semibold text-ink-900 dark:text-white">{verifiedSkills.length}</p>
+          <Card className="p-0">
+            <CardHeader className="mb-0 border-b border-ink-100/80 p-5 dark:border-white/10">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <CardTitle className="text-lg">Portfolio showcase</CardTitle>
+                  <p className="mt-1 text-sm text-ink-500 dark:text-ink-dark-muted">Client-facing links presented as work samples.</p>
                 </div>
-                <div className="muted-panel p-3">
-                  <p className="label-muted">Links</p>
-                  <p className="mt-1 text-lg font-semibold text-ink-900 dark:text-white">{portfolioLinks.length}</p>
-                </div>
+                <Globe2 size={19} className="text-brand-500" />
               </div>
-              <div className="muted-panel p-3">
-                <p className="label-muted">CV</p>
-                <p className="mt-1 text-sm font-semibold text-ink-900 dark:text-white">{cvUrl ? 'Uploaded' : 'Not uploaded'}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="mb-0">
-              <CardTitle className="text-sm">Verified skills</CardTitle>
             </CardHeader>
-            <CardContent className="mt-3">
-              {verifiedSkills.length ? (
-                <div className="flex flex-wrap gap-2">
-                  {verifiedSkills.map((s: any) => (
-                    <Badge key={s._id || s.skill?._id || s.skill?.name} variant="brand" className="normal-case tracking-normal">
-                      {s.skill?.name || 'Skill'} {s.score != null ? `· ${s.score}` : ''}
-                    </Badge>
+            <CardContent className="p-5">
+              {featuredLinks.length ? (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {featuredLinks.map((link, index) => (
+                    <a
+                      key={link}
+                      href={link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="group min-w-0 rounded-2xl border border-ink-200/80 bg-white/70 p-4 text-ink-800 no-underline shadow-soft transition hover:-translate-y-0.5 hover:border-brand-200 hover:bg-brand-50/60 hover:text-brand-700 hover:shadow-card dark:border-white/10 dark:bg-white/[0.04] dark:text-ink-200 dark:hover:border-brand-500/30 dark:hover:bg-brand-900/20 dark:hover:text-brand-300"
+                    >
+                      <div className="mb-4 flex h-24 items-end rounded-xl border border-ink-200/70 bg-[linear-gradient(135deg,rgba(37,99,235,0.12),rgba(15,23,42,0.04))] p-3 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(59,130,246,0.18),rgba(255,255,255,0.04))]">
+                        <span className="rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-600 shadow-soft dark:bg-ink-dark-surface/90 dark:text-ink-300">
+                          Project {index + 1}
+                        </span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <ExternalLink size={15} className="mt-0.5 shrink-0 text-ink-400 transition-colors group-hover:text-brand-500" />
+                        <div className="min-w-0">
+                          <p className="truncate font-semibold">{getDomain(link)}</p>
+                          <p className="mt-1 truncate text-xs text-ink-500 dark:text-ink-dark-muted">{link}</p>
+                        </div>
+                      </div>
+                    </a>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm leading-6 text-ink-500 dark:text-ink-400">
-                  No verified skills yet. Pass an AI interview to add them.
-                </p>
+                <div className="rounded-2xl border border-dashed border-ink-200/80 bg-ink-50/70 p-6 text-center dark:border-white/10 dark:bg-white/[0.04]">
+                  <Globe2 size={22} className="mx-auto text-brand-500" />
+                  <p className="mt-3 font-semibold text-ink-900 dark:text-white">No portfolio links yet</p>
+                  <p className="mx-auto mt-1 max-w-sm text-sm text-ink-500 dark:text-ink-dark-muted">
+                    Add GitHub, case studies, LinkedIn, Behance, or live project links in the editor.
+                  </p>
+                </div>
               )}
             </CardContent>
           </Card>
-        </aside>
 
-        <section className="space-y-5">
-          <ProfileSection title="Personal Information" icon={<UserRound size={16} />}>
-            <div className="grid gap-4 md:grid-cols-2">
+          <Card className="p-0">
+            <CardHeader className="mb-0 border-b border-ink-100/80 p-5 dark:border-white/10">
+              <CardTitle className="text-lg">Proof and credentials</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-3 p-5 sm:grid-cols-2">
+              <div className="rounded-2xl border border-ink-200/80 bg-ink-50/70 p-4 dark:border-white/10 dark:bg-white/[0.04]">
+                <p className="flex items-center gap-2 text-sm font-semibold text-ink-900 dark:text-white"><GraduationCap size={15} className="text-brand-500" />Education</p>
+                <p className="mt-2 text-sm text-ink-500 dark:text-ink-dark-muted">{formValues.university || 'Add your university to strengthen trust.'}</p>
+              </div>
+              <div className="rounded-2xl border border-ink-200/80 bg-ink-50/70 p-4 dark:border-white/10 dark:bg-white/[0.04]">
+                <p className="flex items-center gap-2 text-sm font-semibold text-ink-900 dark:text-white"><FileText size={15} className="text-brand-500" />CV</p>
+                <div className="mt-2 flex items-center justify-between gap-3">
+                  <p className="text-sm text-ink-500 dark:text-ink-dark-muted">{cvUrl ? 'Current CV uploaded.' : 'No CV uploaded yet.'}</p>
+                  {cvUrl ? (
+                    <a href={cvUrl} target="_blank" rel="noreferrer" className="text-sm font-semibold">
+                      View
+                    </a>
+                  ) : null}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <section className="space-y-4">
+            <div>
+              <h2 className="text-xl font-semibold text-ink-900 dark:text-white">Client reviews</h2>
+              <p className="text-sm text-ink-500 dark:text-ink-400">Completed engagements and client feedback.</p>
+            </div>
+            {reviews.length ? (
+              <div className="grid gap-4 lg:grid-cols-2">
+                {reviews.map((r, i) => (
+                  <Card key={`${r.clientName}-${i}`} className="space-y-3 p-5">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="font-semibold text-ink-900 dark:text-white">{r.clientName}</p>
+                        {r.jobTitle ? <p className="text-xs text-ink-500 dark:text-ink-400">{r.jobTitle}</p> : null}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: 5 }).map((_, si) => (
+                          <Star key={si} size={12} className={si < r.rating ? 'fill-amber-400 text-amber-400' : 'text-ink-300 dark:text-ink-600'} />
+                        ))}
+                      </div>
+                    </div>
+                    {r.comment ? <p className="text-sm text-ink-600 dark:text-ink-300">{r.comment}</p> : null}
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <EmptyState title="No reviews yet" description="Completed engagements and submitted reviews will appear here." />
+            )}
+          </section>
+        </main>
+
+        <aside className="space-y-4 lg:sticky lg:top-24">
+          <Card className="p-0">
+            <CardHeader className="mb-0 border-b border-ink-100/80 p-5 dark:border-white/10">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-lg"><PencilLine size={17} className="text-brand-500" />Profile editor</CardTitle>
+                  <p className="mt-1 text-sm text-ink-500 dark:text-ink-dark-muted">Update the client-facing content.</p>
+                </div>
+                <span className="text-sm font-bold text-brand-600 dark:text-brand-400">{completionPct}%</span>
+              </div>
+              <Progress value={completionPct} className="mt-4" />
+            </CardHeader>
+            <CardContent className="space-y-4 p-4">
+              <Button
+                className="w-full"
+                onClick={() => saveProfile({ ...formValues, portfolioLinks: formValues.portfolioLinks })}
+                disabled={isSaving}
+              >
+                {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                {isSaving ? 'Saving...' : 'Save changes'}
+              </Button>
+            </CardContent>
+          </Card>
+
+          <EditSection title="Personal Information" icon={<UserRound size={15} />}>
+            <div className="grid gap-4">
               <div className="space-y-2">
                 <Label htmlFor="profile-name">Full name</Label>
                 <Input
@@ -359,9 +470,9 @@ const StudentProfile: React.FC = () => {
                 <Input value={profile.email || ''} disabled />
               </div>
             </div>
-          </ProfileSection>
+          </EditSection>
 
-          <ProfileSection title="About" icon={<BadgeCheck size={16} />}>
+          <EditSection title="About" icon={<BadgeCheck size={15} />}>
             <div className="space-y-2">
               <Label htmlFor="profile-bio">Professional bio</Label>
               <Textarea
@@ -375,9 +486,9 @@ const StudentProfile: React.FC = () => {
                 Lead with your strongest skills, evidence, and the kinds of projects you want.
               </p>
             </div>
-          </ProfileSection>
+          </EditSection>
 
-          <ProfileSection title="Education" icon={<GraduationCap size={16} />}>
+          <EditSection title="Education" icon={<GraduationCap size={15} />}>
             <div className="space-y-2">
               <Label htmlFor="profile-university">University</Label>
               <Input
@@ -387,66 +498,28 @@ const StudentProfile: React.FC = () => {
                 placeholder="e.g. Cairo University"
               />
             </div>
-          </ProfileSection>
+          </EditSection>
 
-          <ProfileSection title="Portfolio and Social Links" icon={<Link2 size={16} />}>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="profile-links">Links</Label>
-                <Textarea
-                  id="profile-links"
-                  rows={4}
-                  placeholder="https://github.com/you&#10;https://portfolio.com&#10;https://linkedin.com/in/you"
-                  value={formValues.portfolioLinks}
-                  onChange={(e) => setFormValues((p) => ({ ...p, portfolioLinks: e.target.value }))}
-                />
-                <p className="flex items-center gap-2 text-xs text-ink-500 dark:text-ink-400">
-                  <Link2 size={12} />
-                  One link per line. Include portfolio, GitHub, LinkedIn, Behance, or case studies.
-                </p>
-              </div>
-
-              {portfolioLinks.length ? (
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {portfolioLinks.map((link) => (
-                    <a
-                      key={link}
-                      href={link}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="group flex min-w-0 items-center gap-2 rounded-xl border border-ink-200/80 bg-ink-50/70 px-3 py-2 text-sm font-medium text-ink-700 no-underline transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700 dark:border-white/10 dark:bg-white/[0.04] dark:text-ink-300 dark:hover:border-brand-500/30 dark:hover:bg-brand-900/20 dark:hover:text-brand-300"
-                    >
-                      <ExternalLink size={14} className="shrink-0" />
-                      <span className="truncate">{link}</span>
-                    </a>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-          </ProfileSection>
-
-          <ProfileSection title="Skills" icon={<CheckCircle2 size={16} />}>
-            {verifiedSkills.length ? (
-              <div className="grid gap-3 sm:grid-cols-2">
-                {verifiedSkills.map((s: any) => (
-                  <div key={s._id || s.skill?._id || s.skill?.name} className="rounded-2xl border border-ink-200/80 bg-ink-50/70 p-4 dark:border-white/10 dark:bg-white/[0.04]">
-                    <p className="font-semibold text-ink-900 dark:text-white">{s.skill?.name || 'Verified skill'}</p>
-                    <p className="mt-1 text-xs text-ink-500 dark:text-ink-dark-muted">
-                      {s.score != null ? `AI interview score ${s.score}` : 'Verified by AI interview'}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-ink-500 dark:text-ink-400">
-                Verified skill badges will appear here after successful AI interviews.
+          <EditSection title="Portfolio Links" icon={<Link2 size={15} />}>
+            <div className="space-y-2">
+              <Label htmlFor="profile-links">Links</Label>
+              <Textarea
+                id="profile-links"
+                rows={4}
+                placeholder="https://github.com/you&#10;https://portfolio.com&#10;https://linkedin.com/in/you"
+                value={formValues.portfolioLinks}
+                onChange={(e) => setFormValues((p) => ({ ...p, portfolioLinks: e.target.value }))}
+              />
+              <p className="flex items-center gap-2 text-xs text-ink-500 dark:text-ink-400">
+                <Link2 size={12} />
+                One link per line.
               </p>
-            )}
-          </ProfileSection>
+            </div>
+          </EditSection>
 
-          <ProfileSection
+          <EditSection
             title="CV"
-            icon={<FileText size={16} />}
+            icon={<FileText size={15} />}
             action={
               <Button type="button" size="sm" variant="outline" disabled={isUploadingCv} onClick={() => cvInputRef.current?.click()}>
                 {isUploadingCv ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
@@ -475,38 +548,9 @@ const StudentProfile: React.FC = () => {
                 </Button>
               ) : null}
             </div>
-          </ProfileSection>
-        </section>
+          </EditSection>
+        </aside>
       </motion.div>
-
-      <motion.section variants={fadeUp} className="mx-auto max-w-6xl space-y-4">
-        <div>
-          <h2 className="text-xl font-semibold text-ink-900 dark:text-white">Client reviews</h2>
-          <p className="text-sm text-ink-500 dark:text-ink-400">Completed engagements and client feedback.</p>
-        </div>
-        {reviews.length ? (
-          <div className="grid gap-4 lg:grid-cols-2">
-            {reviews.map((r, i) => (
-              <Card key={`${r.clientName}-${i}`} className="space-y-3 p-5">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="font-semibold text-ink-900 dark:text-white">{r.clientName}</p>
-                    {r.jobTitle ? <p className="text-xs text-ink-500 dark:text-ink-400">{r.jobTitle}</p> : null}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: 5 }).map((_, si) => (
-                      <Star key={si} size={12} className={si < r.rating ? 'fill-amber-400 text-amber-400' : 'text-ink-300 dark:text-ink-600'} />
-                    ))}
-                  </div>
-                </div>
-                {r.comment ? <p className="text-sm text-ink-600 dark:text-ink-300">{r.comment}</p> : null}
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <EmptyState title="No reviews yet" description="Completed engagements and submitted reviews will appear here." />
-        )}
-      </motion.section>
     </motion.div>
   );
 };
