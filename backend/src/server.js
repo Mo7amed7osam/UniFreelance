@@ -67,6 +67,7 @@ app.use('/api/notifications', notificationRoutes);
 const aiRoutes = require('./routes/aiRoutes');
 app.use('/api/ai', aiRoutes);
 app.use('/uploads', express.static(getUploadsRoot()));
+app.use('/api/uploads', express.static(getUploadsRoot()));
 app.get('/', (req, res) => {
     console.log("server is working");
     res.status(200).send('ok');

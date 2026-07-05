@@ -41,6 +41,7 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
+import { buildAssetUrl } from '@/lib/assets';
 
 type Review = { clientName: string; rating: number; comment?: string; jobTitle?: string };
 type ViewMode = 'edit' | 'public';
@@ -222,13 +223,9 @@ const StudentProfile: React.FC = () => {
     },
   });
 
-  const apiBase = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
-  const origin = apiBase.endsWith('/api') ? apiBase.slice(0, -4) : apiBase;
-  const asset = (v?: string) => (v?.startsWith('http') ? v : v ? `${origin}${v}` : '');
-
-  const photoUrl = localPhotoPreview || asset(formValues.profilePhotoUrl || profile?.profilePhotoUrl);
-  const coverUrl = localCoverPreview || asset(formValues.coverPhotoUrl || profile?.coverPhotoUrl);
-  const cvUrl = asset(profile?.cvUrl);
+  const photoUrl = localPhotoPreview || buildAssetUrl(formValues.profilePhotoUrl || profile?.profilePhotoUrl);
+  const coverUrl = localCoverPreview || buildAssetUrl(formValues.coverPhotoUrl || profile?.coverPhotoUrl);
+  const cvUrl = buildAssetUrl(profile?.cvUrl);
   const completionPct = profile ? getCompletionPct({ ...profile, ...formValues, portfolioLinks: formValues.portfolioLinks.split('\n').filter(Boolean) }) : 0;
   const verifiedSkills = profile?.verifiedSkills || [];
   const portfolioLinks = useMemo(

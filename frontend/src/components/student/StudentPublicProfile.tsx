@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
+import { buildAssetUrl } from '@/lib/assets';
 
 function getInitials(name?: string) {
   if (!name) return '?';
@@ -28,9 +29,6 @@ const StudentPublicProfile: React.FC = () => {
   if (isLoading) return <Skeleton className="h-80 w-full rounded-xl" />;
   if (isError || !profile) return <EmptyState title="Unable to load student profile" description="This profile could not be loaded right now." />;
 
-  const apiBase = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
-  const origin = apiBase.endsWith('/api') ? apiBase.slice(0, -4) : apiBase;
-  const buildAssetUrl = (value?: string) => (value ? (value.startsWith('http') ? value : `${origin}${value}`) : '');
   const photoUrl = buildAssetUrl(profile.profilePhotoUrl);
   const coverUrl = buildAssetUrl(profile.coverPhotoUrl);
   const coverStyle = coverUrl
