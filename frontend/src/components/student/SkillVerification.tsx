@@ -102,7 +102,7 @@ const SkillVerification: React.FC = () => {
           {[
             {
               title: 'AI-guided interview',
-              body: 'Gravis leads the session and keeps the process structured.',
+              body: 'Shaghalny AI leads the session and keeps the process structured.',
               Icon: Video,
             },
             {
@@ -154,7 +154,7 @@ const SkillVerification: React.FC = () => {
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="muted-panel p-4 dark:bg-white/[0.055]">
                     <p className="label-muted">Interview mode</p>
-                    <p className="mt-3 text-sm font-bold text-ink-900 dark:text-white">Live with Gravis</p>
+                    <p className="mt-3 text-sm font-bold text-ink-900 dark:text-white">Live with Shaghalny AI</p>
                   </div>
                   <div className="muted-panel p-4 dark:bg-white/[0.055]">
                     <p className="label-muted">Outcome</p>

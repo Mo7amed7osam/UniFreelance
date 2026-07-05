@@ -75,7 +75,7 @@ function budgetLabel(job: any) {
   if (job?.budgetMin !== undefined || job?.budgetMax !== undefined) {
     return `${job.budgetMin !== undefined ? formatCurrency(job.budgetMin) : '-'}-${job.budgetMax !== undefined ? formatCurrency(job.budgetMax) : '-'}`;
   }
-  return job?.budget ? formatCurrency(job.budget) : 'Budget TBA';
+  return job?.budget ? formatCurrency(job.budget) : 'Budget not set';
 }
 
 function postedLabel(job: any) {
@@ -87,9 +87,23 @@ function postedLabel(job: any) {
   return `${days}d ago`;
 }
 
-function matchScore(job: any, index: number) {
+function matchScore(job: any, verifiedSkillIds: Set<string>) {
   if (typeof job?.matchScore === 'number') return Math.round(job.matchScore);
-  return Math.max(72, 96 - index * 4);
+  const requiredSkills = Array.isArray(job?.requiredSkills) ? job.requiredSkills : [];
+  if (requiredSkills.length === 0) return null;
+  const matched = requiredSkills.filter((skill: any) => verifiedSkillIds.has(String(skill?._id || skill))).length;
+  return Math.round((matched / requiredSkills.length) * 100);
+}
+
+function isClientVerified(job: any) {
+  return Boolean(
+    job?.clientId?.isVerified ||
+    job?.clientId?.verified ||
+    job?.client?.isVerified ||
+    job?.client?.verified ||
+    job?.verifiedClient ||
+    job?.clientVerified
+  );
 }
 
 const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
@@ -128,8 +142,8 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
     return new Set(ids);
   }, [proposals]);
 
-  const verifiedSkillIds = useMemo(
-    () => new Set((profile?.verifiedSkills || []).map((item: any) => String(item.skill?._id || item.skill))),
+  const verifiedSkillIds = useMemo<Set<string>>(
+    () => new Set<string>((profile?.verifiedSkills || []).map((item: any) => String(item.skill?._id || item.skill))),
     [profile]
   );
 
@@ -244,43 +258,24 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
       <div className="grid items-start gap-6 lg:grid-cols-[248px_minmax(0,1fr)]">
         <aside className="sh-panel hidden p-[18px] lg:sticky lg:top-[88px] lg:block">
           <div className="mb-3 flex items-center justify-between">
-            <span className="text-sm font-semibold text-ink-900 dark:text-white">Filters</span>
-            <button type="button" className="text-xs font-semibold text-brand-600">Reset</button>
+            <span className="text-sm font-semibold text-ink-900 dark:text-white">Job board</span>
+            {search ? (
+              <button type="button" onClick={() => setSearch('')} className="text-xs font-semibold text-brand-600">Reset</button>
+            ) : null}
           </div>
-          <div className="space-y-4">
-            <div>
-              <div className="label-muted mb-2">Category</div>
-              <div className="flex flex-wrap gap-2">
-                {['Development', 'Design', 'Marketing', 'Writing', 'Data'].map((item, index) => (
-                  <span key={item} className={index === 0 ? 'sh-chip rounded-lg' : 'sh-muted-chip rounded-lg'}>{item}</span>
-                ))}
+          <div className="space-y-3">
+            {[
+              { label: 'Open jobs', value: openJobCount },
+              { label: 'Ready to apply', value: readyJobCount },
+              { label: 'Verified skills', value: verifiedSkillIds.size },
+            ].map((item) => (
+              <div key={item.label} className="rounded-[12px] border border-ink-100 bg-ink-50 px-3.5 py-3 dark:border-ink-dark-border dark:bg-white/[0.04]">
+                <p className="label-muted">{item.label}</p>
+                <p className="sh-number mt-1 text-xl text-ink-900 dark:text-white">{item.value}</p>
               </div>
-            </div>
-            <div>
-              <div className="label-muted mb-2">Job type</div>
-              <div className="space-y-2.5">
-                {['Fixed price', 'Hourly', 'Part-time', 'Internship'].map((item, index) => (
-                  <label key={item} className="flex items-center gap-2.5 text-[13.5px] text-ink-600 dark:text-ink-300">
-                    <span className={`flex h-[17px] w-[17px] items-center justify-center rounded-[5px] ${index === 0 ? 'bg-brand-500 text-white' : 'border border-ink-400'}`}>
-                      {index === 0 ? <CheckCircle2 size={11} /> : null}
-                    </span>
-                    {item}
-                  </label>
-                ))}
-              </div>
-            </div>
-            <div>
-              <div className="label-muted mb-3">Budget range</div>
-              <div className="relative mx-1 h-[5px] rounded-full bg-ink-200 dark:bg-white/10">
-                <div className="absolute left-[12%] right-[34%] top-0 h-full rounded-full bg-brand-500" />
-                <div className="absolute left-[12%] top-1/2 h-[15px] w-[15px] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-brand-500 bg-white" />
-                <div className="absolute left-[66%] top-1/2 h-[15px] w-[15px] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-brand-500 bg-white" />
-              </div>
-              <div className="mt-2 flex justify-between font-mono text-xs text-ink-500"><span>$150</span><span>$2,400</span></div>
-            </div>
-            <div className="flex items-center justify-between rounded-[11px] border border-emerald-100 bg-emerald-50 px-3 py-2.5 dark:border-emerald-500/25 dark:bg-emerald-500/15">
-              <span className="flex items-center gap-2 text-[13px] font-semibold text-emerald-700 dark:text-emerald-300"><CheckCircle2 size={15} /> Verified clients only</span>
-              <span className="relative h-[19px] w-[34px] rounded-full bg-emerald-600"><span className="absolute right-0.5 top-0.5 h-[15px] w-[15px] rounded-full bg-white" /></span>
+            ))}
+            <div className="rounded-[12px] border border-brand-100 bg-brand-50 px-3.5 py-3 text-sm leading-6 text-brand-700 dark:border-brand-500/25 dark:bg-brand-500/15 dark:text-brand-200">
+              Job recommendations are based on the live jobs returned by the backend and your verified skills.
             </div>
           </div>
         </aside>
@@ -307,7 +302,7 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                 <Sparkles size={17} />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold text-ink-900 dark:text-white">{readyJobCount} jobs perfectly match your verified skills</div>
+                <div className="text-sm font-semibold text-ink-900 dark:text-white">{readyJobCount} job{readyJobCount === 1 ? '' : 's'} ready for your verified skills</div>
                 <div className="mt-0.5 text-[12.5px] text-ink-600 dark:text-ink-300">Based on your verified skill profile and current applications.</div>
               </div>
               <Button variant="outline" size="sm" className="hidden border-brand-100 text-brand-600 md:inline-flex">View matches</Button>
@@ -340,7 +335,8 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                   const skills = job.requiredSkills || [];
                   const missingSkills = getMissingVerifiedSkills(job);
                   const canApply = missingSkills.length === 0;
-                  const score = matchScore(job, index);
+                  const score = matchScore(job, verifiedSkillIds);
+                  const clientVerified = isClientVerified(job);
 
                   return (
                     <motion.article
@@ -358,9 +354,11 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <h3 className="m-0 text-[16px] font-semibold tracking-[-0.01em] text-ink-900 dark:text-white">{job.title}</h3>
-                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[11.5px] font-semibold text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/15 dark:text-emerald-300">
-                            <CheckCircle2 size={11} /> Verified client
-                          </span>
+                          {clientVerified ? (
+                            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[11.5px] font-semibold text-emerald-700 dark:border-emerald-500/25 dark:bg-emerald-500/15 dark:text-emerald-300">
+                              <CheckCircle2 size={11} /> Verified client
+                            </span>
+                          ) : null}
                         </div>
                         <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[13px] text-ink-500 dark:text-ink-dark-muted">
                           <span className="font-semibold text-ink-600 dark:text-ink-300">{companyName(job)}</span>
@@ -396,15 +394,17 @@ const JobList: React.FC<JobListProps> = ({ embedded = false }) => {
                           <div className="text-right">
                             <div className="sh-number text-[17px] text-ink-900 dark:text-white">{budgetLabel(job)}</div>
                             <div className="text-[11.5px] text-ink-500">{job.duration || 'Fixed price'}</div>
-                            <div className="mt-2 flex items-center justify-end gap-2">
-                              <div
-                                className="flex h-[26px] w-[26px] items-center justify-center rounded-full"
-                                style={{ background: `conic-gradient(#6366f1 ${score}%, #edeef3 0)` }}
-                              >
-                                <span className="h-[18px] w-[18px] rounded-full bg-white dark:bg-ink-dark-surface" />
+                            {score !== null ? (
+                              <div className="mt-2 flex items-center justify-end gap-2">
+                                <div
+                                  className="flex h-[26px] w-[26px] items-center justify-center rounded-full"
+                                  style={{ background: `conic-gradient(#6366f1 ${score}%, #edeef3 0)` }}
+                                >
+                                  <span className="h-[18px] w-[18px] rounded-full bg-white dark:bg-ink-dark-surface" />
+                                </div>
+                                <span className="text-xs text-ink-600 dark:text-ink-300"><b className="text-ink-900 dark:text-white">{score}%</b> match</span>
                               </div>
-                              <span className="text-xs text-ink-600 dark:text-ink-300"><b className="text-ink-900 dark:text-white">{score}%</b> match</span>
-                            </div>
+                            ) : null}
                           </div>
                         </div>
                         {hasSubmitted ? (

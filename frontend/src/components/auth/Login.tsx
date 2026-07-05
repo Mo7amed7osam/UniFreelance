@@ -22,7 +22,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const highlights = [
   { icon: BadgeCheck, text: 'Verified student talent and trusted profiles' },
-  { icon: Video, text: 'AI interview verification with Gravis' },
+  { icon: Video, text: 'AI interview verification with Shaghalny AI' },
   { icon: ShieldCheck, text: 'Structured proposals, contracts, and payments' },
 ];
 

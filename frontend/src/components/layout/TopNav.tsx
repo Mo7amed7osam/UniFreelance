@@ -94,11 +94,8 @@ export const TopNav = () => {
               <Menu size={18} />
             </button>
 
-            <NavLink to={homePath} className="flex shrink-0 items-center gap-2.5 rounded-xl no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" aria-label="Go to dashboard">
-              <span className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-gradient-to-br from-brand-500 to-brand-600 text-[17px] font-extrabold leading-none text-white shadow-[0_4px_14px_-3px_rgba(99,102,241,0.65)]">
-                ش
-              </span>
-              <span className="hidden text-[17px] font-bold tracking-[-0.025em] text-ink-900 min-[430px]:inline dark:text-ink-dark-text">Shaghalny</span>
+            <NavLink to={homePath} className="flex shrink-0 items-center rounded-xl no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500" aria-label="Go to dashboard">
+              <Logo markClassName="h-9 w-9" className="[&_.logo-wordmark]:hidden min-[430px]:[&_.logo-wordmark]:inline" />
             </NavLink>
           </div>
 

@@ -90,13 +90,13 @@ const Register: React.FC = () => {
               <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
                 <div className="space-y-1.5">
                   <Label htmlFor="name">Full name</Label>
-                  <Input id="name" placeholder="Alex Johnson" {...register('name')} />
+                  <Input id="name" placeholder="Full name" {...register('name')} />
                   {errors.name ? <p className="text-xs text-rose-600 dark:text-rose-400">{errors.name.message}</p> : null}
                 </div>
 
                 <div className="space-y-1.5">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="alex@example.com" {...register('email')} />
+                  <Input id="email" type="email" placeholder="name@example.com" {...register('email')} />
                   {errors.email ? <p className="text-xs text-rose-600 dark:text-rose-400">{errors.email.message}</p> : null}
                 </div>
 

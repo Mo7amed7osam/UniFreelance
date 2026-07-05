@@ -74,11 +74,11 @@ const ProductPreview: React.FC = () => {
       content: (
         <div className="flex items-start gap-3">
           <Avatar className="h-9 w-9 shrink-0">
-            <AvatarFallback className="text-xs font-bold">SK</AvatarFallback>
+            <AvatarFallback className="text-xs font-bold">VS</AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-ink-900 dark:text-ink-dark-text">Sara Khalil</span>
+              <span className="text-sm font-semibold text-ink-900 dark:text-ink-dark-text">Verified student</span>
               <Badge variant="success" className="text-[10px]">
                 <BadgeCheck size={9} />
                 Verified
@@ -125,7 +125,7 @@ const ProductPreview: React.FC = () => {
             <Badge variant="warning" className="text-[10px]">New</Badge>
           </div>
           <p className="text-xs text-ink-500 dark:text-ink-dark-muted leading-relaxed">
-            "I can deliver in 5 days with full responsive design." — Sara K.
+            "I can deliver in 5 days with full responsive design."
           </p>
           <div className="flex items-center gap-2">
             <span className="text-sm font-bold text-accent-600 dark:text-accent-400">280 EGP</span>
@@ -144,7 +144,7 @@ const ProductPreview: React.FC = () => {
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
             <Zap size={13} className="text-brand-500" />
-            <p className="text-sm font-semibold text-ink-900 dark:text-ink-dark-text">Gravis AI — Interview Complete</p>
+            <p className="text-sm font-semibold text-ink-900 dark:text-ink-dark-text">Shaghalny AI — Interview Complete</p>
           </div>
           <div className="flex gap-2">
             {[
@@ -238,7 +238,7 @@ const features = [
   },
   {
     icon: Video,
-    title: 'AI verification with Gravis',
+    title: 'AI verification with Shaghalny AI',
     description: 'Students complete structured interviews before proposals move forward. Clients see evidence, not claims.',
     accent: 'bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400',
   },
@@ -283,7 +283,7 @@ const steps = [
   {
     n: '02',
     title: 'Verify capability',
-    body: 'Gravis runs a structured AI interview. Scores are attached to the profile before any proposal is sent.',
+    body: 'Shaghalny AI runs a structured AI interview. Scores are attached to the profile before any proposal is sent.',
     icon: BadgeCheck,
   },
   {
@@ -629,13 +629,13 @@ const LandingPage: React.FC = () => {
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-brand-100">
                 <BadgeCheck size={12} />
-                Gravis AI verification
+                Shaghalny AI verification
               </div>
               <h2 className="text-2xl font-semibold text-white sm:text-3xl">
                 Skills that are proven, not promised.
               </h2>
               <p className="max-w-xl text-sm leading-6 text-brand-100">
-                Every student on Shaghalny has completed a structured AI interview with Gravis before their proposals
+                Every student on Shaghalny has completed a structured AI interview with Shaghalny AI before their proposals
                 reach clients. No unverified claims, no noise in your candidate shortlist.
               </p>
               <div className="flex flex-col gap-3 pt-1">
@@ -658,7 +658,7 @@ const LandingPage: React.FC = () => {
                     <Zap size={16} className="text-brand-100" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-brand-100">Gravis Score</p>
+                    <p className="text-xs font-semibold text-brand-100">Shaghalny AI Score</p>
                     <p className="text-[10px] text-brand-200">AI-powered assessment</p>
                   </div>
                 </div>

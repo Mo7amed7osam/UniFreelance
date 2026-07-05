@@ -11,7 +11,6 @@ import {
   FileText,
   Mic,
   Sparkles,
-  TrendingUp,
   UserRound,
   Wallet,
 } from 'lucide-react';
@@ -71,7 +70,22 @@ function budgetLabel(job: any) {
   if (job?.budgetMin !== undefined || job?.budgetMax !== undefined) {
     return `${job.budgetMin !== undefined ? formatCurrency(job.budgetMin) : '-'}-${job.budgetMax !== undefined ? formatCurrency(job.budgetMax) : '-'}`;
   }
-  return job?.budget ? formatCurrency(job.budget) : 'Budget TBA';
+  return job?.budget ? formatCurrency(job.budget) : 'Budget not set';
+}
+
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
+}
+
+function jobMatchPercent(job: any, verifiedSkillIds: Set<string>) {
+  if (typeof job?.matchScore === 'number') return Math.round(job.matchScore);
+  const requiredSkills = Array.isArray(job?.requiredSkills) ? job.requiredSkills : [];
+  if (requiredSkills.length === 0) return null;
+  const matched = requiredSkills.filter((skill: any) => verifiedSkillIds.has(String(skill?._id || skill))).length;
+  return Math.round((matched / requiredSkills.length) * 100);
 }
 
 const QuickAction = ({
@@ -131,6 +145,8 @@ const StudentDashboard: React.FC = () => {
   const balance = profile?.balance?.toFixed?.(2) ?? '0.00';
   const { pct: completionPct, missing: completionMissing } = getProfileCompletion(profile, verifiedSkillsCount);
   const firstName = user?.name?.split(' ')[0] || 'there';
+  const verifiedSkillIds = new Set<string>((profile?.verifiedSkills || []).map((item: any) => String(item.skill?._id || item.skill)));
+  const greeting = getGreeting();
 
   return (
     <motion.div className="space-y-[22px]" initial="hidden" animate="visible" variants={staggerContainer}>
@@ -141,7 +157,7 @@ const StudentDashboard: React.FC = () => {
         <div className="pointer-events-none absolute -right-10 -top-16 h-64 w-64 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.25),transparent_70%)]" />
         <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <div className="mb-1.5 text-[13px] font-medium text-[#dcdcff]">Good afternoon, {firstName}</div>
+            <div className="mb-1.5 text-[13px] font-medium text-[#dcdcff]">{greeting}, {firstName}</div>
             <h1 className="max-w-3xl text-[26px] font-bold tracking-[-0.025em] text-white">
               {verifiedSkillsCount > 0 ? 'Keep building your student freelance profile' : "You're 1 verified skill away from better matches"}
             </h1>
@@ -183,29 +199,32 @@ const StudentDashboard: React.FC = () => {
               ) : recommendedJobs.length === 0 ? (
                 <EmptyState title="No new jobs right now" description="New recommendations will appear here once clients publish matching work." />
               ) : (
-                recommendedJobs.map((job: any, index: number) => (
-                  <button
-                    key={job._id || index}
-                    type="button"
-                    onClick={() => navigate('/student/jobs')}
-                    className="sh-panel flex w-full items-center gap-3 px-4 py-3 text-left transition hover:-translate-y-0.5 hover:border-brand-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
-                  >
-                    <span
-                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] text-sm font-bold text-white"
-                      style={{ background: logoColors[index % logoColors.length] }}
+                recommendedJobs.map((job: any, index: number) => {
+                  const match = jobMatchPercent(job, verifiedSkillIds);
+                  return (
+                    <button
+                      key={job._id || index}
+                      type="button"
+                      onClick={() => navigate('/student/jobs')}
+                      className="sh-panel flex w-full items-center gap-3 px-4 py-3 text-left transition hover:-translate-y-0.5 hover:border-brand-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
                     >
-                      {initials(companyName(job))}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[14.5px] font-semibold text-ink-900 dark:text-white">{job.title}</span>
-                      <span className="block truncate text-xs text-ink-500 dark:text-ink-dark-muted">{companyName(job)} · {job.duration || 'Fixed price'}</span>
-                    </span>
-                    <span className="text-right">
-                      <span className="sh-number block text-sm text-ink-900 dark:text-white">{budgetLabel(job)}</span>
-                      <span className="block text-[11.5px] font-semibold text-emerald-600">match ready</span>
-                    </span>
-                  </button>
-                ))
+                      <span
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] text-sm font-bold text-white"
+                        style={{ background: logoColors[index % logoColors.length] }}
+                      >
+                        {initials(companyName(job))}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[14.5px] font-semibold text-ink-900 dark:text-white">{job.title}</span>
+                        <span className="block truncate text-xs text-ink-500 dark:text-ink-dark-muted">{companyName(job)} · {job.duration || 'Fixed price'}</span>
+                      </span>
+                      <span className="text-right">
+                        <span className="sh-number block text-sm text-ink-900 dark:text-white">{budgetLabel(job)}</span>
+                        {match !== null ? <span className="block text-[11.5px] font-semibold text-emerald-600">{match}% match</span> : null}
+                      </span>
+                    </button>
+                  );
+                })
               )}
             </div>
           </section>
@@ -296,12 +315,13 @@ const StudentDashboard: React.FC = () => {
           <section className="sh-panel p-[18px]">
             <div className="flex items-center gap-3">
               <div className="flex h-[46px] w-[46px] shrink-0 flex-col items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/15">
-                <span className="text-[10px] font-bold uppercase">AI</span>
-                <span className="text-[17px] font-bold leading-none">09</span>
+                <Mic size={18} />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold text-ink-900 dark:text-white">AI Interview</div>
-                <div className="mt-0.5 text-[12.5px] text-ink-500 dark:text-ink-dark-muted">Verify your next skill · 15 min</div>
+                <div className="text-sm font-semibold text-ink-900 dark:text-white">Skill verification</div>
+                <div className="mt-0.5 text-[12.5px] text-ink-500 dark:text-ink-dark-muted">
+                  {verifiedSkillsCount > 0 ? `${verifiedSkillsCount} verified skill${verifiedSkillsCount === 1 ? '' : 's'}` : 'Start your first AI interview'}
+                </div>
               </div>
             </div>
             <Button variant="soft" className="mt-3 w-full" onClick={() => navigate('/student/skill-verification')}>

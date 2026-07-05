@@ -13,10 +13,6 @@ interface LogoProps {
   markClassName?: string;
 }
 
-/**
- * Inline brand logo. Renders the mark as inline SVG and the wordmark as text so
- * it never depends on external asset loading or SVG <text> font support.
- */
 export const Logo: React.FC<LogoProps> = ({
   tone = 'auto',
   markOnly = false,
@@ -50,7 +46,7 @@ export const Logo: React.FC<LogoProps> = ({
       {!markOnly ? (
         <span
           className={cn(
-            'text-lg font-semibold tracking-tight',
+            'logo-wordmark text-lg font-semibold tracking-tight',
             inverted ? 'text-white' : 'text-ink-900 dark:text-ink-dark-text'
           )}
         >
