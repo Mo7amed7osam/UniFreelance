@@ -41,10 +41,11 @@ function getInitials(name?: string) {
 }
 
 function getProfileCompletion(profile: any, verifiedSkillsCount: number): { pct: number; missing: string[] } {
+  const portfolioLinks = Array.isArray(profile?.portfolioLinks) ? profile.portfolioLinks.filter(Boolean) : [];
   const checks = [
-    { label: 'Bio added', done: !!profile?.bio },
+    { label: 'Bio added', done: !!profile?.description },
     { label: 'Skills verified', done: verifiedSkillsCount > 0 },
-    { label: 'Portfolio links', done: !!profile?.portfolioUrl },
+    { label: 'Portfolio links', done: portfolioLinks.length > 0 },
     { label: 'University set', done: !!profile?.university },
   ];
   const done = checks.filter((c) => c.done).length;
@@ -173,57 +174,17 @@ const StudentDashboard: React.FC = () => {
         />
       </motion.div>
 
-      {/* Middle row: profile completion + quick actions */}
+      {/* Middle row: quick actions + upcoming interviews */}
       <motion.div variants={staggerContainer} className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
         <motion.div variants={fadeUp}>
           <Card className="h-full">
-            <CardHeader className="mb-0">
-              <div className="flex items-center justify-between gap-4">
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp size={16} className="text-brand-500" />
-                  Profile completion
-                </CardTitle>
-                <span className="text-sm font-bold text-brand-600 dark:text-brand-400">{profileLoading ? '...' : `${completionPct}%`}</span>
-              </div>
-            </CardHeader>
-            <CardContent className="mt-3 space-y-4">
-              {profileLoading ? (
-                <Skeleton className="h-2 w-full rounded-full" />
-              ) : (
-                <Progress value={completionPct} />
-              )}
-              {!profileLoading && completionMissing.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-ink-400">Complete to unlock more visibility</p>
-                  <div className="flex flex-wrap gap-2">
-                    {completionMissing.map((item) => (
-                      <span key={item} className="inline-flex items-center gap-1.5 rounded-md border border-ink-200 bg-ink-50 px-2.5 py-1 text-xs font-medium text-ink-600 dark:border-ink-dark-border dark:bg-white/5 dark:text-ink-300">
-                        <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {!profileLoading && completionPct === 100 && (
-                <p className="flex items-center gap-2 text-sm font-medium text-accent-600 dark:text-accent-400">
-                  <Sparkles size={14} /> Profile complete — you're visible to all clients
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div variants={fadeUp}>
-          <div className="grid h-full gap-4">
-          <Card>
             <CardHeader className="mb-0">
               <CardTitle className="flex items-center gap-2">
                 <Briefcase size={16} className="text-brand-500" />
                 Quick actions
               </CardTitle>
             </CardHeader>
-            <CardContent className="mt-3 space-y-2">
+            <CardContent className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
               {[
                 { label: 'Browse job board', icon: <BookOpen size={14} />, path: '/student/jobs' },
                 { label: 'Verify a skill', icon: <Shield size={14} />, path: '/student/skill-verification' },
@@ -233,18 +194,21 @@ const StudentDashboard: React.FC = () => {
                 <button
                   key={action.path}
                   onClick={() => navigate(action.path)}
-                  className="group flex w-full items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-semibold text-ink-700 transition-colors hover:border-ink-200/70 hover:bg-white/70 hover:text-ink-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:text-ink-300 dark:hover:border-white/10 dark:hover:bg-white/5 dark:hover:text-white"
+                  className="group flex items-center gap-3 rounded-xl border border-ink-200/70 bg-ink-50/70 px-3 py-3 text-left text-sm font-semibold text-ink-700 transition-colors hover:border-brand-200 hover:bg-brand-50/70 hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-white/10 dark:bg-white/[0.045] dark:text-ink-300 dark:hover:border-brand-400/25 dark:hover:bg-brand-400/10 dark:hover:text-brand-200"
                 >
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ink-100 text-ink-500 transition-colors group-hover:bg-brand-50 group-hover:text-brand-600 dark:bg-white/10 dark:text-ink-400 dark:group-hover:bg-brand-900/30 dark:group-hover:text-brand-300">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-ink-500 shadow-soft transition-colors group-hover:text-brand-600 dark:bg-white/10 dark:text-ink-300 dark:group-hover:text-brand-200">
                     {action.icon}
                   </span>
-                  {action.label}
-                  <ArrowRight size={13} className="ml-auto text-ink-300 dark:text-ink-600" />
+                  <span className="min-w-0 flex-1">{action.label}</span>
+                  <ArrowRight size={13} className="shrink-0 text-ink-300 transition-transform group-hover:translate-x-0.5 group-hover:text-brand-500 dark:text-ink-600" />
                 </button>
               ))}
             </CardContent>
           </Card>
+        </motion.div>
 
+        <motion.div variants={fadeUp}>
+          <div className="grid h-full gap-4">
           <Card>
             <CardHeader className="mb-0">
               <CardTitle className="flex items-center gap-2">
@@ -394,6 +358,46 @@ const StudentDashboard: React.FC = () => {
                   </div>
                 </button>
               ))
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="mt-4">
+          <CardContent className="space-y-3 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-2">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100 dark:bg-brand-400/10 dark:text-brand-200 dark:ring-brand-400/20">
+                  <TrendingUp size={15} />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-ink-900 dark:text-white">Profile completion</p>
+                  <p className="text-xs text-ink-500 dark:text-ink-dark-muted">Improve client visibility</p>
+                </div>
+              </div>
+              <span className="text-sm font-bold text-brand-600 dark:text-brand-300">{profileLoading ? '...' : `${completionPct}%`}</span>
+            </div>
+
+            {profileLoading ? <Skeleton className="h-2 w-full rounded-full" /> : <Progress value={completionPct} />}
+
+            {!profileLoading && completionMissing.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5">
+                {completionMissing.slice(0, 3).map((item) => (
+                  <span key={item} className="inline-flex items-center gap-1.5 rounded-lg border border-ink-200 bg-ink-50 px-2 py-1 text-[11px] font-medium text-ink-600 dark:border-white/10 dark:bg-white/[0.055] dark:text-ink-300">
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                    {item}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+
+            {!profileLoading && completionPct === 100 ? (
+              <p className="flex items-center gap-2 text-xs font-semibold text-accent-600 dark:text-accent-300">
+                <Sparkles size={13} /> Complete profile
+              </p>
+            ) : (
+              <Button variant="ghost" size="sm" className="h-8 w-full justify-between px-2" onClick={() => navigate('/student/profile')}>
+                Finish profile <ArrowRight size={13} />
+              </Button>
             )}
           </CardContent>
         </Card>
