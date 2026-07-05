@@ -110,7 +110,7 @@ export const TopNav = () => {
                   cn(
                     'relative isolate rounded-full px-[15px] py-2 text-[13.5px] font-medium leading-none no-underline transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500',
                     isActive
-                      ? 'text-ink-900 dark:text-white'
+                      ? 'font-semibold text-ink-900 dark:text-white'
                       : 'text-ink-500 hover:text-ink-900 dark:text-ink-dark-muted dark:hover:text-white'
                   )
                 }
@@ -120,7 +120,7 @@ export const TopNav = () => {
                     {isActive ? (
                       <motion.span
                         layoutId="topnav-active"
-                        className="absolute inset-0 -z-10 rounded-full bg-white shadow-[0_1px_2px_rgba(16,16,20,0.1),0_4px_14px_-6px_rgba(99,102,241,0.45)] dark:bg-white/[0.13]"
+                        className="absolute inset-0 -z-10 rounded-full bg-white shadow-[0_0_0_1px_rgba(99,102,241,0.16),0_3px_10px_-4px_rgba(16,16,20,0.22),0_14px_34px_-16px_rgba(79,70,229,0.72)] dark:bg-white/[0.14] dark:shadow-[0_0_0_1px_rgba(129,140,248,0.24),0_3px_10px_-4px_rgba(0,0,0,0.75),0_14px_34px_-16px_rgba(129,140,248,0.72)]"
                         transition={{ type: 'spring', stiffness: 420, damping: 34 }}
                       />
                     ) : (
