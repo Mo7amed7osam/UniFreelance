@@ -4,11 +4,11 @@
     { "handle": "filesystem" },
     {
       "src": "/api/(.*)",
-      "dest": "http://gradproject-back-1776705847.francecentral.azurecontainer.io:5000/api/$1"
+      "dest": "http://c131ifc431ps8bw4r46iqi7d.152.239.115.207.sslip.io/api/$1"
     },
     {
       "src": "/uploads/(.*)",
-      "dest": "http://gradproject-back-1776705847.francecentral.azurecontainer.io:5000/uploads/$1"
+      "dest": "http://c131ifc431ps8bw4r46iqi7d.152.239.115.207.sslip.io/uploads/$1"
     },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
