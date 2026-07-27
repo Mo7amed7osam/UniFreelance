@@ -45,7 +45,7 @@ export const CameraRecorder: React.FC<CameraRecorderProps> = ({
           </div>
         </div>
 
-        <p className="text-xs leading-5 text-white/68">{statusText || 'Camera stays live during the interview.'}</p>
+        <p className="text-xs leading-5 text-white/70">{statusText || 'Camera stays live during the interview.'}</p>
         {error ? <p className="rounded-2xl border border-rose-300/15 bg-rose-500/10 px-2.5 py-2 text-[11px] text-rose-200">{error}</p> : null}
       </div>
     </div>

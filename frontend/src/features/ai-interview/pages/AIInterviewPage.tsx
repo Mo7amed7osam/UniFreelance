@@ -28,7 +28,7 @@ const SHOW_MIC_DEBUG = false; // Hide mic debug during live interview
 const formatDuration = (totalSeconds: number) => {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
-  return `${minutes}:${String(seconds).padStart(2, '0')}`;
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 
 const getErrorMessage = (error: unknown, fallback: string) => {
@@ -59,6 +59,7 @@ const AIInterviewPage: React.FC = () => {
   const [retryPayload, setRetryPayload] = useState<{ questionId: string; files: RecordedCapture } | null>(null);
   const [isCompactViewport, setIsCompactViewport] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [sessionSeconds, setSessionSeconds] = useState(0);
 
   const {
     cameraReady,
@@ -110,6 +111,7 @@ const AIInterviewPage: React.FC = () => {
   const isStoppingRecordingRef = useRef(false);
   const isUploadingRef = useRef(false);
   const recordingQuestionRef = useRef<string | null>(null);
+  const sessionStartedAtRef = useRef<number | null>(null);
 
   const answerMutation = useMutation({
     mutationFn: async (payload: { questionId: string; files: RecordedCapture }) => {
@@ -236,6 +238,8 @@ const AIInterviewPage: React.FC = () => {
   const handleEnterInterview = useCallback(() => {
     if (!canEnterInterview) return;
     resetQuestionFlow();
+    sessionStartedAtRef.current = Date.now();
+    setSessionSeconds(0);
     setStage('call');
   }, [canEnterInterview, resetQuestionFlow]);
 
@@ -243,6 +247,8 @@ const AIInterviewPage: React.FC = () => {
     cancelQuestionSpeech();
     resetQuestionFlow();
     hasAutoSpokenRef.current = null;
+    sessionStartedAtRef.current = null;
+    setSessionSeconds(0);
     setCallPhase('idle');
     setStage('setup');
   }, [cancelQuestionSpeech, resetQuestionFlow]);
@@ -333,21 +339,12 @@ const AIInterviewPage: React.FC = () => {
   }, [cameraReady, error, isRecording, micReady, screenReady, stage]);
 
   const statusText = useMemo(() => {
-    if (callPhase === 'processingAnswer') return 'Processing...';
+    if (callPhase === 'processingAnswer') return 'Submitting and evaluating your answer...';
     if (callPhase === 'speakingQuestion') return 'Gravis is speaking...';
     if (callPhase === 'recordingAnswer') return 'Recording your answer...';
     return 'Press record when you are ready.';
   }, [callPhase]);
 
-const aiProcessingSteps = useMemo(() => {
-    if (callPhase !== 'processingAnswer') return null;
-    return [
-      'Analyzing your answer...',
-      'Evaluating technical knowledge...',
-      'Assessing communication quality...',
-      'Generating AI feedback...',
-    ];
-  }, [callPhase]);
   const avatarStatus = useMemo(() => {
     if (callPhase === 'processingAnswer') return 'processing' as const;
     if (callPhase === 'speakingQuestion') return 'speaking' as const;
@@ -400,6 +397,28 @@ const aiProcessingSteps = useMemo(() => {
 
     return () => window.clearInterval(timer);
   }, [callPhase]);
+
+  // Keep the header timer tied to the live interview session, not to each recording.
+  useEffect(() => {
+    if (stage !== 'call') {
+      return undefined;
+    }
+
+    if (sessionStartedAtRef.current === null) {
+      sessionStartedAtRef.current = Date.now();
+    }
+
+    const updateSessionDuration = () => {
+      const startedAt = sessionStartedAtRef.current;
+      if (startedAt === null) return;
+      setSessionSeconds(Math.floor((Date.now() - startedAt) / 1000));
+    };
+
+    updateSessionDuration();
+    const timer = window.setInterval(updateSessionDuration, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [stage]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
@@ -548,7 +567,8 @@ const aiProcessingSteps = useMemo(() => {
 
           <div className="flex shrink-0 items-center gap-3">
             <span className="hidden rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 font-mono text-xs tabular-nums text-white/70 md:inline-flex">
-              {isRecordingPhase ? formatDuration(recordingSeconds) : '00:00'}
+              <span className="sr-only">Interview duration:</span>
+              {formatDuration(sessionSeconds)}
             </span>
             <Badge variant="brand" className="border-brand-300/20 bg-[#142742]/90 text-ink-50 md:hidden">
               {currentNumber} / {totalQuestions}
@@ -572,7 +592,7 @@ const aiProcessingSteps = useMemo(() => {
 
             <div
               key={nextQuestion.id}
-              className="animate-fade-up relative w-full max-w-4xl rounded-[2rem] border border-white/12 bg-white/[0.065] px-6 py-7 shadow-[0_34px_100px_rgba(3,7,18,0.58),0_1px_0_rgba(255,255,255,0.12)_inset] backdrop-blur-2xl md:px-9 md:py-9"
+              className="animate-fade-up relative w-full max-w-4xl rounded-[2rem] border border-white/15 bg-white/[0.065] px-6 py-7 shadow-[0_34px_100px_rgba(3,7,18,0.58),0_1px_0_rgba(255,255,255,0.12)_inset] backdrop-blur-2xl md:px-9 md:py-9"
             >
               <div className="mb-7 flex flex-wrap items-center justify-between gap-3">
                 <div className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.06] py-1.5 pl-2 pr-4">
@@ -586,7 +606,7 @@ const aiProcessingSteps = useMemo(() => {
                   </span>
                   <span className="text-xs font-medium text-white/80">Gravis · {aiStatusLabel}</span>
                 </div>
-                <span className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs font-medium text-white/64">
+                <span className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs font-medium text-white/70">
                   {session.skill}
                 </span>
               </div>
@@ -600,8 +620,8 @@ const aiProcessingSteps = useMemo(() => {
 
               <div className="mt-7 grid gap-3 text-left md:grid-cols-3">
                 {['Answer directly first', 'Use one concrete example', 'Keep it under two minutes'].map((tip) => (
-                  <div key={tip} className="rounded-2xl border border-white/10 bg-black/18 px-4 py-3">
-                    <p className="text-xs font-semibold text-white/78">{tip}</p>
+                  <div key={tip} className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                    <p className="text-xs font-semibold text-white/80">{tip}</p>
                   </div>
                 ))}
               </div>
@@ -619,11 +639,22 @@ const aiProcessingSteps = useMemo(() => {
                   </p>
                 ) : null}
                 {statusError ? <p className="text-sm text-rose-300">{statusError}</p> : null}
-                {aiProcessingSteps ? (
-                  <div className="mx-auto max-w-md space-y-1 pt-1">
-                    {aiProcessingSteps.map((step, i) => (
-                      <p key={i} className="animate-pulse rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-white/60">{step}</p>
-                    ))}
+                {callPhase === 'processingAnswer' ? (
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    className="mt-4 flex items-start gap-3 rounded-2xl border border-brand-300/25 bg-brand-500/10 px-4 py-3"
+                  >
+                    <span
+                      className="mt-0.5 h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-brand-200/35 border-t-brand-200"
+                      aria-hidden="true"
+                    />
+                    <div className="space-y-0.5">
+                      <p className="text-sm font-semibold leading-5 text-white">Your answer is being reviewed</p>
+                      <p className="text-xs leading-5 text-white/70">
+                        Keep this window open. The next question will appear automatically.
+                      </p>
+                    </div>
                   </div>
                 ) : null}
               </div>
@@ -631,7 +662,7 @@ const aiProcessingSteps = useMemo(() => {
               {canReplayQuestion ? (
                 <button
                   type="button"
-                  className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.05] px-4 py-2 text-xs font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+                  className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-4 py-2 text-xs font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
                   onClick={handleReplayQuestion}
                 >
                   <RotateCcw size={13} />
@@ -722,7 +753,7 @@ const aiProcessingSteps = useMemo(() => {
 
         {/* Bottom controls */}
         <footer className="relative z-20 shrink-0 border-t border-white/10 bg-white/[0.045] px-4 py-4 backdrop-blur-xl md:px-6">
-          <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-3 rounded-[1.5rem] border border-white/10 bg-black/24 px-4 py-3 shadow-[0_24px_70px_-44px_rgba(0,0,0,0.95)]">
+          <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-3 rounded-[1.5rem] border border-white/10 bg-black/25 px-4 py-3 shadow-[0_24px_70px_-44px_rgba(0,0,0,0.95)]">
             <div className="flex min-h-11 flex-wrap items-center justify-center gap-4">
               {isRecordingPhase ? (
                 <div className="flex items-center gap-3" aria-live="polite">
@@ -812,7 +843,7 @@ const aiProcessingSteps = useMemo(() => {
               />
             </div>
 
-            <div className="mt-3 space-y-1 text-xs text-white/84">
+            <div className="mt-3 space-y-1 text-xs text-white/85">
               <p>State: {micDebugState}</p>
               <p>Camera: {cameraReady ? 'ready' : 'offline'}</p>
               <p>Screen: {screenReady ? 'ready' : 'offline'}</p>

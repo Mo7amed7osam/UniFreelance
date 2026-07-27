@@ -19,7 +19,7 @@ export const InterviewProgress: React.FC<InterviewProgressProps> = ({
       <div
         className={[
           'flex items-center justify-between text-sm',
-          inverted ? 'text-white/78' : 'text-ink-600 dark:text-ink-300',
+          inverted ? 'text-white/80' : 'text-ink-600 dark:text-ink-300',
         ].join(' ')}
       >
         <span>
